@@ -26,7 +26,7 @@ const server = createServer(app);
  * Listen on provided port, on all network interfaces.
  */
 
-server.listen(port, () => console.log(`Server running on port ${port}`));
+server.listen(port, () => console.log(`Server running on port ${port}`.cyan.bold.underline));
 server.on('error', onError);
 server.on('listening', onListening);
 

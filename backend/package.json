@@ -1,5 +1,5 @@
 {
-  "name": "database-sample",
+  "name": "login-page",
   "version": "1.0.0",
   "type": "module",
   "engines": {
@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "colors": "^1.4.0",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "dotenv": "^16.0.1",

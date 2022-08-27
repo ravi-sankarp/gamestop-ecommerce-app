@@ -3,6 +3,7 @@ import express, { json, urlencoded } from 'express';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import { config } from 'dotenv';
+import colors from 'colors';
 
 //setting routes
 import indexRouter from './routes/index.js';
@@ -29,12 +30,12 @@ app.use((req, res, next) => {
 // error handler
 app.use((err, req, res, next) => {
   // Sending error message
-  res.status(err.status || 500);
+  res.status(res.statusCode || err.status || 500);
+  console.error(colors.red(`\n \n URL:${req.url}\n Message:${err.message}`) +colors.yellow(`\n Stack:${err.stack} \n \n`));
   res.json({
-    message: 'Something went wrong',
+    message: err.message,
     details: {
-      errorMessage: err.message,
-      fullDetails: req.app.get('env') === 'development' ? err : {}
+      stack: req.app.get('env') === 'development' ? err.stack : {}
     }
   });
 });
