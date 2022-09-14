@@ -1,13 +1,12 @@
 import express from 'express';
+import userAuth from '../contollers/userAuthController.js';
 
 const router = express.Router();
 
+//User login route
+router.post('/login', userAuth.userLogin);
 
-
-/* GET home page. */
-router.get('/', (_req, res)=> {
-  res.status(200).json({success:'success'});
-});
+//Register New User Route
+router.post('/register', userAuth.registerUser);
 
 export default router;
- 

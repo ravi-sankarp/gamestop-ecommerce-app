@@ -11,25 +11,20 @@ import xss from 'xss-clean';
 import colors from 'colors';
 
 //importing mongoconnect function
-import db from './config/db.js';
+import {initDb} from './config/db.js';
 
 //importing error handling middleware
 import errorHandler from './middlewares/errorHandler.js';
 import AppError from './utils/appError.js';
 
 //importing routes
-import indexRouter from './routes/index.js';
+import userRouter from './routes/index.js';
 import adminRouter from './routes/admin.js';
 
 //linking config file
 config({ path: './config.env' });
 
 const app = express();
-app.enable('trust proxy');
-
-app.use(json());
-app.use(urlencoded({ extended: true }));
-app.use(cookieParser());
 
 // Implement CORS
 app.use(
@@ -38,21 +33,27 @@ app.use(
   })
 );
 
+// Limit requests from same API
+const limiter = rateLimit({
+  max: 100,
+  windowMs: 60 * 60 * 1000,
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  message: 'Too many requests from this IP, please try again in an hour!'
+});
+app.use('/api', limiter);
+
 // Set security HTTP headers
 app.use(helmet());
+
+app.use(json());
+app.use(urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // Development logging
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
-
-// Limit requests from same API
-const limiter = rateLimit({
-  max: 100,
-  windowMs: 60 * 60 * 1000,
-  message: 'Too many requests from this IP, please try again in an hour!'
-});
-app.use('/api', limiter);
 
 // Data sanitization against NoSQL query injection
 app.use(mongoSanitize());
@@ -60,9 +61,8 @@ app.use(mongoSanitize());
 // Data sanitization against XSS
 app.use(xss());
 
-
 //connecting to database
-db.initDb((err, _db) => {
+initDb((err, _db) => {
   if (err) {
     console.log(err);
   } else {
@@ -70,8 +70,8 @@ db.initDb((err, _db) => {
   }
 });
 
-app.use('/', indexRouter);
-app.use('/admin', adminRouter);
+app.use('/api/user', userRouter);
+app.use('/api/admin', adminRouter);
 
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));

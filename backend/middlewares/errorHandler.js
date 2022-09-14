@@ -1,6 +1,6 @@
 import AppError from '../utils/appError.js';
 
-const handleCastErrorDB = err => {
+const handleCastErrorDB = (err) => {
   const message = `Invalid ${err.path}: ${err.value}.`;
   return new AppError(message, 400);
 };
@@ -14,8 +14,7 @@ const sendErrorDev = (err, req, res) => {
   // A) API
   if (req.originalUrl.startsWith('/')) {
     return res.status(err.statusCode).json({
-      status: err.status,
-      error: err,
+      ...err,
       message: err.message,
       stack: err.stack
     });
