@@ -28,13 +28,13 @@ const adminLogin = asyncHandler(async (req, res) => {
   }
   //checking whether password matches
   else if (await bcrypt.compare(password, user.password)) {
-
     //check if user is an admin
     if (!user.isAdmin) {
       throw new AppError('You do not have permission to access this route', 403);
     }
     const data = {
       status: 'success',
+      message: 'Login Successfull',
       token: generateToken(user._id),
       admin: true
     };

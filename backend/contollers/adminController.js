@@ -75,10 +75,11 @@ const editUser = asyncHandler(async (req, res) => {
 });
 
 //@desc   block/unblock a user
-//@route  GET /api/admin/changeuserstatus/:id
+//@route  PUT /api/admin/changeuserstatus/:id
 //@access private
 const changeUserStatus = asyncHandler(async (req, res) => {
-  const userId = ObjectId(req.params.id);
+  console.log(req.body);
+  const userId = ObjectId(req.body.id);
   const user = await getDb().collection('users').findOne({ _id: userId });
   if (!user) {
     throw new AppError('User does not exist', 400);
@@ -216,7 +217,25 @@ const deleteCategory = asyncHandler(async (req, res) => {
 //@route  GET /api/admin/getproducts
 //@access private
 const listProducts = asyncHandler(async (req, res) => {
-  const products = await getDb().collection('products').find().toArray();
+  const agg = [
+    {
+      $lookup: {
+        from: 'categories',
+        localField: 'categoryId',
+        foreignField: '_id',
+        as: 'category'
+      }
+    },
+    {
+      $lookup: {
+        from: 'brands',
+        localField: 'brandId',
+        foreignField: '_id',
+        as: 'brand'
+      }
+    }
+  ];
+  const products = await getDb().collection('products').aggregate(agg).toArray();
   const resData = {
     status: 'success',
     data: products
@@ -419,8 +438,8 @@ const addBrand = asyncHandler(async (req, res) => {
   }
 
   //checking if category name already exists
-  const category = await getDb().collection('brands').findOne({ name });
-  if (category) {
+  const brand = await getDb().collection('brands').findOne({ name });
+  if (brand) {
     throw new AppError('Brand name already exists', 400);
   }
   //uploading image to cloudinary
@@ -442,10 +461,10 @@ const addBrand = asyncHandler(async (req, res) => {
 //@access private
 const editBrand = asyncHandler(async (req, res) => {
   const id = ObjectId(req.params.id);
-  const categoryDetails = await getDb().collection('brands').findOne({ _id: id });
+  const brandDetails = await getDb().collection('brands').findOne({ _id: id });
 
   //checking if id is valid
-  if (!categoryDetails) {
+  if (!brandDetails) {
     throw new AppError('Invalid brand ID', 400);
   }
   let result;
@@ -461,9 +480,9 @@ const editBrand = asyncHandler(async (req, res) => {
     };
   }
   const data = {
-    name: req.body.name || categoryDetails.name,
-    description: req.body.description || categoryDetails.description,
-    bannerImg: bannerImg || categoryDetails.bannerImg
+    name: req.body.name || brandDetails.name,
+    description: req.body.description || brandDetails.description,
+    bannerImg: bannerImg || brandDetails.bannerImg
   };
 
   //updating the data
@@ -491,6 +510,115 @@ const deleteBrand = asyncHandler(async (req, res) => {
   sendResponse(200, resData, res);
 });
 
+//@desc   get all banner data
+//@route  GET /api/admin/getbanner
+//@access private
+const listBanners = asyncHandler(async (req, res) => {
+  const banners = await getDb().collection('banners').find().toArray();
+  const resData = {
+    status: 'success',
+    data: banners
+  };
+  sendResponse(200, resData, res);
+});
+
+//@desc   add a new banner
+//@route  POST /api/admin/addbanner
+//@access private
+const addBanner = asyncHandler(async (req, res) => {
+  const { title, description, type, typeId } = req.body;
+  //checking if title and desciption exists
+  if (!title || !description || !req.file || !type || !typeId) {
+    throw new AppError('Please send all the required data', 400);
+  }
+
+  //uploading image to cloudinary
+  const result = await cloudinarySingleUpload(req, 'banner');
+  const bannerImg = {
+    public_id: result.public_id,
+    imgUrl: result.secure_url
+  };
+
+  //adding data to database
+  type.toLowerCase();
+  const id = ObjectId(typeId);
+  const typeName = `${type}`;
+  await getDb()
+    .collection('banners')
+    .insertOne({ title, description, type: typeName, id, bannerImg });
+  const resData = {
+    status: 'success',
+    message: 'Successfully added the banner'
+  };
+  sendResponse(201, resData, res);
+});
+
+//@desc   edit an exiting banner
+//@route  PUT /api/admin/editbanner/:id
+//@access private
+const editBanner = asyncHandler(async (req, res) => {
+  const id = ObjectId(req.params.id);
+  const bannerDetails = await getDb().collection('banners').findOne({ _id: id });
+
+  //checking if id is valid
+  if (!bannerDetails) {
+    throw new AppError('Invalid banner ID', 400);
+  }
+  let result;
+  let bannerImg;
+
+  //checking whether image file exists and uploading to cloudinary
+  if (req.file) {
+    result = await cloudinarySingleUpload(req, 'brand');
+    bannerImg = {
+      public_id: result.public_id,
+      imgUrl: result.secure_url
+    };
+  }
+
+  //setting banner type if it exists
+  let typeName;
+  if (req.body.type) {
+    typeName = req.body.type.toLowerCase();
+  }
+
+  //setting banner type id
+  let typeId;
+  if (req.body.typeId) {
+    typeId = ObjectId(req.body.typeId);
+  }
+  const data = {
+    title: req.body.title || bannerDetails.title,
+    description: req.body.description || bannerDetails.description,
+    type: typeName || bannerDetails.type,
+    id: typeId || bannerDetails.id,
+    bannerImg: bannerImg || bannerDetails.bannerImg
+  };
+
+  //updating the data
+  await getDb()
+    .collection('banners')
+    .updateOne({ _id: id }, { $set: { ...data } });
+  const resData = {
+    status: 'success',
+    message: 'Successfully updated the banner'
+  };
+  sendResponse(200, resData, res);
+});
+
+//@desc   delete an exiting banner
+//@route  GET /api/admin/deletebanner/:id
+//@access private
+const deleteBanner = asyncHandler(async (req, res) => {
+  const id = ObjectId(req.params.id);
+  await getDb().collection('banners').deleteOne({ _id: id });
+  const resData = {
+    status: 'success',
+    message: 'Successfully deleted the banner'
+  };
+  sendResponse(200, resData, res);
+});
+
 export default {
   listUsers,
   editUser,
@@ -506,5 +634,9 @@ export default {
   listBrands,
   addBrand,
   editBrand,
-  deleteBrand
+  deleteBrand,
+  listBanners,
+  addBanner,
+  editBanner,
+  deleteBanner
 };

@@ -11,7 +11,7 @@ import xss from 'xss-clean';
 import colors from 'colors';
 
 //importing mongoconnect function
-import {initDb} from './config/db.js';
+import { initDb } from './config/db.js';
 
 //importing error handling middleware
 import errorHandler from './middlewares/errorHandler.js';
@@ -41,8 +41,9 @@ const limiter = rateLimit({
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
   message: 'Too many requests from this IP, please try again in an hour!'
 });
-app.use('/api', limiter);
-
+if (process.env.NODE_ENV === 'production') {
+  app.use('/api', limiter);
+}
 // Set security HTTP headers
 app.use(helmet());
 

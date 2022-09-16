@@ -1,0 +1,14 @@
+body {
+    padding: 0;
+    margin: 0;
+    overflow-x: hidden !important;
+}
+
+.text-link {
+    color: inherit;
+    text-decoration: inherit;
+}
+
+abbr {
+    transition: all 10ms ease-in ;
+}

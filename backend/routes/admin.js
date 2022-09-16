@@ -15,8 +15,8 @@ router.get('/getusers', protect, checkAdmin, adminController.listUsers);
 //PUT Edit User Route
 router.put('/edituser/:id', protect, checkAdmin, adminController.editUser);
 
-//GET Block User Route
-router.get('/changeuserstatus/:id', protect, checkAdmin, adminController.changeUserStatus);
+//PUT Block User Route
+router.put('/changeuserstatus', protect, checkAdmin, adminController.changeUserStatus);
 
 //GET List All Categories Route
 router.get('/getcategories', protect, checkAdmin, adminController.listCategories);
@@ -83,5 +83,29 @@ router.put(
 
 //DELeTE Delete Brand Route
 router.delete('/deletebrand/:id', protect, checkAdmin, adminController.deleteBrand);
+
+//GET List All Banners Route
+router.get('/getbanners', protect, checkAdmin, adminController.listBanners);
+
+//POST Add Banners Route
+router.post(
+  '/addbanner',
+  protect,
+  checkAdmin,
+  upload.single('bannerImg'),
+  adminController.addBanner
+);
+
+//PUT Edit Banner Route
+router.put(
+  '/editbanner/:id',
+  protect,
+  checkAdmin,
+  upload.single('bannerImg'),
+  adminController.editBanner
+);
+
+//DELeTE Delete Banner Route
+router.delete('/deletebanner/:id', protect, checkAdmin, adminController.deleteBanner);
 
 export default router;
