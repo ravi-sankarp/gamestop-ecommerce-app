@@ -5,16 +5,16 @@ export const PrimaryButton = styled(Button)({
   textTransform: 'none',
   fontSize: 16,
   margin: '20px',
-  borderRadius: '0',
   padding: '6px 12px',
   lineHeight: 1.5,
-
+  borderRadius: '3px',
   backgroundColor: '#000',
   color: '#fff',
   zIndex: 1,
   '&:hover': {
     backgroundColor: '#000',
     color: '#000',
+    borderRadius: '0',
     boxShadow: ' 0px 0px 0px 1px rgba(0,0,0,0.75)',
     transition: 'all 300ms ease-in-out'
   },
@@ -46,7 +46,7 @@ export const SecondaryButton = styled(Button)({
   textTransform: 'none',
   fontSize: 16,
   margin: '20px',
-  borderRadius: '0',
+  borderRadius: '2px',
   padding: '6px 12px',
   lineHeight: 1.5,
   boxShadow: ' 0px 0px 0px 1px rgba(0,0,0,0.75)',
@@ -56,6 +56,7 @@ export const SecondaryButton = styled(Button)({
   '&:hover': {
     backgroundColor: '#000',
     color: '#fff',
+    borderRadius: '0',
     transition: 'all 300ms ease-in-out'
   },
   '&:active': {

@@ -68,7 +68,6 @@ function Login({ handleAdminLogin, formError }) {
         <TextField
           sx={{ mb: 2 }}
           label="Email"
-          name="email"
           fullWidth
           required
           type="email"
@@ -81,7 +80,6 @@ function Login({ handleAdminLogin, formError }) {
           label="Password"
           fullWidth
           required
-          name="password"
           type="password"
           error={!!errors.password}
           helperText={errors.password ? errors.password.message : ''}

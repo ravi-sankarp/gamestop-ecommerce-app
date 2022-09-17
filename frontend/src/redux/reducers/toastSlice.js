@@ -10,7 +10,6 @@ const toastSlice = createSlice({
   initialState,
   reducers: {
     setToast(state, action) {
-      console.log(action);
       state.data = { open: action.payload.open, data: action.payload.data };
     },
     clearToast(state) {

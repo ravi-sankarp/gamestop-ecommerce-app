@@ -1,6 +1,6 @@
 import { Box, CircularProgress, Typography } from '@mui/material';
 import { useDispatch } from 'react-redux';
-import ProductTableList from '../../components/admin/Table/ProductTableList';
+import UserTableList from '../../components/admin/Table/UserTableList';
 import { useGetUserDataQuery } from '../../redux/api/adminApiSlice';
 import { setToast } from '../../redux/reducers/toastSlice';
 
@@ -40,7 +40,7 @@ function AdminUsersPage() {
         Users List
       </Typography>
       {content}
-      {isSuccess && <ProductTableList data={data.data} />}
+      {isSuccess && <UserTableList data={data.data} />}
     </Box>
   );
 }

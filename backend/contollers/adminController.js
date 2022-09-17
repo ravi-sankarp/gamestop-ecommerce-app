@@ -235,10 +235,17 @@ const listProducts = asyncHandler(async (req, res) => {
       }
     }
   ];
+  const categories = await getDb().collection('categories').find({}).project({ name: 1 }).toArray();
+  const brands = await getDb()
+    .collection('brands')
+    .find({}, { name: 1 })
+    .project({ name: 1 })
+    .toArray();
   const products = await getDb().collection('products').aggregate(agg).toArray();
+
   const resData = {
     status: 'success',
-    data: products
+    data: { products, categories, brands }
   };
   sendResponse(200, resData, res);
 });
@@ -295,7 +302,7 @@ const addProduct = asyncHandler(async (req, res) => {
   const dataToInsert = {
     name,
     price: Int32(price),
-    discountedPrice: price - price * discount * 0.01,
+    discountedPrice: Math.ceil(price - price * discount * 0.01),
     discount: Int32(discount),
     categoryId: ObjectId(categoryId),
     brandId: ObjectId(brandId),
@@ -307,6 +314,7 @@ const addProduct = asyncHandler(async (req, res) => {
     images,
     createdOn: Timestamp(Date.now())
   };
+
   await getDb().collection('products').insertOne(dataToInsert);
   const resData = {
     status: 'success',

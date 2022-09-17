@@ -19,7 +19,8 @@ function AdminRoutes() {
         display: 'flex',
         gap: 2,
         backgroundColor: '#dddddd5e',
-        minHeight: '100vh'
+        minHeight: '100vh',
+        overflowX: 'hidden'
       }}
     >
       <Sidebar />

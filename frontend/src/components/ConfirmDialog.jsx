@@ -9,11 +9,11 @@ import {
   DialogTitle
 } from '@mui/material';
 import { useDispatch } from 'react-redux';
-import { useChangeuserstatusMutation } from '../redux/api/adminApiSlice';
+import { useChangeUserStatusMutation } from '../redux/api/adminApiSlice';
 import { setToast } from '../redux/reducers/toastSlice';
 
 function ConfirmDialog({ open, setOpen, data }) {
-  const [changeuserstatus, { isLoading }] = useChangeuserstatusMutation();
+  const [changeuserstatus, { isLoading }] = useChangeUserStatusMutation();
   const dispatch = useDispatch();
   const handleClose = () => {
     setOpen(false);
