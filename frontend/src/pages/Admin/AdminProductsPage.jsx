@@ -13,7 +13,7 @@ import { useState } from 'react';
 import { setToast } from '../../redux/reducers/toastSlice';
 import ProductTableList from '../../components/admin/Table/ProductTableList';
 import { useGetProductDataQuery } from '../../redux/api/adminApiSlice';
-import ProductForm from '../../components/admin/Forms/ProductForm';
+import ProductForm from '../../components/admin/Forms/Product/ProductForm';
 
 function AdminProductsPage() {
   const [openPopup, setOpenPopup] = useState(false);
@@ -50,7 +50,7 @@ function AdminProductsPage() {
     setOpenPopup((current) => !current);
   };
   return (
-    <Box sx={{ overflowX: 'hidden', width: '80vw' }}>
+    <Box sx={{ overflowX: 'hidden' }}>
       <Typography variant="h5" sx={{ mb: '1rem', textAlign: 'center', fontWeight: '450' }}>
         Products List
       </Typography>
@@ -60,7 +60,11 @@ function AdminProductsPage() {
           <Button onClick={handlePopupView} sx={{ mt: 5 }} variant="contained" color="success">
             Add Product
           </Button>
-          <ProductTableList data={data.data.products} />
+          <ProductTableList
+            data={data.data.products}
+            categories={data.data.categories}
+            brands={data.data.brands}
+          />
           <Dialog sx={{ height: '100vh' }} onClose={handlePopupView} open={openPopup} maxWidth="md">
             <DialogTitle>
               <div style={{ display: 'flex' }}>

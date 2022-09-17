@@ -7,9 +7,9 @@ import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { useDispatch } from 'react-redux';
 import { Alert, Grid, Box, TextField, Slider, Typography, MenuItem } from '@mui/material';
-import { PrimaryButton } from '../../../MaterialUiConfig/styled';
-import { useAddNewProductMutation } from '../../../redux/api/adminApiSlice';
-import { setToast } from '../../../redux/reducers/toastSlice';
+import { PrimaryButton } from '../../../../MaterialUiConfig/styled';
+import { useAddNewProductMutation } from '../../../../redux/api/adminApiSlice';
+import { setToast } from '../../../../redux/reducers/toastSlice';
 
 function ProductForm({ categories, brands, close }) {
   const [formError, setFormError] = useState('');
@@ -31,6 +31,8 @@ function ProductForm({ categories, brands, close }) {
       .typeError('Discount must be a number')
       .max(100),
     details: yup.string().required('Please provide Product details ').min(10),
+    categoryId: yup.string().required('Please select a Category '),
+    brandId: yup.string().required('Please select a Brand '),
     keyFeatures: yup.string().required('Please provide Key features of the product').min(10),
     description: yup.string().required('Please Provide description of the product').min(10),
     stock: yup.number().required().typeError('Stock must be a number'),
@@ -98,12 +100,11 @@ function ProductForm({ categories, brands, close }) {
         <Grid item xs={6}>
           <TextField
             sx={{ mb: 2 }}
-            label="Brand Name"
+            label="Select Brand Name"
             name="brandId"
             select
             fullWidth
             required
-            value={brands[0]._id.toString()}
             type="text"
             error={!!errors.brandId}
             helperText={errors.brandId ? errors.brandId.message : ''}
@@ -119,11 +120,11 @@ function ProductForm({ categories, brands, close }) {
         <Grid item xs={6}>
           <TextField
             sx={{ mb: 2 }}
-            label="Category"
+            label="Select Category"
             select
             fullWidth
             required
-            value={categories[0]._id.toString()}
+            de
             name="categoryId"
             type="text"
             error={!!errors.categoryId}
@@ -131,7 +132,7 @@ function ProductForm({ categories, brands, close }) {
             {...register('categoryId')}
           >
             {categories.map((category) => (
-              <MenuItem key={category.name} value={category._id.toString()}>
+              <MenuItem selected key={category.name} value={category._id.toString()}>
                 {category.name}
               </MenuItem>
             ))}

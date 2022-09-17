@@ -21,6 +21,7 @@ export const extendedAdminApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ['userdata']
     }),
+
     getProductData: builder.query({
       query: () => '/admin/getproducts',
       providesTags: ['productdata']
@@ -34,12 +35,82 @@ export const extendedAdminApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ['productdata']
     }),
+    editProduct: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/admin/editproduct/${id}`,
+        method: 'PUT',
+        body: data
+      }),
+      invalidatesTags: ['productdata']
+    }),
     deleteProduct: builder.mutation({
       query: ({ id }) => ({
         url: `/admin/deleteproduct/${id}`,
         method: 'DELETE'
       }),
       invalidatesTags: ['productdata']
+    }),
+
+    getCategoryData: builder.query({
+      query: () => '/admin/getcategories',
+      providesTags: ['categorydata']
+    }),
+
+    addNewCategory: builder.mutation({
+      query: (data) => ({
+        url: '/admin/addcategory',
+        method: 'POST',
+        body: data
+      }),
+      invalidatesTags: ['categorydata']
+    }),
+
+    editCategory: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/admin/editcategory/${id}`,
+        method: 'PUT',
+        body: data
+      }),
+      invalidatesTags: ['categorydata']
+    }),
+
+    deleteCategory: builder.mutation({
+      query: ({ id }) => ({
+        url: `/admin/deletecategory/${id}`,
+        method: 'DELETE'
+      }),
+      invalidatesTags: ['categorydata']
+    }),
+
+    getBrandData: builder.query({
+      query: () => '/admin/getbrands',
+      providesTags: ['branddata']
+    }),
+
+    addNewBrand: builder.mutation({
+      query: (data) => ({
+        url: '/admin/addbrand',
+        method: 'POST',
+        body: data
+      }),
+      invalidatesTags: ['branddata']
+    }),
+
+    editBrand: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/admin/editbrand/${id}`,
+        method: 'PUT',
+        body: data
+      }),
+      invalidatesTags: ['branddata']
+    }),
+
+    deleteBrand: builder.mutation({
+      query: ({ id }) => ({
+        url: `/admin/deletebrand/${id}`,
+        method: 'DELETE'
+      }),
+      invalidatesTags: ['branddata']
     })
   })
 });
@@ -50,5 +121,14 @@ export const {
   useChangeUserStatusMutation,
   useGetProductDataQuery,
   useAddNewProductMutation,
-  useDeleteProductMutation
+  useDeleteProductMutation,
+  useEditProductMutation,
+  useGetCategoryDataQuery,
+  useAddNewCategoryMutation,
+  useEditCategoryMutation,
+  useDeleteCategoryMutation,
+  useGetBrandDataQuery,
+  useAddNewBrandMutation,
+  useEditBrandMutation,
+  useDeleteBrandMutation
 } = extendedAdminApiSlice;

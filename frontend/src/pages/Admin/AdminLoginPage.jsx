@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Navigate, useNavigate } from 'react-router-dom';
-import Login from '../../components/Login/Login';
+import Login from '../../components/admin/Login/Login';
 import { useAdminLoginMutation } from '../../redux/api/adminApiSlice';
 import { setToken } from '../../redux/reducers/authSlice';
 import { setToast } from '../../redux/reducers/toastSlice';

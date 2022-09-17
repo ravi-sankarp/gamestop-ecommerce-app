@@ -14,7 +14,7 @@ const apiSlice = createApi({
       return headers;
     }
   }),
-  tagTypes: ['user', 'productdata', 'admin', 'userdata'],
+  tagTypes: ['user', 'productdata', 'admin', 'userdata', 'categorydata', 'branddata'],
   endpoints: (builder) => ({})
 });
 

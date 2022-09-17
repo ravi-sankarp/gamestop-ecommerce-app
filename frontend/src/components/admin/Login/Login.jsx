@@ -4,7 +4,7 @@ import { Alert, Box, TextField, Typography } from '@mui/material';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
-import { PrimaryButton } from '../../MaterialUiConfig/styled';
+import { PrimaryButton } from '../../../MaterialUiConfig/styled';
 
 function Login({ handleAdminLogin, formError }) {
   const schema = yup.object().shape({

@@ -1,4 +1,5 @@
-import { Route, Routes } from 'react-router-dom';
+/* eslint-disable no-unused-vars */
+import { Route, Routes, useLocation } from 'react-router-dom';
 import { Box } from '@mui/material';
 import AdminOutlet from './AdminOutlet';
 import AdminBrandsPage from '../../pages/Admin/AdminBrandsPage';
@@ -13,6 +14,8 @@ import AdminPaymentsPage from '../../pages/Admin/AdminPaymentsPage';
 import Sidebar from '../../components/admin/Sidebar/Sidebar';
 
 function AdminRoutes() {
+  const location = useLocation();
+  const show = location.pathname.startsWith('/admin');
   return (
     <Box
       sx={{
@@ -25,9 +28,7 @@ function AdminRoutes() {
     >
       <Sidebar />
       <Routes>
-        <Route path="/admin">
-          <Route path="login" element={<AdminLoginPage />} />
-        </Route>
+        <Route path="/admin/login" element={<AdminLoginPage />} />
       </Routes>
       <Box
         sx={{

@@ -135,13 +135,16 @@ const listCategories = asyncHandler(async (req, res) => {
 //@access private
 const addCategory = asyncHandler(async (req, res) => {
   const { name, description } = req.body;
+  name.trim();
   //checking if name and desciption exists
   if (!name || !description || !req.file) {
     throw new AppError('Please send all the required data', 400);
   }
 
   //checking if category name already exists
-  const category = await getDb().collection('categories').findOne({ name });
+  const category = await getDb()
+    .collection('categories')
+    .findOne({ name: { $regex: `^${req.body.name.trim().toLowerCase()}$`, $options: 'i' } });
   if (category) {
     throw new AppError('Category name already exists', 400);
   }
@@ -172,6 +175,19 @@ const editCategory = asyncHandler(async (req, res) => {
   }
   let result;
   let bannerImg;
+
+  //checking if category name already exists
+  if (req.body.name) {
+    const category = await getDb()
+      .collection('categories')
+      .findOne({
+        _id: { $ne: id },
+        name: { $regex: `^${req.body.name.trim().toLowerCase()}$`, $options: 'i' }
+      });
+    if (category) {
+      throw new AppError('Category name already exists', 400);
+    }
+  }
 
   //checking whether image file exists
   if (req.file) {
@@ -367,7 +383,7 @@ const editProduct = asyncHandler(async (req, res) => {
   const dataToInsert = {
     name,
     price: Int32(price),
-    discountedPrice: price - price * discount * 0.01,
+    discountedPrice: Math.ceil(price - price * discount * 0.01),
     discount: Int32(discount),
     categoryId: ObjectId(categoryId),
     brandId: ObjectId(brandId),

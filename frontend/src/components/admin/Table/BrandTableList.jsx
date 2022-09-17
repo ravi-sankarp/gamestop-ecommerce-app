@@ -8,6 +8,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import {
+  Box,
   Button,
   Dialog,
   DialogActions,
@@ -22,18 +23,18 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import { useDispatch } from 'react-redux';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
-import { useDeleteProductMutation } from '../../../redux/api/adminApiSlice';
+import { useDeleteBrandMutation } from '../../../redux/api/adminApiSlice';
 import { setToast } from '../../../redux/reducers/toastSlice';
 
-import ProductEditForm from '../Forms/Product/ProductEditForm';
+import BrandEditForm from '../Forms/Brand/BrandEditForm';
 
-export default function UserTableList({ data, categories, brands }) {
+export default function CategoryTableList({ data }) {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [productData, setProductData] = useState({});
+  const [brandData, setBrandData] = useState({});
   const [operation, setOperation] = useState('');
-  const [sendDeleteProduct, { isLoading }] = useDeleteProductMutation();
+  const [sendDeleteBrand, { isLoading }] = useDeleteBrandMutation();
   const dispatch = useDispatch();
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -50,19 +51,17 @@ export default function UserTableList({ data, categories, brands }) {
   };
 
   // open delete confirm dialog
-  const handleAction = (selectedProduct, currentOperation) => {
-    setProductData(selectedProduct);
+  const handleAction = (currentBrand, currentOperation) => {
+    setBrandData(currentBrand);
     setOperation(currentOperation);
     handleAlertShow();
   };
 
   // confirm delete
-  const handleConfirmProductDelete = async () => {
+  const handleConfirmCategoryDelete = async () => {
     try {
       if (!isLoading) {
-        console.log('inside');
-        const res = await sendDeleteProduct({ id: productData._id }).unwrap();
-        console.log(res);
+        const res = await sendDeleteBrand({ id: brandData._id }).unwrap();
         handleAlertShow();
         dispatch(setToast({ data: res, open: true }));
       }
@@ -79,55 +78,39 @@ export default function UserTableList({ data, categories, brands }) {
             <TableHead sx={{ backgroundColor: '#2987de7a' }}>
               <TableRow>
                 <TableCell align="center">Name</TableCell>
-                <TableCell align="center">Brand</TableCell>
-                <TableCell align="center">Category</TableCell>
-                <TableCell align="center">Orginal Price</TableCell>
-                <TableCell align="center">Discounted Price</TableCell>
-                <TableCell align="center">Stock</TableCell>
-                <TableCell align="center">Rating</TableCell>
+                <TableCell align="center">Description</TableCell>
+                <TableCell align="center">Total Products</TableCell>
                 <TableCell align="center">Action</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((product) => (
+              {data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((brand) => (
                 <TableRow
-                  key={product.name}
+                  key={brand.name}
                   sx={{
                     '&:last-child td, &:last-child th': { border: 0 },
                     '&:nth-of-type(even) ': { backgroundColor: ' #3774ad2e' }
                   }}
                 >
                   <TableCell data-label="Name" align="center">
-                    {product.name}
+                    {brand.name}
                   </TableCell>
-                  <TableCell data-label="Brand" align="center">
-                    {product.brand[0].name}
+                  <TableCell data-label="Description" align="center">
+                    {brand.description}
                   </TableCell>
-                  <TableCell data-label="Category" align="center">
-                    {product.category[0].name}
-                  </TableCell>
-                  <TableCell data-label="Original Price" align="center">
-                    {product.price}
-                  </TableCell>
-                  <TableCell data-label="Discounted Price" align="center">
-                    {product.discountedPrice}
-                  </TableCell>
-                  <TableCell data-label="Stock" align="center">
-                    {product.stock}
-                  </TableCell>
-                  <TableCell data-label="Rating" align="center">
-                    {product.rating}
+                  <TableCell data-label="Total Products" align="center">
+                    {brand.totalProducts}
                   </TableCell>
                   <TableCell data-label="Action" align="center">
                     <IconButton
-                      onClick={() => handleAction(product, 'edit')}
+                      onClick={() => handleAction(brand, 'edit')}
                       aria-label="edit"
                       color="primary"
                     >
                       <EditOutlinedIcon />
                     </IconButton>
                     <IconButton
-                      onClick={() => handleAction(product, 'delete')}
+                      onClick={() => handleAction(brand, 'delete')}
                       aria-label="delete"
                       color="primary"
                     >
@@ -160,7 +143,25 @@ export default function UserTableList({ data, categories, brands }) {
             <DialogTitle id="alert-dialog-title">Confirm Delete </DialogTitle>
             <DialogContent>
               <DialogContentText id="alert-dialog-description">
-                Are you sure you want to delete the product {productData.name}
+                <p>
+                  Are you sure you want to delete the Brand{' '}
+                  <Box
+                    component="span"
+                    sx={{ color: '#000', fontWeight: '800', textTransform: 'uppercase' }}
+                  >
+                    {brandData.name}
+                  </Box>
+                </p>
+                <p>
+                  Deleting the Brand also deletes{' '}
+                  <Box
+                    component="span"
+                    sx={{ color: '#000', fontWeight: '800', textTransform: 'uppercase' }}
+                  >
+                    {brandData.totalProducts} Products
+                  </Box>{' '}
+                  along with it
+                </p>
               </DialogContentText>
             </DialogContent>
             <DialogActions>
@@ -177,7 +178,7 @@ export default function UserTableList({ data, categories, brands }) {
                   backgroundColor: '#fa5252',
                   '&:hover': { backgroundColor: '#e03131' }
                 }}
-                onClick={handleConfirmProductDelete}
+                onClick={handleConfirmCategoryDelete}
                 autoFocus
               >
                 Yes
@@ -189,7 +190,7 @@ export default function UserTableList({ data, categories, brands }) {
             <DialogTitle>
               <div style={{ display: 'flex' }}>
                 <Typography variant="h6" component="div" style={{ flexGrow: 1 }}>
-                  Edit Product
+                  Edit Brand
                 </Typography>
                 <Button color="primary" variant="outlined" onClick={handleAlertShow}>
                   <CloseOutlinedIcon />
@@ -197,12 +198,7 @@ export default function UserTableList({ data, categories, brands }) {
               </div>
             </DialogTitle>
             <DialogContent dividers>
-              <ProductEditForm
-                product={productData}
-                categories={categories}
-                brands={brands}
-                close={handleAlertShow}
-              />
+              <BrandEditForm brandData={brandData} close={handleAlertShow} />
             </DialogContent>
           </>
         )}
