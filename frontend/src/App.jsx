@@ -1,6 +1,5 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
-// import { useSelector } from 'react-redux';
 import AdminRoutes from './routes/Admin/AdminRoutes';
 import UserRoutes from './routes/User/UserRoutes';
 import theme from './MaterialUiConfig/themes';
@@ -14,7 +13,7 @@ function App() {
       <ThemeProvider theme={theme}>
         <Routes>
           <Route path="/admin/*" element={<AdminRoutes />} />
-          <Route path="*" element={<UserRoutes />} />
+          <Route path="/*" element={<UserRoutes />} />
         </Routes>
         <DisplayMessage />
       </ThemeProvider>

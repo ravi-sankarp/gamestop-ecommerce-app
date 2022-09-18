@@ -59,8 +59,6 @@ function CategoryForm({ close }) {
         const res = await addNewCategory(form).unwrap();
         dispatch(setToast({ data: res, open: true }));
         close();
-
-        console.log(res);
       } catch (err) {
         setText('Add Category');
         setFormError(err.data.message);

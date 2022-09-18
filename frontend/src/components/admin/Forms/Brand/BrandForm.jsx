@@ -59,8 +59,6 @@ function BrandForm({ close }) {
         const res = await addNewBrand(form).unwrap();
         dispatch(setToast({ data: res, open: true }));
         close();
-
-        console.log(res);
       } catch (err) {
         setText('Add Brand');
         setFormError(err.data.message);

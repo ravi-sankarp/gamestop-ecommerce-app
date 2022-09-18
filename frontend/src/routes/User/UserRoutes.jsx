@@ -1,6 +1,6 @@
 import { Box } from '@mui/material';
 import { Route, Routes } from 'react-router-dom';
-// import UserNavbar from '../../components/user/UserNavbar';
+import UserNavbar from '../../components/user/UserNavbar';
 import AllProductsPage from '../../pages/User/AllProductsPage';
 import HomePage from '../../pages/User/HomePage';
 import ProductPage from '../../pages/User/ProductPage';
@@ -12,19 +12,18 @@ function UserRoutes() {
     <Box
       sx={{
         display: 'flex',
-        gap: 2,
-        backgroundColor: '#dddddd5e',
+        backgroundColor: '#fff',
         minHeight: '100vh',
         overflowX: 'hidden'
       }}
     >
-      {/* <UserNavbar /> */}
+      <UserNavbar />
 
       <Box
         sx={{
-          paddingTop: '10vh',
-          paddingRight: '1rem',
-          flexGrow: 1
+          paddingTop: '64px',
+          flexGrow: 1,
+          backgroundColor: '#fff'
         }}
       >
         <Routes>
@@ -32,7 +31,7 @@ function UserRoutes() {
             <Route index element={<HomePage />} />
             <Route path="login" element={<UserLoginPage />} />
             <Route path="register" element={<UserRegisterPage />} />
-            <Route path="allproducts" element={<AllProductsPage />} />
+            <Route path="products" element={<AllProductsPage />} />
             <Route path="product/:id" element={<ProductPage />} />
           </Route>
         </Routes>

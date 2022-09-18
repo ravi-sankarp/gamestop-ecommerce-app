@@ -69,8 +69,6 @@ function ProductForm({ categories, brands, close }) {
         const res = await addNewProduct(form).unwrap();
         dispatch(setToast({ data: res, open: true }));
         close();
-
-        console.log(res);
       } catch (err) {
         setText('Add Product');
         setFormError(err.data.message);

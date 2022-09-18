@@ -56,8 +56,6 @@ function CategoryEditForm({ categoryData, close }) {
         const res = await editCategory({ id: categoryData._id, data: form }).unwrap();
         dispatch(setToast({ data: res, open: true }));
         close();
-
-        console.log(res);
       } catch (err) {
         setText('Update Category');
         setFormError(err.data.message);

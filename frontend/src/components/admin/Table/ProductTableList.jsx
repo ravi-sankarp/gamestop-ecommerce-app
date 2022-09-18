@@ -60,9 +60,7 @@ export default function UserTableList({ data, categories, brands }) {
   const handleConfirmProductDelete = async () => {
     try {
       if (!isLoading) {
-        console.log('inside');
         const res = await sendDeleteProduct({ id: productData._id }).unwrap();
-        console.log(res);
         handleAlertShow();
         dispatch(setToast({ data: res, open: true }));
       }

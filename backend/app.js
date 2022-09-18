@@ -71,7 +71,7 @@ initDb((err, _db) => {
   }
 });
 
-app.use('/api/user', userRouter);
+app.use('/api/', userRouter);
 app.use('/api/admin', adminRouter);
 
 app.all('*', (req, res, next) => {

@@ -71,8 +71,6 @@ function ProductForm({ categories, brands, close, product }) {
         const res = await editProduct({ id: product._id, data: form }).unwrap();
         dispatch(setToast({ data: res, open: true }));
         close();
-
-        console.log(res);
       } catch (err) {
         setText('Update Product');
         setFormError(err.data.message);

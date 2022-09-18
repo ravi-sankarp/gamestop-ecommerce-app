@@ -38,7 +38,6 @@ const editUser = asyncHandler(async (req, res) => {
     phoneNumber: req.body.phoneNumber || userData.phoneNumber
   };
 
-  console.log({ updatedData });
   //checking if email is valid
   if (!validator.isEmail(updatedData.email)) {
     throw new AppError('Please enter a valid email address', 400);
@@ -78,7 +77,6 @@ const editUser = asyncHandler(async (req, res) => {
 //@route  PUT /api/admin/changeuserstatus/:id
 //@access private
 const changeUserStatus = asyncHandler(async (req, res) => {
-  console.log(req.body);
   const userId = ObjectId(req.body.id);
   const user = await getDb().collection('users').findOne({ _id: userId });
   if (!user) {

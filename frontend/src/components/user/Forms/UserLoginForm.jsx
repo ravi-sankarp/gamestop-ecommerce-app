@@ -1,16 +1,29 @@
 /* eslint-disable react/jsx-one-expression-per-line */
 /* eslint-disable react/jsx-props-no-spreading */
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { Alert, Box, TextField, Typography } from '@mui/material';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
+import { Link, useNavigate } from 'react-router-dom';
 import * as yup from 'yup';
-import { PrimaryButton } from '../../../MaterialUiConfig/styled';
+import { PrimaryButton, SecondaryButton } from '../../../MaterialUiConfig/styled';
+import { useUserLoginMutation } from '../../../redux/api/userApiSlice';
+import { setToken } from '../../../redux/reducers/authSlice';
+import { setToast } from '../../../redux/reducers/toastSlice';
 
-function Login({ handleAdminLogin, formError }) {
+function UserLoginForm({ setLoginMethod }) {
+  const [formError, setFormError] = useState('');
+  const [btnText, setBtnText] = useState('Login');
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [userLogin, { isLoading }] = useUserLoginMutation();
+
   const schema = yup.object().shape({
     email: yup.string().email('Enter a valid email address').required('Please enter you email '),
     password: yup.string().required('Please enter you password').min(3)
   });
+
   const {
     register,
     handleSubmit,
@@ -19,8 +32,27 @@ function Login({ handleAdminLogin, formError }) {
     resolver: yupResolver(schema),
     mode: 'onChange'
   });
-  const onSubmitHandler = (data) => {
-    handleAdminLogin(data);
+
+  const handleSelectLoginMethod = () => {
+    setLoginMethod('otp');
+  };
+
+  const onSubmitHandler = async (data) => {
+    if (!isLoading) {
+      try {
+        setBtnText('Loading...');
+        const res = await userLogin(data).unwrap();
+        if (res.status === 'success') {
+          dispatch(setToast({ data: res, open: true }));
+          setFormError('');
+          await dispatch(setToken(res));
+          navigate('/');
+        }
+      } catch (err) {
+        setBtnText('Login');
+        setFormError(err.data.message);
+      }
+    }
   };
 
   return (
@@ -28,12 +60,10 @@ function Login({ handleAdminLogin, formError }) {
       sx={{
         display: 'flex',
         minWidth: '100vw',
-        height: '100vh',
+        minHeight: '100vh',
         backgroundColor: '#1098ad',
         justifyContent: 'center',
-        alignItems: 'center',
-        flexShrink: 0,
-        flexGrow: 2
+        alignItems: 'center'
       }}
     >
       <Box
@@ -43,7 +73,9 @@ function Login({ handleAdminLogin, formError }) {
           p: 5,
           textAlign: 'center',
           backgroundColor: '#ffffff',
-          minHeight: '50vh'
+          minHeight: '50vh',
+          display: 'flex',
+          flexDirection: 'column'
         }}
         component="form"
         noValidate
@@ -85,12 +117,32 @@ function Login({ handleAdminLogin, formError }) {
           helperText={errors.password ? errors.password.message : ''}
           {...register('password')}
         />
-        <PrimaryButton sx={{ width: '200px', p: 1 }} type="submit">
-          Login
+        <PrimaryButton sx={{ width: '100%', p: 1, mx: 'auto' }} type="submit">
+          {btnText}
         </PrimaryButton>
+        <SecondaryButton
+          disabled={isLoading}
+          onClick={handleSelectLoginMethod}
+          sx={{ width: '100%', p: 1, mx: 'auto' }}
+          type="submit"
+        >
+          Login with OTP
+        </SecondaryButton>
+        <Typography sx={{ mt: 3, color: '#862e9c' }} variant="subtitle2">
+          New to GameStop ?
+        </Typography>
+        <Box
+          component={Link}
+          to="/register"
+          sx={isLoading ? { pointerEvents: 'none', color: '#101010' } : { color: '#101010' }}
+        >
+          <Typography variant="subtitle2" sx={{ m: 0 }}>
+            Create your account
+          </Typography>
+        </Box>
       </Box>
     </Box>
   );
 }
 
-export default Login;
+export default UserLoginForm;
