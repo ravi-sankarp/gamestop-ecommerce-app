@@ -1,12 +1,16 @@
 import validator from 'validator';
 import asyncHandler from 'express-async-handler';
-import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 
-import { getDb } from '../config/db.js';
 import AppError from '../utils/appError.js';
 import sendResponse from '../utils/sendResponse.js';
 import { sendOtp, verifyOtp } from '../utils/otpHelper.js';
+import {
+  generateRefreshToken,
+  generateToken,
+  generateTokenWithRefreshToken
+} from '../utils/jwtHelper.js';
+import { createNewUser, findUserByEmail, findUserByPhoneNumber } from '../helpers/userHelpers.js';
 
 //function for hashing user passords
 const hashPassword = async (pwd) => {
@@ -16,25 +20,20 @@ const hashPassword = async (pwd) => {
     return hashedPwd;
   } catch (err) {
     console.error(err);
+    throw new AppError('Something went wrong please try again', 500);
   }
 };
 
-//function for signing JWT Tokens
-const generateToken = (id) =>
-  jwt.sign({ id }, process.env.JWT_ACCESS_TOKEN, { expiresIn: process.env.JWT_EXPIRY });
-
-//@desc   handle user login
-//@route  POST /api/user/login
-//@access public
-const userLogin = asyncHandler(async (req, res) => {
+//function for verifying user login
+const verifyUserLogin = asyncHandler(async (req) => {
   //checking whether email and password is present
   const { email, password } = req.body;
 
   if (!email || !password) {
     throw new AppError('Please send all the data', 400);
   }
-  email.toLowerCase().trim();
-  const user = await getDb().collection('users').findOne({ email });
+  const user = await findUserByEmail(email.toLowerCase().trim());
+
   //if account does not exists
   if (!user) {
     throw new AppError('Account does not exist ! Please create a new account', 400);
@@ -45,20 +44,29 @@ const userLogin = asyncHandler(async (req, res) => {
     if (user.isBlocked) {
       throw new AppError('Your Account is currently blocked', 403);
     }
-    const data = {
-      status: 'success',
-      token: generateToken(user._id),
-      message: 'Login successfull',
-      admin: false
-    };
-    sendResponse(200, data, res);
+    return user;
   } else {
     throw new AppError('Invalid credentials', 400);
   }
 });
 
+//@desc   handle user login
+//@route  POST /api/auth/login
+//@access public
+const userLogin = asyncHandler(async (req, res) => {
+  const user = await verifyUserLogin(req);
+  const data = {
+    status: 'success',
+    token: generateToken(user._id),
+    refreshToken: generateRefreshToken(user._id),
+    message: 'Login successfull',
+    admin: user.isAdmin
+  };
+  sendResponse(200, data, res);
+});
+
 //@desc   handle User Registration
-//@route  POST /api/user/register
+//@route  POST /api/auth/register
 //@access public
 const registerUser = asyncHandler(async (req, res) => {
   const { email, password, confirmPassword, firstName, lastName, phoneNumber } = req.body;
@@ -80,21 +88,19 @@ const registerUser = asyncHandler(async (req, res) => {
   const modifiedEmail = email.toLowerCase().trim();
   const modifiedNumber = phoneNumber.trim();
   //checking if email already exists
-  const userCheckEmail = await getDb().collection('users').findOne({ email: modifiedEmail });
+  const userCheckEmail = await findUserByEmail(modifiedEmail);
   if (userCheckEmail) {
     throw new AppError('Email already exists', 409);
   }
 
   //checking if phone number already exists
-  const userCheckPhoneNumber = await getDb()
-    .collection('users')
-    .findOne({ phoneNumber: modifiedNumber });
+  const userCheckPhoneNumber = await findUserByPhoneNumber(modifiedNumber);
   if (userCheckPhoneNumber) {
     throw new AppError('Phone number already exists', 409);
   }
   email.toLowerCase().trim();
   const hashedPwd = await hashPassword(password);
-  const result = await getDb().collection('users').insertOne({
+  const result = await createNewUser({
     email: modifiedEmail,
     firstName,
     lastName,
@@ -106,18 +112,21 @@ const registerUser = asyncHandler(async (req, res) => {
   const data = {
     status: 'success',
     token: generateToken(result.insertedId),
-    message: 'Successfully created your account',
-    admin: false
+    refreshToken: generateRefreshToken(result.insertedId),
+    message: 'Successfully created your account'
   };
   sendResponse(201, data, res);
 });
 
 //@desc   request OTP for login
-//@route  GET /api/requestotp
+//@route  GET /api/auth/requestotp
 //@access public
 const requestOtp = asyncHandler(async (req, res) => {
   const { phoneNumber } = req.body;
-  const check = await getDb().collection('users').findOne({ phoneNumber });
+  if (!phoneNumber) {
+    throw new AppError('Please send all the necessary data', 400);
+  }
+  const check = await findUserByPhoneNumber(phoneNumber.trim());
   if (!check) {
     throw new AppError('You does not have an account! Please create an account first', 400);
   }
@@ -125,7 +134,7 @@ const requestOtp = asyncHandler(async (req, res) => {
 });
 
 //@desc   verify OTP for login
-//@route  GET /api/verifyotp
+//@route  GET /api/auth/verifyotp
 //@access public
 const verifyUserOtp = asyncHandler(async (req, res) => {
   const { phoneNumber, code } = req.body;
@@ -134,21 +143,64 @@ const verifyUserOtp = asyncHandler(async (req, res) => {
   }
   const result = await verifyOtp(phoneNumber, code);
   if (result.status === 'approved') {
-    const user = await getDb().collection('users').findOne({ phoneNumber });
+    const user = await findUserByPhoneNumber(phoneNumber.trim());
+
+    //checking if user is blocked or not
+    if (user.isBlocked) {
+      throw new AppError('Your Account is currently blocked', 403);
+    }
     const data = {
       status: 'success',
       message: 'Login Successful',
       token: generateToken(user._id),
-      admin: false
+      refreshToken: generateRefreshToken(user._id),
+      admin: user.isAdmin
     };
     sendResponse(200, data, res);
   } else {
     throw new AppError('Otp verification failed! Please try again', 400);
   }
 });
+
+//@desc   handle refresh token request
+//@route  GET /api/auth/refreshtoken
+//@access public
+const handleRefreshToken = asyncHandler(async (req, res) => {
+  const { token, refreshToken, isAdmin } = await generateTokenWithRefreshToken(req);
+  const data = {
+    status: 'success',
+    message: 'Generated Token',
+    token: token,
+    refreshToken: refreshToken,
+    admin: isAdmin
+  };
+  sendResponse(200, data, res);
+});
+
+//@desc   verify admin login
+//@route  GET /api/auth/adminlogin
+//@access public
+const adminLogin = asyncHandler(async (req, res) => {
+  const user = await verifyUserLogin(req);
+  if (user.isAdmin) {
+    const data = {
+      status: 'success',
+      token: generateToken(user._id),
+      refreshToken: generateRefreshToken(user._id),
+      message: 'Login successfull',
+      admin: user.isAdmin
+    };
+    sendResponse(200, data, res);
+  } else {
+    throw new AppError('Not Authorized to access this route', 403);
+  }
+});
+
 export default {
   userLogin,
   registerUser,
   requestOtp,
-  verifyUserOtp
+  verifyUserOtp,
+  handleRefreshToken,
+  adminLogin
 };

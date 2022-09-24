@@ -18,7 +18,9 @@ import errorHandler from './middlewares/errorHandler.js';
 import AppError from './utils/appError.js';
 
 //importing routes
-import userRouter from './routes/index.js';
+import indexRouter from './routes/index.js';
+import authRouter from './routes/auth.js';
+import userRouter from './routes/user.js';
 import adminRouter from './routes/admin.js';
 
 //linking config file
@@ -66,12 +68,15 @@ app.use(xss());
 initDb((err, _db) => {
   if (err) {
     console.log(err);
+    throw new AppError('Database not Initialized', 500);
   } else {
     console.log(`\n MongoDB Connection successful \n \n `.magenta);
   }
 });
 
-app.use('/api/', userRouter);
+app.use('/api', indexRouter);
+app.use('/api/auth', authRouter);
+app.use('/api/user', userRouter);
 app.use('/api/admin', adminRouter);
 
 app.all('*', (req, res, next) => {

@@ -3,7 +3,7 @@ import streamifier from 'streamifier';
 import cloudinary from '../config/cloudinary.js';
 
 // eslint-disable-next-line arrow-body-style
-export const cloudinarySingleUpload = asyncHandler((req, folderName) => {
+ const cloudinarySingleUpload = asyncHandler((req, folderName) => {
   return new Promise((resolve, reject) => {
     const cldUploadStream = cloudinary.uploader.upload_stream(
       {
@@ -21,4 +21,4 @@ export const cloudinarySingleUpload = asyncHandler((req, folderName) => {
   });
 });
 
-export const cloudinaryMultipleUpload = {};
+export default cloudinarySingleUpload;

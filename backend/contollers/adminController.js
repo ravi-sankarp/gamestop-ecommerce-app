@@ -1,16 +1,20 @@
 import asyncHandler from 'express-async-handler';
-import { ObjectId, Int32, Timestamp } from 'mongodb';
 import validator from 'validator';
-import { getDb } from '../config/db.js';
 import AppError from '../utils/appError.js';
 import sendResponse from '../utils/sendResponse.js';
-import { cloudinarySingleUpload } from '../utils/uploadToCloudinary.js';
+import * as userHelpers from '../helpers/userHelpers.js';
+import * as productHelpers from '../helpers/productHelpers.js';
+import * as categoryHelpers from '../helpers/categoryHelpers.js';
+import * as brandHelpers from '../helpers/brandHelpers.js';
+import * as bannerHelpers from '../helpers/bannerHelpers.js';
+import * as adminHelpers from '../helpers/adminHelpers.js';
+import cloudinarySingleUpload from '../utils/uploadToCloudinary.js';
 
 //@desc   get all user data
 //@route  GET /api/admin/getusers
 //@access private
 const listUsers = asyncHandler(async (req, res) => {
-  const users = await getDb().collection('users').find().project({ password: 0 }).toArray();
+  const users = await adminHelpers.findAllUsers();
   const resData = {
     status: 'success',
     data: users
@@ -22,9 +26,8 @@ const listUsers = asyncHandler(async (req, res) => {
 //@route  PUT /api/admin/edituser/:id
 //@access private
 const editUser = asyncHandler(async (req, res) => {
-  const userId = ObjectId(req.params.id);
-  const userData = await getDb().collection('users').findOne({ _id: userId });
-
+  const { id } = req.params;
+  const userData = await userHelpers.findUserById(id);
   //checking if id was valid
   if (!userData) {
     throw new AppError('Cannot find user! Invalid ID', 400);
@@ -34,8 +37,8 @@ const editUser = asyncHandler(async (req, res) => {
   const updatedData = {
     firstName: req.body.firstName || userData.firstName,
     lastName: req.body.lastName || userData.lastName,
-    email: req.body.email.toLowerCase().trim() || userData.email,
-    phoneNumber: req.body.phoneNumber || userData.phoneNumber
+    email: req.body.email?.toLowerCase().trim() || userData.email,
+    phoneNumber: req.body.phoneNumber?.trim() || userData.phoneNumber
   };
 
   //checking if email is valid
@@ -47,25 +50,20 @@ const editUser = asyncHandler(async (req, res) => {
   }
 
   //checking if email already exists
-  const userCheckEmail = await getDb()
-    .collection('users')
-    .findOne({ _id: { $ne: userId }, email: updatedData.email });
+  const userCheckEmail = await userHelpers.checkEmailAlreadyExists(id, updatedData.email);
   if (userCheckEmail) {
     throw new AppError('Email already exists', 409);
   }
 
   //checking if phone number already exists
-  const userCheckPhoneNumber = await getDb()
-    .collection('users')
-    .findOne({ _id: { $ne: userId }, phoneNumber: updatedData.phoneNumber });
+  const userCheckPhoneNumber = await userHelpers.checkPhoneNumberAlreadyExists(
+    id,
+    updatedData.phoneNumber
+  );
   if (userCheckPhoneNumber) {
     throw new AppError('Phone number already exists', 409);
   }
-
-  //updating data to database
-  await getDb()
-    .collection('users')
-    .updateOne({ _id: userId }, { $set: { ...updatedData } });
+  await userHelpers.updateUserById(id, updatedData);
   const resData = {
     status: 'success',
     message: 'successfully updated user data'
@@ -77,15 +75,13 @@ const editUser = asyncHandler(async (req, res) => {
 //@route  PUT /api/admin/changeuserstatus/:id
 //@access private
 const changeUserStatus = asyncHandler(async (req, res) => {
-  const userId = ObjectId(req.body.id);
-  const user = await getDb().collection('users').findOne({ _id: userId });
+  const { id } = req.body;
+  const user = await userHelpers.findUserById(id);
   if (!user) {
     throw new AppError('User does not exist', 400);
   }
   const changedStatus = !user.isBlocked;
-  await getDb()
-    .collection('users')
-    .updateOne({ _id: userId }, { $set: { isBlocked: changedStatus } });
+  await userHelpers.updateUserStatus(id, changedStatus);
   const resData = {
     status: 'success',
     message: `Successfully ${changedStatus === true ? 'blocked' : 'unblocked'} ${user.firstName} ${
@@ -99,28 +95,7 @@ const changeUserStatus = asyncHandler(async (req, res) => {
 //@route  GET /api/admin/getcategories
 //@access private
 const listCategories = asyncHandler(async (req, res) => {
-  const agg = [
-    {
-      $lookup: {
-        from: 'products',
-        localField: '_id',
-        foreignField: 'categoryId',
-        as: 'products'
-      }
-    },
-    {
-      $project: {
-        _id: 1,
-        name: 1,
-        description: 1,
-        bannerImg: 1,
-        totalProducts: {
-          $size: '$products'
-        }
-      }
-    }
-  ];
-  const categories = await getDb().collection('categories').aggregate(agg).toArray();
+  const categories = await categoryHelpers.findAllCategories();
   const resData = {
     status: 'success',
     data: categories
@@ -133,16 +108,14 @@ const listCategories = asyncHandler(async (req, res) => {
 //@access private
 const addCategory = asyncHandler(async (req, res) => {
   const { name, description } = req.body;
-  name.trim();
   //checking if name and desciption exists
   if (!name || !description || !req.file) {
     throw new AppError('Please send all the required data', 400);
   }
 
   //checking if category name already exists
-  const category = await getDb()
-    .collection('categories')
-    .findOne({ name: { $regex: `^${req.body.name.trim().toLowerCase()}$`, $options: 'i' } });
+
+  const category = await categoryHelpers.checkCategoryNameExists(null, name);
   if (category) {
     throw new AppError('Category name already exists', 400);
   }
@@ -152,7 +125,9 @@ const addCategory = asyncHandler(async (req, res) => {
     public_id: result.public_id,
     imgUrl: result.secure_url
   };
-  await getDb().collection('categories').insertOne({ name, description, bannerImg });
+  const modifiedName = name.trim();
+  //adding data to database
+  await categoryHelpers.createNewCategory({ name:modifiedName, description, bannerImg });
   const resData = {
     status: 'success',
     message: 'Successfully added the category'
@@ -164,8 +139,8 @@ const addCategory = asyncHandler(async (req, res) => {
 //@route  PUT /api/admin/editcategory/:id
 //@access private
 const editCategory = asyncHandler(async (req, res) => {
-  const id = ObjectId(req.params.id);
-  const categoryDetails = await getDb().collection('categories').findOne({ _id: id });
+  const { id } = req.params;
+  const categoryDetails = await categoryHelpers.findCategoryById(id);
 
   //checking if id is valid
   if (!categoryDetails) {
@@ -176,12 +151,7 @@ const editCategory = asyncHandler(async (req, res) => {
 
   //checking if category name already exists
   if (req.body.name) {
-    const category = await getDb()
-      .collection('categories')
-      .findOne({
-        _id: { $ne: id },
-        name: { $regex: `^${req.body.name.trim().toLowerCase()}$`, $options: 'i' }
-      });
+    const category = await categoryHelpers.checkCategoryNameExists(id, req.body.name);
     if (category) {
       throw new AppError('Category name already exists', 400);
     }
@@ -197,15 +167,13 @@ const editCategory = asyncHandler(async (req, res) => {
     };
   }
   const data = {
-    name: req.body.name || categoryDetails.name,
+    name: req.body.name.trim() || categoryDetails.name,
     description: req.body.description || categoryDetails.description,
     bannerImg: bannerImg || categoryDetails.bannerImg
   };
 
   //updating the data
-  await getDb()
-    .collection('categories')
-    .updateOne({ _id: id }, { $set: { ...data } });
+  await categoryHelpers.updateCategoryById(id, data);
   const resData = {
     status: 'success',
     message: 'Successfully updated the category'
@@ -213,13 +181,12 @@ const editCategory = asyncHandler(async (req, res) => {
   sendResponse(200, resData, res);
 });
 
-//@desc   delete an existing category
+//@desc   delete an existing category and products belonging to that category
 //@route  DELETE /api/admin/deletecategory/:id
 //@access private
 const deleteCategory = asyncHandler(async (req, res) => {
-  const id = ObjectId(req.params.id);
-  await getDb().collection('categories').deleteOne({ _id: id });
-  await getDb().collection('products').deleteMany({ _id: id });
+  const { id } = req.params;
+  await categoryHelpers.deleteCategoryById(id);
   const resData = {
     status: 'success',
     message: 'Successfully deleted the category'
@@ -231,35 +198,13 @@ const deleteCategory = asyncHandler(async (req, res) => {
 //@route  GET /api/admin/getproducts
 //@access private
 const listProducts = asyncHandler(async (req, res) => {
-  const agg = [
-    {
-      $lookup: {
-        from: 'categories',
-        localField: 'categoryId',
-        foreignField: '_id',
-        as: 'category'
-      }
-    },
-    {
-      $lookup: {
-        from: 'brands',
-        localField: 'brandId',
-        foreignField: '_id',
-        as: 'brand'
-      }
-    }
-  ];
-  const categories = await getDb().collection('categories').find({}).project({ name: 1 }).toArray();
-  const brands = await getDb()
-    .collection('brands')
-    .find({}, { name: 1 })
-    .project({ name: 1 })
-    .toArray();
-  const products = await getDb().collection('products').aggregate(agg).toArray();
+  const categories = await categoryHelpers.findAllCategories();
+  const brands = await brandHelpers.findAllBrands();
+  const products = await productHelpers.findAllProducts();
 
   const resData = {
     status: 'success',
-    data: { products, categories, brands }
+    data: { products, brands, categories }
   };
   sendResponse(200, resData, res);
 });
@@ -315,21 +260,20 @@ const addProduct = asyncHandler(async (req, res) => {
   //inserting data to the database
   const dataToInsert = {
     name,
-    price: Int32(price),
+    price: price,
     discountedPrice: Math.ceil(price - price * discount * 0.01),
-    discount: Int32(discount),
-    categoryId: ObjectId(categoryId),
-    brandId: ObjectId(brandId),
+    discount: discount,
+    categoryId: categoryId,
+    brandId: brandId,
     details,
     keyFeatures,
     description,
-    stock: Int32(stock),
-    rating: Int32(rating),
-    images,
-    createdOn: Timestamp(Date.now())
+    stock: stock,
+    rating: rating,
+    images
   };
 
-  await getDb().collection('products').insertOne(dataToInsert);
+  await productHelpers.createNewProduct(dataToInsert);
   const resData = {
     status: 'success',
     message: 'Successfully added the product'
@@ -341,8 +285,8 @@ const addProduct = asyncHandler(async (req, res) => {
 //@route  PUT /api/admin/editproduct/:id
 //@access private
 const editProduct = asyncHandler(async (req, res) => {
-  const id = ObjectId(req.params.id);
-  const product = await getDb().collection('products').findOne({ _id: id });
+  const { id } = req.params;
+  const product = await productHelpers.findProductById(id);
   if (!product) {
     throw new AppError('Invalid product ID', 400);
   }
@@ -361,41 +305,40 @@ const editProduct = asyncHandler(async (req, res) => {
 
   /*uploading image to cloudinary which returns an array of promises
   so using Promise.all to await for all of it */
-  const images = await Promise.all(
-    req.files.map(async (file) => {
-      req.file = file;
-      const result = await cloudinarySingleUpload(req, 'products');
-      return {
-        public_id: result.public_id,
-        imgUrl: result.secure_url
-      };
-    })
-  );
+  let images = [];
+  if (req.files.length) {
+    images = await Promise.all(
+      req.files.map(async (file) => {
+        req.file = file;
+        const result = await cloudinarySingleUpload(req, 'products');
+        return {
+          public_id: result.public_id,
+          imgUrl: result.secure_url
+        };
+      })
+    );
+  }
 
   //concating old images with new images
-  images.forEach((img, i) => {
+  images?.forEach((img, i) => {
     product.images[i] = img;
   });
-
   //updating data to the database
   const dataToInsert = {
     name,
-    price: Int32(price),
+    price: price,
     discountedPrice: Math.ceil(price - price * discount * 0.01),
-    discount: Int32(discount),
-    categoryId: ObjectId(categoryId),
-    brandId: ObjectId(brandId),
+    discount: discount,
+    categoryId: categoryId,
+    brandId: brandId,
     details,
     keyFeatures,
     description,
-    stock: Int32(stock),
-    rating: Int32(rating),
-    images: product.images,
-    createdOn: Timestamp(Date.now())
+    stock: stock,
+    rating: rating,
+    images: product.images
   };
-  await getDb()
-    .collection('products')
-    .updateOne({ _id: id }, { $set: { ...dataToInsert } });
+  await productHelpers.updateProductById(id, dataToInsert);
   const resData = {
     status: 'success',
     message: 'Successfully updated the product'
@@ -407,8 +350,8 @@ const editProduct = asyncHandler(async (req, res) => {
 //@route  DELETE /api/admin/deleteproduct/:id
 //@access private
 const deleteProduct = asyncHandler(async (req, res) => {
-  const id = ObjectId(req.params.id);
-  await getDb().collection('products').deleteOne({ _id: id });
+  const { id } = req.params;
+  await productHelpers.deleteProductById(id);
   const resData = {
     status: 'success',
     message: 'Successfully deleted the product'
@@ -420,28 +363,7 @@ const deleteProduct = asyncHandler(async (req, res) => {
 //@route  GET /api/admin/getbrands
 //@access private
 const listBrands = asyncHandler(async (req, res) => {
-  const agg = [
-    {
-      $lookup: {
-        from: 'products',
-        localField: '_id',
-        foreignField: 'brandId',
-        as: 'products'
-      }
-    },
-    {
-      $project: {
-        _id: 1,
-        name: 1,
-        description: 1,
-        bannerImg: 1,
-        totalProducts: {
-          $size: '$products'
-        }
-      }
-    }
-  ];
-  const brands = await getDb().collection('brands').aggregate(agg).toArray();
+  const brands = await brandHelpers.findAllBrands();
   const resData = {
     status: 'success',
     data: brands
@@ -459,8 +381,9 @@ const addBrand = asyncHandler(async (req, res) => {
     throw new AppError('Please send all the required data', 400);
   }
 
-  //checking if category name already exists
-  const brand = await getDb().collection('brands').findOne({ name });
+  const modifiedName = name.trim();
+  //checking if brand name already exists
+  const brand = await brandHelpers.checkBrandNameExists(null, modifiedName);
   if (brand) {
     throw new AppError('Brand name already exists', 400);
   }
@@ -470,7 +393,7 @@ const addBrand = asyncHandler(async (req, res) => {
     public_id: result.public_id,
     imgUrl: result.secure_url
   };
-  await getDb().collection('brands').insertOne({ name, description, bannerImg });
+  await brandHelpers.createNewBrand({ name:modifiedName, description, bannerImg });
   const resData = {
     status: 'success',
     message: 'Successfully added the brand'
@@ -482,8 +405,8 @@ const addBrand = asyncHandler(async (req, res) => {
 //@route  PUT /api/admin/editbrand/:id
 //@access private
 const editBrand = asyncHandler(async (req, res) => {
-  const id = ObjectId(req.params.id);
-  const brandDetails = await getDb().collection('brands').findOne({ _id: id });
+  const { id } = req.params;
+  const brandDetails = await brandHelpers.finBrandByID(id);
 
   //checking if id is valid
   if (!brandDetails) {
@@ -492,6 +415,13 @@ const editBrand = asyncHandler(async (req, res) => {
   let result;
   let bannerImg;
 
+  //checking whether brand name exists
+  if (req.body.name) {
+    const brand = await brandHelpers.checkBrandNameExists(id, req.body.name);
+    if (brand) {
+      throw new AppError('Brand Name already exists', 400);
+    }
+  }
   //checking whether image file exists
   if (req.file) {
     //uploading image to cloudinary
@@ -502,15 +432,13 @@ const editBrand = asyncHandler(async (req, res) => {
     };
   }
   const data = {
-    name: req.body.name || brandDetails.name,
+    name: req.body.name.trim() || brandDetails.name,
     description: req.body.description || brandDetails.description,
     bannerImg: bannerImg || brandDetails.bannerImg
   };
 
   //updating the data
-  await getDb()
-    .collection('brands')
-    .updateOne({ _id: id }, { $set: { ...data } });
+  await brandHelpers.updateBrandById(id, data);
   const resData = {
     status: 'success',
     message: 'Successfully updated the brand'
@@ -522,9 +450,8 @@ const editBrand = asyncHandler(async (req, res) => {
 //@route  GET /api/admin/deletebrand/:id
 //@access private
 const deleteBrand = asyncHandler(async (req, res) => {
-  const id = ObjectId(req.params.id);
-  await getDb().collection('brands').deleteOne({ _id: id });
-  await getDb().collection('products').deleteMany({ _id: id });
+  const { id } = req.params;
+  await brandHelpers.deleteBrandById(id);
   const resData = {
     status: 'success',
     message: 'Successfully deleted the brand'
@@ -536,7 +463,7 @@ const deleteBrand = asyncHandler(async (req, res) => {
 //@route  GET /api/admin/getbanner
 //@access private
 const listBanners = asyncHandler(async (req, res) => {
-  const banners = await getDb().collection('banners').find().toArray();
+  const banners = await bannerHelpers.findAllBanners();
   const resData = {
     status: 'success',
     data: banners
@@ -562,12 +489,7 @@ const addBanner = asyncHandler(async (req, res) => {
   };
 
   //adding data to database
-  type.toLowerCase();
-  const id = ObjectId(typeId);
-  const typeName = `${type}`;
-  await getDb()
-    .collection('banners')
-    .insertOne({ title, description, type: typeName, id, bannerImg });
+  await bannerHelpers.createNewBanner({ title, description, type, id: typeId, bannerImg });
   const resData = {
     status: 'success',
     message: 'Successfully added the banner'
@@ -579,8 +501,8 @@ const addBanner = asyncHandler(async (req, res) => {
 //@route  PUT /api/admin/editbanner/:id
 //@access private
 const editBanner = asyncHandler(async (req, res) => {
-  const id = ObjectId(req.params.id);
-  const bannerDetails = await getDb().collection('banners').findOne({ _id: id });
+  const { id } = req.params;
+  const bannerDetails = await bannerHelpers.findBannerById(id);
 
   //checking if id is valid
   if (!bannerDetails) {
@@ -604,23 +526,16 @@ const editBanner = asyncHandler(async (req, res) => {
     typeName = req.body.type.toLowerCase();
   }
 
-  //setting banner type id
-  let typeId;
-  if (req.body.typeId) {
-    typeId = ObjectId(req.body.typeId);
-  }
   const data = {
     title: req.body.title || bannerDetails.title,
     description: req.body.description || bannerDetails.description,
     type: typeName || bannerDetails.type,
-    id: typeId || bannerDetails.id,
+    id: req.body.typeId || bannerDetails.id,
     bannerImg: bannerImg || bannerDetails.bannerImg
   };
 
   //updating the data
-  await getDb()
-    .collection('banners')
-    .updateOne({ _id: id }, { $set: { ...data } });
+  await bannerHelpers.updateBannerById(id, data);
   const resData = {
     status: 'success',
     message: 'Successfully updated the banner'
@@ -632,8 +547,8 @@ const editBanner = asyncHandler(async (req, res) => {
 //@route  GET /api/admin/deletebanner/:id
 //@access private
 const deleteBanner = asyncHandler(async (req, res) => {
-  const id = ObjectId(req.params.id);
-  await getDb().collection('banners').deleteOne({ _id: id });
+  const { id } = req.params;
+  await bannerHelpers.deleteBannerById(id);
   const resData = {
     status: 'success',
     message: 'Successfully deleted the banner'

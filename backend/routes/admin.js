@@ -1,13 +1,9 @@
 import { Router } from 'express';
-import adminAuthController from '../contollers/adminAuthController.js';
 import adminController from '../contollers/adminController.js';
 import { protect, checkAdmin } from '../middlewares/authMiddleware.js';
 import upload from '../config/multer.js';
 
 const router = Router();
-
-//POST login Route
-router.post('/login', adminAuthController.adminLogin);
 
 //GET List All Users Route
 router.get('/getusers', protect, checkAdmin, adminController.listUsers);
