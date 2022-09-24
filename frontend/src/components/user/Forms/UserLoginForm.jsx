@@ -8,11 +8,11 @@ import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import * as yup from 'yup';
 import { PrimaryButton, SecondaryButton } from '../../../MaterialUiConfig/styled';
-import { useUserLoginMutation } from '../../../redux/api/userApiSlice';
+import { useUserLoginMutation } from '../../../redux/api/authApiSlice';
 import { setToken } from '../../../redux/reducers/authSlice';
 import { setToast } from '../../../redux/reducers/toastSlice';
 
-function UserLoginForm({ setLoginMethod }) {
+function UserLoginForm() {
   const [formError, setFormError] = useState('');
   const [btnText, setBtnText] = useState('Login');
   const dispatch = useDispatch();
@@ -32,10 +32,6 @@ function UserLoginForm({ setLoginMethod }) {
     resolver: yupResolver(schema),
     mode: 'onChange'
   });
-
-  const handleSelectLoginMethod = () => {
-    setLoginMethod('otp');
-  };
 
   const onSubmitHandler = async (data) => {
     if (!isLoading) {
@@ -121,10 +117,10 @@ function UserLoginForm({ setLoginMethod }) {
           {btnText}
         </PrimaryButton>
         <SecondaryButton
+          component={Link}
+          to="/otplogin"
           disabled={isLoading}
-          onClick={handleSelectLoginMethod}
           sx={{ width: '100%', p: 1, mx: 'auto' }}
-          type="submit"
         >
           Login with OTP
         </SecondaryButton>

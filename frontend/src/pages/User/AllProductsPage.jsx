@@ -1,25 +1,30 @@
-/* eslint-disable no-unused-vars */
 import { Box, CircularProgress, Typography } from '@mui/material';
 import { useDispatch } from 'react-redux';
-import ProductListCards from '../../components/user/ProductListCards';
+import { useLocation } from 'react-router-dom';
+import NoResultsFound from '../../components/NoResultsFound';
+import MenuDrawer from '../../components/user/Drawer/MenuDrawer';
+import ProductListCards from '../../components/user/Product/ProductListCards';
+import ProductSort from '../../components/user/ProductSort';
 import { useGetAllProductsQuery } from '../../redux/api/viewsApiSlice';
 import { setToast } from '../../redux/reducers/toastSlice';
 
 function AllProductsPage() {
+  // const [query, setQuery] = useState();
   const dispatch = useDispatch();
-  const { data, isLoading, isFetching, isError, isSuccess, error } = useGetAllProductsQuery();
+  const { search } = useLocation();
+  // setQuery(search);
+  const { data, isLoading, isFetching, isError, isSuccess, error } = useGetAllProductsQuery(search);
   let content;
   if (isLoading || isFetching) {
     content = (
       <Box
         sx={{
           width: '100%',
-          height: '100%',
+          height: '100vh',
           overflowY: 'hidden',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          p: 4,
           '&::-webkit-scrollbar': {
             display: 'none'
           }
@@ -30,17 +35,36 @@ function AllProductsPage() {
     );
   }
   if (isError) {
-    console.log(error);
-    content = null;
+    console.log({ error });
+    content = error.message;
     dispatch(setToast({ open: true, data: error }));
   }
+
+  const checkProductsExists = () => {
+    if (data.data.length) {
+      return <ProductListCards products={data.data} />;
+    }
+    return <NoResultsFound />;
+  };
   return (
     <Box sx={{ overflowX: 'hidden', minHeight: '100vh', p: { xs: 1, md: 3, lg: 4 } }}>
-      <Typography variant="h5" sx={{ mb: 4, textAlign: 'center', fontWeight: '450' }}>
-        Products
+      <Typography variant="h4" sx={{ mb: 4, mt: 2, textAlign: 'center', fontWeight: '450' }}>
+        SHOP
       </Typography>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: { xs: 'space-between' },
+          height: '5rem',
+          alignItems: 'center',
+          mb: 3
+        }}
+      >
+        <MenuDrawer />
+        <ProductSort />
+      </Box>
       {content}
-      {isSuccess && <ProductListCards products={data.data} />}
+      {isSuccess && checkProductsExists()}
     </Box>
   );
 }

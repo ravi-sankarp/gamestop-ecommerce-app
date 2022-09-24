@@ -7,19 +7,22 @@ import { useEffect, useState } from 'react';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
-import { useDispatch } from 'react-redux';
 import { Alert, Box, TextField } from '@mui/material';
 import { PrimaryButton } from '../../../../MaterialUiConfig/styled';
 import { useEditCategoryMutation } from '../../../../redux/api/adminApiSlice';
-import { setToast } from '../../../../redux/reducers/toastSlice';
+import useSuccessHandler from '../../../../hooks/useSuccessHandler';
 
 function CategoryEditForm({ categoryData, close }) {
   const [formError, setFormError] = useState('');
   const [text, setText] = useState('Update Category');
-  const dispatch = useDispatch();
+  const setSuccess = useSuccessHandler();
+
   const SUPPORTED_FORMATS = ['image/jpg', 'image/jpeg', 'image/png', 'image/webp'];
   const schema = yup.object().shape({
-    name: yup.string().min(3, 'Category Name must be atleast 3 character'),
+    name: yup
+      .string()
+      .matches(/^[aA-zZ\s]+$/, 'Only alphabets are allowed as Category name ')
+      .min(3, 'Category Name must be atleast 3 character'),
 
     description: yup.string().min(10),
     bannerImg: yup
@@ -54,8 +57,8 @@ function CategoryEditForm({ categoryData, close }) {
         setFormError('');
         setText('Updating Category...');
         const res = await editCategory({ id: categoryData._id, data: form }).unwrap();
-        dispatch(setToast({ data: res, open: true }));
         close();
+        setSuccess(res);
       } catch (err) {
         setText('Update Category');
         setFormError(err.data.message);

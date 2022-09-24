@@ -72,7 +72,7 @@ export default function CategoryTableList({ data }) {
   };
   return (
     <>
-      <Paper sx={{ mb: 5, mt: 4 }}>
+      <Paper sx={{ mb: 5, mt: 14 }}>
         <TableContainer>
           <Table aria-label="simple table">
             <TableHead sx={{ backgroundColor: '#2987de7a' }}>
@@ -88,8 +88,12 @@ export default function CategoryTableList({ data }) {
                 <TableRow
                   key={brand.name}
                   sx={{
+                    p: 0,
+                    '& td': {
+                      p: { md: 1 }
+                    },
                     '&:last-child td, &:last-child th': { border: 0 },
-                    '&:nth-of-type(even) ': { backgroundColor: ' #3774ad2e' }
+                    '&:nth-of-type(even) ': { backgroundColor: '#f4f8fd' }
                   }}
                 >
                   <TableCell data-label="Name" align="center">

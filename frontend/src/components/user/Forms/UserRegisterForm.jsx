@@ -8,7 +8,7 @@ import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import * as yup from 'yup';
 import { PrimaryButton } from '../../../MaterialUiConfig/styled';
-import { useUserRegisterMutation } from '../../../redux/api/userApiSlice';
+import { useUserRegisterMutation } from '../../../redux/api/authApiSlice';
 import { setToken } from '../../../redux/reducers/authSlice';
 import { setToast } from '../../../redux/reducers/toastSlice';
 
@@ -23,12 +23,14 @@ function UserRegisterForm() {
     email: yup.string().email('Enter a valid email address').required('Please enter you email '),
     firstName: yup
       .string()
-      .min(4, 'First Name must be atleast 4 characters')
-      .required('Please enter your First Name '),
+      .required('Please enter your First Name ')
+      .matches(/^[aA-zZ\s]+$/, 'Only alphabets are allowed as first name ')
+      .min(4, 'First Name must be atleast 4 characters'),
     lastName: yup
       .string()
-      .min(1, 'Last name must be atleast 1 character')
-      .required('Please enter you last name'),
+      .required('Please enter you last name')
+      .matches(/^[aA-zZ\s]+$/, 'Only alphabets are allowed as last name ')
+      .min(1, 'Last name must be atleast 1 character'),
     phoneNumber: yup
       .string()
       .matches(/^[6-9]\d{9}$/, 'Enter a valid phone number')

@@ -45,6 +45,7 @@ function ProductForm({ categories, brands, close, product }) {
   });
   const {
     register,
+    getValues,
     handleSubmit,
     reset,
     formState: { errors }
@@ -80,8 +81,12 @@ function ProductForm({ categories, brands, close, product }) {
   useEffect(() => {
     const newProduct = { ...product };
     newProduct.images = [];
+    newProduct.brandId = newProduct.brandId.toString();
+    newProduct.categoryId = newProduct.categoryId.toString();
     reset(newProduct);
+    getValues('rating');
   }, []);
+  console.log(register('name'));
   return (
     <Box component="form" noValidate autoComplete="off" onSubmit={handleSubmit(onSubmitHandler)}>
       {formError && (
@@ -116,7 +121,7 @@ function ProductForm({ categories, brands, close, product }) {
             {...register('brandId')}
           >
             {brands.map((brand) => (
-              <MenuItem key={brand.name} value={brand._id.toString()}>
+              <MenuItem key={brand.name} selected value={brand._id.toString()}>
                 {brand.name}
               </MenuItem>
             ))}
@@ -244,7 +249,7 @@ function ProductForm({ categories, brands, close, product }) {
           <Slider
             sx={{ width: '50%' }}
             aria-label="Always visible"
-            defaultValue={3}
+            defaultValue={getValues('rating')}
             min={1}
             max={5}
             size="small"

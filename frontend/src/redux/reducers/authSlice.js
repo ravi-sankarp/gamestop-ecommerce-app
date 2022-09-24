@@ -10,11 +10,16 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     setToken(state, action) {
+      const { token, refreshToken, admin } = action.payload;
       localStorage.setItem(
         'auth',
-        JSON.stringify({ token: action.payload.token, admin: action.payload.admin })
+        JSON.stringify({
+          token,
+          refreshToken,
+          admin
+        })
       );
-      state.data = { token: action.payload.token, admin: action.payload.admin };
+      state.data = { token, refreshToken, admin };
     },
     deleteToken(state) {
       state.data = {};

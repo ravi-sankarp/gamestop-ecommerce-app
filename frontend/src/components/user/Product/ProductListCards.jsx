@@ -7,15 +7,20 @@ import { Link } from 'react-router-dom';
 
 export default function ProductListCards({ products }) {
   return (
-    <Grid container rowSpacing={3} columnSpacing={{ xs: 1, sm: 2, md: 3, lg: 4 }}>
+    <Grid
+      container
+      rowSpacing={4}
+      columnSpacing={{ xs: 1, sm: 2, md: 3, lg: 4 }}
+      sx={{ alignItems: 'center', justifyContent: 'center' }}
+    >
       {products.map((product) => (
         <Grid key={product._id} item xs={6} sm={4} md={4} lg={3} xl={3}>
           <Link to={`/product/${product._id}`} className="text-link">
             <Card
               elevation={0}
               sx={{
-                maxWidth: 300,
-                height: { xs: 240, lg: 250 }
+                maxWidth: { xs: '100%', md: 300 },
+                minHeight: 240
               }}
             >
               <CardActionArea
@@ -42,7 +47,7 @@ export default function ProductListCards({ products }) {
                     alignItems: 'center'
                   }}
                 >
-                  <Typography gutterBottom variant="subtitle2" component="div">
+                  <Typography gutterBottom variant="subtitle1" component="div">
                     {product.name}
                   </Typography>
 
@@ -51,25 +56,22 @@ export default function ProductListCards({ products }) {
                   >
                     <Typography
                       gutterBottom
-                      variant="subtitle"
-                      sx={{ color: '#000', opacity: 1, fontWeight: '550', fontSize: '15px' }}
-                      component="div"
+                      variant="h6"
+                      sx={{ color: '#000', fontSize: '1.01rem' }}
                     >
                       {`₹${product.discountedPrice}`}
                     </Typography>
                     <Typography
                       gutterBottom
-                      sx={{ textDecoration: 'line-through', opacity: 0.5 }}
+                      sx={{ textDecoration: 'line-through', opacity: 0.5, fontSize: 13 }}
                       variant="subtitle"
-                      component="div"
                     >
                       {`₹${product.price}`}
                     </Typography>
                     <Typography
                       gutterBottom
                       sx={{ color: 'green', opacity: 0.8 }}
-                      variant="subtitle"
-                      component="div"
+                      variant="caption"
                     >
                       {`(${product.discount}% off )`}
                     </Typography>

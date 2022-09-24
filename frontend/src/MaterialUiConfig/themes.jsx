@@ -9,6 +9,11 @@ const theme = createTheme({
     secondary: {
       main: '#ffffff'
     }
+  },
+  typography: {
+    allVariants: {
+      fontFamily: ['Whitney', 'sans-serif'].join(',')
+    }
   }
 });
 export default theme;

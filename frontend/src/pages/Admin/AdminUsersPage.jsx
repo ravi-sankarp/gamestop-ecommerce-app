@@ -1,24 +1,23 @@
 import { Box, CircularProgress, Typography } from '@mui/material';
-import { useDispatch } from 'react-redux';
+import { useEffect } from 'react';
 import UserTableList from '../../components/admin/Table/UserTableList';
+import useApiErrorHandler from '../../hooks/useApiErrorHandler';
 import { useGetUserDataQuery } from '../../redux/api/adminApiSlice';
-import { setToast } from '../../redux/reducers/toastSlice';
 
 function AdminUsersPage() {
-  const dispatch = useDispatch();
   const { data, isLoading, isFetching, isSuccess, isError, error } = useGetUserDataQuery();
+  const handleError = useApiErrorHandler();
   let content;
   if (isLoading || (isFetching && !isSuccess)) {
     content = (
       <Box
         sx={{
           width: '100%',
-          height: '100%',
+          height: '100vh',
           overflowY: 'hidden',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          p: 4,
           '&::-webkit-scrollbar': {
             display: 'none'
           }
@@ -28,16 +27,15 @@ function AdminUsersPage() {
       </Box>
     );
   }
-
-  if (isError) {
-    console.log(error);
-    content = null;
-    dispatch(setToast({ open: true, data: error }));
-  }
+  useEffect(() => {
+    if (isError) {
+      handleError(error);
+    }
+  }, [isError, error, handleError]);
   return (
-    <Box sx={{ overflowX: 'hidden' }}>
+    <Box sx={{ overflowX: 'hidden', pt: 4 }}>
       <Typography variant="h5" sx={{ mb: '1rem', textAlign: 'center', fontWeight: '450' }}>
-        Users List
+        USERS
       </Typography>
       {content}
       {isSuccess && <UserTableList data={data.data} />}

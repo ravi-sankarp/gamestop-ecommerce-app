@@ -22,6 +22,7 @@ function BrandForm({ close }) {
     name: yup
       .string()
       .required('Please provide the brand name ')
+      .matches(/^[aA-zZ\s]+$/, 'Only alphabets are allowed as Brand name ')
       .min(3, 'Brand Name must be atleast 3 character'),
 
     description: yup.string().required('Please Provide description of the Brand').min(10),

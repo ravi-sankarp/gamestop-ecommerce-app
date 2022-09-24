@@ -36,6 +36,8 @@ import {
 } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { deleteToken } from '../../../redux/reducers/authSlice';
+import { setToast } from '../../../redux/reducers/toastSlice';
+import apiSlice from '../../../redux/api/apiSlice';
 
 const drawerWidth = 240;
 
@@ -188,14 +190,18 @@ function Sidebar() {
   };
   const handleLogout = async () => {
     await dispatch(deleteToken());
+    await dispatch(apiSlice.util.resetApiState());
     setOpenAlert(false);
+    const message = { message: 'Successfully Logged Out' };
+    dispatch(setToast({ open: true, data: message }));
+
     navigate('/admin/login');
   };
   return (
     <>
       <Box sx={{ flexGrow: 0 }}>
         <AppBar position="fixed" open={open}>
-          <Toolbar sx={{ backgroundColor: '#ffffff', color: '#000000' }}>
+          <Toolbar sx={{ backgroundColor: '#1976d2' }}>
             <IconButton
               color="inherit"
               aria-label="open drawer"
@@ -208,6 +214,9 @@ function Sidebar() {
             >
               <MenuIcon />
             </IconButton>
+            <Typography variant="h6" noWrap component="div">
+              Admin Panel
+            </Typography>
           </Toolbar>
         </AppBar>
         <Drawer variant="permanent" open={open} sx={{ backgroundColor: '#000000 !important' }}>
@@ -238,7 +247,7 @@ function Sidebar() {
                 disablePadding
                 className="text-link"
                 sx={{
-                  ...(text === title ? { backgroundColor: 'lightgray' } : {})
+                  ...(text === title ? { backgroundColor: '#e8f1fb' } : {})
                 }}
               >
                 <ListItemButton
@@ -291,7 +300,11 @@ function Sidebar() {
                 </Tooltip>
                 <ListItemText
                   primary="Logout"
-                  sx={{ opacity: open ? 1 : 0, mt: 1.2, color: 'black' }}
+                  sx={{
+                    opacity: open ? 1 : 0,
+                    mt: 1.2,
+                    color: 'black'
+                  }}
                 />
               </ListItemButton>
             </ListItem>

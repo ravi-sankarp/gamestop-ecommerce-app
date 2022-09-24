@@ -1,7 +1,7 @@
 import { Box, CircularProgress } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import SingleProduct from '../../components/user/SingleProduct';
+import SingleProduct from '../../components/user/Product/SingleProduct';
 import { useGetSingleProductQuery } from '../../redux/api/viewsApiSlice';
 import { setToast } from '../../redux/reducers/toastSlice';
 
@@ -12,17 +12,17 @@ function ProductPage() {
     id
   });
   let content;
+  console.log(data);
   if (isLoading || isFetching) {
     content = (
       <Box
         sx={{
           width: '100%',
-          height: '100%',
+          height: '100vh',
           overflowY: 'hidden',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          p: 4,
           '&::-webkit-scrollbar': {
             display: 'none'
           }
@@ -34,7 +34,7 @@ function ProductPage() {
   }
   if (isError) {
     console.log(error);
-    content = null;
+    content = error.message;
     dispatch(setToast({ open: true, data: error }));
   }
   return (

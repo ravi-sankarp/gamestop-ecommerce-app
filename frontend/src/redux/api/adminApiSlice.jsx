@@ -2,13 +2,6 @@ import apiSlice from './apiSlice';
 
 export const extendedAdminApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    adminLogin: builder.mutation({
-      query: (data) => ({
-        url: '/admin/login',
-        method: 'POST',
-        body: data
-      })
-    }),
     getUserData: builder.query({
       query: () => '/admin/getusers',
       providesTags: ['userdata']
@@ -117,7 +110,6 @@ export const extendedAdminApiSlice = apiSlice.injectEndpoints({
 
 export const {
   useGetUserDataQuery,
-  useAdminLoginMutation,
   useChangeUserStatusMutation,
   useGetProductDataQuery,
   useAddNewProductMutation,

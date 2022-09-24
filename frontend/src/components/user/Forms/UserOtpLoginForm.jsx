@@ -13,7 +13,7 @@ import { setToken } from '../../../redux/reducers/authSlice';
 import {
   useUserRequestOtpMutation,
   useUserVerifyOtpMutation
-} from '../../../redux/api/userApiSlice';
+} from '../../../redux/api/authApiSlice';
 
 function UserOtpLoginForm() {
   const [otpSent, setOtpSent] = useState(false);
@@ -21,8 +21,8 @@ function UserOtpLoginForm() {
   const [formError, setFormError] = useState('');
   const [formSucess, setFormSuccess] = useState('');
   const [btnText, setBtnText] = useState('Send OTP');
-  const [minutes, setMinutes] = useState(true);
-  const [seconds, setSeconds] = useState(true);
+  const [minutes, setMinutes] = useState(0);
+  const [seconds, setSeconds] = useState(0);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [requestOtp, { isLoading: isLoadingRequest }] = useUserRequestOtpMutation();
@@ -34,7 +34,11 @@ function UserOtpLoginForm() {
       .matches(/^[6-9]\d{9}$/, 'Enter a valid phone number')
   });
   const otpSchema = yup.object().shape({
-    code: yup.number().required('OTP is required').min(4, 'OTP is of 4 characters')
+    code: yup
+      .number()
+      .required('Please enter your OTP')
+      .min(4, 'OTP is of 4 characters')
+      .typeError('Please enter your OTP')
   });
 
   const {
@@ -61,8 +65,11 @@ function UserOtpLoginForm() {
       try {
         setBtnText('Loading...');
         const res = await requestOtp(data).unwrap();
+        setFormError('');
         setPhoneNumber(data.phoneNumber);
         setOtpSent(true);
+        setSeconds(0);
+        setMinutes(2);
         setFormSuccess(res.message);
         setBtnText('Verify');
       } catch (err) {
@@ -78,8 +85,8 @@ function UserOtpLoginForm() {
       try {
         setBtnText('Loading...');
         const res = await verifyOtp({ phoneNumber, code: data.code }).unwrap();
-        dispatch(setToast({ data: res, open: true }));
         setFormError('');
+        dispatch(setToast({ data: res, open: true }));
         await dispatch(setToken(res));
         navigate('/');
       } catch (err) {
@@ -106,7 +113,7 @@ function UserOtpLoginForm() {
     return () => {
       clearInterval(myInterval);
     };
-  });
+  }, [otpSent, seconds, minutes]);
 
   return (
     <Box
@@ -137,7 +144,7 @@ function UserOtpLoginForm() {
           onSubmit={handleSubmit(onSubmitHandler)}
         >
           <Typography variant="h4" component="h1" sx={{ mb: '2rem', textAlign: 'center' }}>
-            Login With OTP
+            OTP Login
           </Typography>
           <Typography
             variant="subtitle1"
@@ -169,14 +176,19 @@ function UserOtpLoginForm() {
             {...register('phoneNumber')}
           />
 
-          <PrimaryButton sx={{ p: 1, mx: 'auto', letterSpacing: 1 }} type="submit">
+          <PrimaryButton
+            sx={{ p: 1.2, mx: 'auto', letterSpacing: 1, lineHeight: '1.5em' }}
+            type="submit"
+          >
             {btnText}
           </PrimaryButton>
           <Typography sx={{ mt: 3, color: '#862e9c' }} variant="subtitle2">
             New to GameStop ?
           </Typography>
-          <Link to="/register" className="text-link">
-            <SecondaryButton sx={{ m: 0 }}>Create your account</SecondaryButton>
+          <Link to="/register">
+            <Typography variant="subtitle2" sx={{ m: 0, color: '#000' }}>
+              Create your account
+            </Typography>{' '}
           </Link>
         </Box>
       )}
@@ -233,16 +245,18 @@ function UserOtpLoginForm() {
             Verify
           </PrimaryButton>
           <Box>
-            {minutes === 0 && seconds === 0 ? null : (
-              <Typography variant="subtitle2">
-                Resend OTP in
-                {minutes}:{seconds < 10 ? `0${seconds}` : seconds}
-              </Typography>
-            )}
-            {minutes === 0 && seconds === 0 ? null : (
+            {minutes === 0 && seconds === 0 ? (
               <SecondaryButton onClick={() => onSubmitHandler({ phoneNumber })}>
                 Resend OTP
               </SecondaryButton>
+            ) : (
+              <>
+                <Typography variant="subtitle2">
+                  Resend OTP in
+                  {minutes}:{seconds < 10 ? `0${seconds}` : seconds}
+                </Typography>
+                <SecondaryButton disabled>Resend OTP</SecondaryButton>
+              </>
             )}
           </Box>
         </Box>

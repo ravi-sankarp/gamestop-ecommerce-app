@@ -1,10 +1,11 @@
 import { Box } from '@mui/material';
 import { Route, Routes } from 'react-router-dom';
-import UserNavbar from '../../components/user/UserNavbar';
+import UserNavbar from '../../components/user/NavBar/UserNavbar';
 import AllProductsPage from '../../pages/User/AllProductsPage';
 import HomePage from '../../pages/User/HomePage';
 import ProductPage from '../../pages/User/ProductPage';
 import UserLoginPage from '../../pages/User/UserLoginPage';
+import UserOtpLoginPage from '../../pages/User/UserOtpLoginPage';
 import UserRegisterPage from '../../pages/User/UserRegisterPage';
 
 function UserRoutes() {
@@ -21,7 +22,7 @@ function UserRoutes() {
 
       <Box
         sx={{
-          paddingTop: '64px',
+          paddingTop: '55px',
           flexGrow: 1,
           backgroundColor: '#fff'
         }}
@@ -30,6 +31,7 @@ function UserRoutes() {
           <Route path="/">
             <Route index element={<HomePage />} />
             <Route path="login" element={<UserLoginPage />} />
+            <Route path="otplogin" element={<UserOtpLoginPage />} />
             <Route path="register" element={<UserRegisterPage />} />
             <Route path="products" element={<AllProductsPage />} />
             <Route path="product/:id" element={<ProductPage />} />

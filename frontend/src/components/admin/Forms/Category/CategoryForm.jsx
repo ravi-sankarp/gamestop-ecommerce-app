@@ -7,21 +7,21 @@ import { useState } from 'react';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
-import { useDispatch } from 'react-redux';
 import { Alert, Box, TextField } from '@mui/material';
 import { PrimaryButton } from '../../../../MaterialUiConfig/styled';
 import { useAddNewCategoryMutation } from '../../../../redux/api/adminApiSlice';
-import { setToast } from '../../../../redux/reducers/toastSlice';
+import useSuccessHandler from '../../../../hooks/useSuccessHandler';
 
 function CategoryForm({ close }) {
   const [formError, setFormError] = useState('');
+  const setSuccess = useSuccessHandler();
   const [text, setText] = useState('Add Category');
-  const dispatch = useDispatch();
   const SUPPORTED_FORMATS = ['image/jpg', 'image/jpeg', 'image/png', 'image/webp'];
   const schema = yup.object().shape({
     name: yup
       .string()
       .required('Please provide the category name ')
+      .matches(/^[aA-zZ\s]+$/, 'Only alphabets are allowed as first name ')
       .min(3, 'Category Name must be atleast 3 character'),
 
     description: yup.string().required('Please Provide description of the category').min(10),
@@ -57,7 +57,7 @@ function CategoryForm({ close }) {
         setFormError('');
         setText('Adding Category...');
         const res = await addNewCategory(form).unwrap();
-        dispatch(setToast({ data: res, open: true }));
+        setSuccess(res);
         close();
       } catch (err) {
         setText('Add Category');
@@ -67,7 +67,13 @@ function CategoryForm({ close }) {
   };
 
   return (
-    <Box component="form" noValidate autoComplete="off" onSubmit={handleSubmit(onSubmitHandler)}>
+    <Box
+      sx={{ maxWidth: '50vw' }}
+      component="form"
+      noValidate
+      autoComplete="off"
+      onSubmit={handleSubmit(onSubmitHandler)}
+    >
       {formError && (
         <Alert sx={{ mb: 5, textAlign: 'center' }} severity="error">
           {formError}!

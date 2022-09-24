@@ -8,29 +8,28 @@ import {
   Typography
 } from '@mui/material';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
-import { useDispatch } from 'react-redux';
-import { useState } from 'react';
-import { setToast } from '../../redux/reducers/toastSlice';
+import AddBoxIcon from '@mui/icons-material/AddBox';
+import { useEffect, useState } from 'react';
 import { useGetCategoryDataQuery } from '../../redux/api/adminApiSlice';
 import CategoryForm from '../../components/admin/Forms/Category/CategoryForm';
 import CategoryTableList from '../../components/admin/Table/CategoryTableList';
+import useApiErrorHandler from '../../hooks/useApiErrorHandler';
 
 function AdminCategoryPage() {
   const [openPopup, setOpenPopup] = useState(false);
-  const dispatch = useDispatch();
   const { data, isLoading, isFetching, isSuccess, isError, error } = useGetCategoryDataQuery();
+  const handleError = useApiErrorHandler();
   let content;
   if (isLoading || (isFetching && !isSuccess)) {
     content = (
       <Box
         sx={{
           width: '100%',
-          height: '100%',
+          height: '100vh',
           overflowY: 'hidden',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          p: 4,
           '&::-webkit-scrollbar': {
             display: 'none'
           }
@@ -41,27 +40,39 @@ function AdminCategoryPage() {
     );
   }
 
-  if (isError) {
-    console.log(error);
-    content = null;
-    dispatch(setToast({ open: true, data: error }));
-  }
   const handlePopupView = () => {
     setOpenPopup((current) => !current);
   };
+
+  useEffect(() => {
+    if (isError) {
+      handleError(error);
+    }
+  }, [isError, error, handleError]);
+
   return (
-    <Box sx={{ overflowX: 'hidden' }}>
+    <Box sx={{ overflowX: 'hidden', pt: 4 }}>
       <Typography variant="h5" sx={{ mb: '1rem', textAlign: 'center', fontWeight: '450' }}>
-        Category List
+        CATEGORIES
       </Typography>
       {content}
       {isSuccess && (
         <>
-          <Button onClick={handlePopupView} sx={{ mt: 5 }} variant="contained" color="success">
+          <Button
+            variant="outlined"
+            startIcon={<AddBoxIcon />}
+            onClick={handlePopupView}
+            sx={{ mt: 5, position: 'absolute', right: 16, display: 'flex' }}
+          >
             Add Category
           </Button>
           <CategoryTableList data={data.data} />
-          <Dialog sx={{ height: '100vh' }} onClose={handlePopupView} open={openPopup} maxWidth="md">
+          <Dialog
+            sx={{ height: '100vh', minWidth: '60vw' }}
+            onClose={handlePopupView}
+            open={openPopup}
+            maxWidth="md"
+          >
             <DialogTitle>
               <div style={{ display: 'flex' }}>
                 <Typography variant="h6" component="div" style={{ flexGrow: 1 }}>

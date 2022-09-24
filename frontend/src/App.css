@@ -1,12 +1,28 @@
+@import url('http://fonts.cdnfonts.com/css/whitney-2');
+
 body {
     padding: 0;
     margin: 0;
     overflow-x: hidden !important;
+
+    font-family: 'Whitney',
+        ' -apple-system',
+        'BlinkMacSystemFont',
+        "Segoe UI",
+        ' Roboto',
+        Helvetica,
+        Arial,
+        sans-serif;
+    line-height: 1.25;
 }
 
 .text-link {
     color: inherit;
     text-decoration: inherit;
+}
+
+input[type=checkbox] {
+    background-color: #000;
 }
 
 abbr {
@@ -24,24 +40,24 @@ table {
 
 table caption {
     font-size: 1.5em;
-    margin: .5em 0 .75em;
+    margin: 0.5em 0 0.75em;
 }
 
 table tr {
     background-color: #fff;
     border: 1px solid #ddd;
-    padding: .35em;
+    padding: 0.35em;
 }
 
 table th,
 table td {
-    padding: .625em;
+    padding: 0.625em;
     text-align: center;
 }
 
 table th {
-    font-size: .85em;
-    letter-spacing: .1em;
+    font-size: 0.85em;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
 }
 
@@ -68,13 +84,13 @@ table th {
     table tr {
         border-bottom: 3px solid #ddd !important;
         display: block !important;
-        margin-bottom: .625em !important;
+        margin-bottom: 0.625em !important;
     }
 
     table td {
         border-bottom: 1px solid #ddd !important;
         display: block !important;
-        font-size: .8em !important;
+        font-size: 0.8em !important;
         text-align: right !important;
     }
 
@@ -94,21 +110,108 @@ table th {
     }
 }
 
+.profile-btn>.profile-dropdown {
+    box-sizing: border-box;
+    position: absolute;
+    display: flex;
+    background-color: #fff;
+    flex-direction: column;
+    gap: 4;
+    align-items: center;
+    justify-content: center;
+    height: max-content;
+    width: max-content;
+    overflow: hidden;
+    letter-spacing: 1px;
+    top: calc(100% + 0.25rem);
+    left: -40px;
+    border-radius: 0.25rem;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+    transition: opacity 200ms ease-in-out, transform 150ms ease-in-out;
+}
 
+.profile-btn:hover>.profile-dropdown,
+.profile-btn .profile-dropdown:hover {
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 121;
+    transform: translateY(0px);
+}
 
+.profile-btn .profile-dropdown a,
+.profile-btn .profile-dropdown h6 {
+    margin: 0 auto;
+    padding: 0.5rem 2rem;
+    width: 100%;
+    transition: background-color 50ms ease-in-out;
+}
 
+.profile-btn .profile-dropdown a:hover,
+.profile-btn .profile-dropdown h6:hover {
+    cursor: pointer;
+    background-color: #f1f7fd;
+}
 
+.navbar-list>.navbar-dropdown {
+    box-sizing: border-box;
+    position: absolute;
+    display: flex;
+    background-color: #fff;
+    color: #000;
+    flex-direction: column;
+    gap: 4;
+    align-items: center;
+    justify-content: center;
+    height: max-content;
+    width: max-content;
+    overflow: hidden;
+    letter-spacing: 1px;
+    top: 100%;
+    left: -40px;
+    border-radius: 0.25rem;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+    transition: opacity 200ms ease-in-out, transform 150ms ease-in-out;
+}
 
+.navbar-list:hover>.navbar-dropdown,
+.navbar-list .navbar-dropdown:hover {
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 121;
+    transform: translateY(0px);
+}
 
+.navbar-list:hover {
+    color: #1a6aed;
+    transition: color 300ms ease-in-out;
+}
 
+.navbar-list:hover>.dropdown-icon {
+    transform-origin: center;
+    transform: rotate(-180deg) rotate(0deg);
+    transition: transform 250ms ease-in-out;
+}
 
+.navbar-list .navbar-dropdown a,
+.navbar-list .navbar-dropdown span {
+    margin: 0 auto;
+    padding: 0.5rem 2rem;
+    width: 100%;
+    cursor: pointer;
+    transition: background-color 50ms ease-in-out;
+}
 
+.navbar-list .navbar-dropdown a:hover,
+.navbar-list .navbar-dropdown span:hover {
+    background-color: #f1f7fd;
+}
 
-
-
-
-/* general styling */
-body {
-    font-family: "Open Sans", sans-serif;
-    line-height: 1.25;
+.sort-dropdown {
+    left: 10px !important;
 }

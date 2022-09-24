@@ -7,30 +7,29 @@ import {
   DialogTitle,
   Typography
 } from '@mui/material';
+import AddBoxIcon from '@mui/icons-material/AddBox';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
-import { useDispatch } from 'react-redux';
-import { useState } from 'react';
-import { setToast } from '../../redux/reducers/toastSlice';
+import { useEffect, useState } from 'react';
 import { useGetBrandDataQuery } from '../../redux/api/adminApiSlice';
 import BrandTableList from '../../components/admin/Table/BrandTableList';
 import BrandForm from '../../components/admin/Forms/Brand/BrandForm';
+import useApiErrorHandler from '../../hooks/useApiErrorHandler';
 
 function AdminBrandsPage() {
   const [openPopup, setOpenPopup] = useState(false);
-  const dispatch = useDispatch();
   const { data, isLoading, isFetching, isSuccess, isError, error } = useGetBrandDataQuery();
   let content;
+  const handleError = useApiErrorHandler();
   if (isLoading || (isFetching && !isSuccess)) {
     content = (
       <Box
         sx={{
           width: '100%',
-          height: '100%',
+          height: '100vh',
           overflowY: 'hidden',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          p: 4,
           '&::-webkit-scrollbar': {
             display: 'none'
           }
@@ -41,23 +40,28 @@ function AdminBrandsPage() {
     );
   }
 
-  if (isError) {
-    console.log(error);
-    content = null;
-    dispatch(setToast({ open: true, data: error }));
-  }
+  useEffect(() => {
+    if (isError) {
+      handleError(error);
+    }
+  }, [isError, error, handleError]);
   const handlePopupView = () => {
     setOpenPopup((current) => !current);
   };
   return (
-    <Box sx={{ overflowX: 'hidden' }}>
+    <Box sx={{ overflowX: 'hidden', pt: 4 }}>
       <Typography variant="h5" sx={{ mb: '1rem', textAlign: 'center', fontWeight: '450' }}>
-        Brand List
+        BRANDS
       </Typography>
       {content}
       {isSuccess && (
         <>
-          <Button onClick={handlePopupView} sx={{ mt: 5 }} variant="contained" color="success">
+          <Button
+            variant="outlined"
+            startIcon={<AddBoxIcon />}
+            onClick={handlePopupView}
+            sx={{ mt: 5, position: 'absolute', right: 16, display: 'flex' }}
+          >
             Add Brand
           </Button>
           <BrandTableList data={data.data} />

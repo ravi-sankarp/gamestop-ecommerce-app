@@ -21,12 +21,12 @@ import {
 } from '@mui/material';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
-import { useDispatch } from 'react-redux';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import { useDeleteCategoryMutation } from '../../../redux/api/adminApiSlice';
-import { setToast } from '../../../redux/reducers/toastSlice';
 
 import CategoryEditForm from '../Forms/Category/CategoryEditForm';
+import useSuccessHandler from '../../../hooks/useSuccessHandler';
+import useApiErrorHandler from '../../../hooks/useApiErrorHandler';
 
 export default function CategoryTableList({ data }) {
   const [page, setPage] = useState(0);
@@ -35,7 +35,9 @@ export default function CategoryTableList({ data }) {
   const [categoryData, setCategoryData] = useState({});
   const [operation, setOperation] = useState('');
   const [sendDeleteCategory, { isLoading }] = useDeleteCategoryMutation();
-  const dispatch = useDispatch();
+  const setSuccess = useSuccessHandler();
+  const handleError = useApiErrorHandler();
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -63,16 +65,17 @@ export default function CategoryTableList({ data }) {
       if (!isLoading) {
         const res = await sendDeleteCategory({ id: categoryData._id }).unwrap();
         handleAlertShow();
-        dispatch(setToast({ data: res, open: true }));
+
+        setSuccess(res);
       }
     } catch (err) {
       handleAlertShow();
-      dispatch(setToast({ data: err.data, open: true }));
+      handleError(err);
     }
   };
   return (
     <>
-      <Paper sx={{ mb: 5, mt: 4 }}>
+      <Paper sx={{ mb: 5, mt: 14 }}>
         <TableContainer>
           <Table aria-label="simple table">
             <TableHead sx={{ backgroundColor: '#2987de7a' }}>
@@ -88,8 +91,12 @@ export default function CategoryTableList({ data }) {
                 <TableRow
                   key={category.name}
                   sx={{
+                    p: 0,
+                    '& td': {
+                      p: { md: 1 }
+                    },
                     '&:last-child td, &:last-child th': { border: 0 },
-                    '&:nth-of-type(even) ': { backgroundColor: ' #3774ad2e' }
+                    '&:nth-of-type(even) ': { backgroundColor: '#f4f8fd' }
                   }}
                 >
                   <TableCell data-label="Name" align="center">
@@ -143,7 +150,7 @@ export default function CategoryTableList({ data }) {
             <DialogTitle id="alert-dialog-title">Confirm Delete </DialogTitle>
             <DialogContent>
               <DialogContentText id="alert-dialog-description">
-                <p>
+                <span>
                   Are you sure you want to delete the Category{' '}
                   <Box
                     component="span"
@@ -151,17 +158,17 @@ export default function CategoryTableList({ data }) {
                   >
                     {categoryData.name}
                   </Box>
-                </p>
-                <p>
+                </span>
+                <span>
                   Deleting the Category also deletes{' '}
                   <Box
                     component="span"
                     sx={{ color: '#000', fontWeight: '800', textTransform: 'uppercase' }}
                   >
-                     {categoryData.totalProducts} Products
+                    {categoryData.totalProducts} Products
                   </Box>{' '}
                   along with it
-                </p>
+                </span>
               </DialogContentText>
             </DialogContent>
             <DialogActions>

@@ -10,7 +10,7 @@ import Paper from '@mui/material/Paper';
 import { TablePagination } from '@mui/material';
 import BlockIcon from '@mui/icons-material/Block';
 import ConfirmDialog from '../../ConfirmDialog';
-import { PrimaryButton } from '../../../MaterialUiConfig/styled';
+import { SecondaryButton } from '../../../MaterialUiConfig/styled';
 
 export default function UserTableList({ data }) {
   const [page, setPage] = useState(0);
@@ -50,8 +50,12 @@ export default function UserTableList({ data }) {
                 <TableRow
                   key={user.email}
                   sx={{
+                    p: 0,
+                    '& td': {
+                      p: { md: 0 }
+                    },
                     '&:last-child td, &:last-child th': { border: 0 },
-                    '&:nth-of-type(even) ': { backgroundColor: ' #3774ad2e' }
+                    '&:nth-of-type(even) ': { backgroundColor: '#f4f8fd' }
                   }}
                 >
                   <TableCell data-label="Name" align="center">
@@ -70,12 +74,12 @@ export default function UserTableList({ data }) {
                     {`${user.isAdmin.toString().toUpperCase()}`}
                   </TableCell>
                   <TableCell data-label="Action" align="center">
-                    <PrimaryButton
+                    <SecondaryButton
                       onClick={() => handleBlock(user)}
                       endIcon={!user.isBlocked ? <BlockIcon /> : ''}
                     >
-                      {user.isBlocked ? 'UnBlock' : 'Block'}
-                    </PrimaryButton>
+                      {user.isBlocked ? 'Unblock' : 'Block'}
+                    </SecondaryButton>
                   </TableCell>
                 </TableRow>
               ))}

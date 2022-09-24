@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Box, Button, Grid, List, ListItem, Typography } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
 import ReactImageMagnify from 'react-image-magnify';
-import { PrimaryButton, SecondaryButton } from '../../MaterialUiConfig/styled';
+import { PrimaryButton, SecondaryButton } from '../../../MaterialUiConfig/styled';
 
 function SingleProduct({ product }) {
   const [img, setImg] = useState(product.images[0].imgUrl);
@@ -11,6 +11,12 @@ function SingleProduct({ product }) {
       setImg(e.target.src);
     }
   };
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  }, []);
   return (
     <Grid
       container
@@ -132,7 +138,7 @@ function SingleProduct({ product }) {
             }
           }}
         >
-          <Typography variant="subtitle2">Product Highlights</Typography>
+          <Typography variant="h6">Product Highlights : </Typography>
           {product.keyFeatures.split(',').map((feature) => (
             <ListItem key={feature.split(':')[0]} disablePadding>
               <Box component="span" sx={{ display: 'flex', gap: 1 }}>

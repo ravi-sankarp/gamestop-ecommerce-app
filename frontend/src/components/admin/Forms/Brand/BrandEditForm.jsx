@@ -19,7 +19,10 @@ function BrandEditForm({ brandData, close }) {
   const dispatch = useDispatch();
   const SUPPORTED_FORMATS = ['image/jpg', 'image/jpeg', 'image/png', 'image/webp'];
   const schema = yup.object().shape({
-    name: yup.string().min(3, 'Brand Name must be atleast 3 character'),
+    name: yup
+      .string()
+      .matches(/^[aA-zZ\s]+$/, 'Only alphabets are allowed as Brand name ')
+      .min(3, 'Brand Name must be atleast 3 character'),
 
     description: yup.string().min(10),
     bannerImg: yup

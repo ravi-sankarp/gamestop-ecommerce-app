@@ -8,29 +8,28 @@ import {
   Typography
 } from '@mui/material';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
-import { useDispatch } from 'react-redux';
-import { useState } from 'react';
-import { setToast } from '../../redux/reducers/toastSlice';
+import { useEffect, useState } from 'react';
+import AddBoxIcon from '@mui/icons-material/AddBox';
 import ProductTableList from '../../components/admin/Table/ProductTableList';
 import { useGetProductDataQuery } from '../../redux/api/adminApiSlice';
 import ProductForm from '../../components/admin/Forms/Product/ProductForm';
+import useApiErrorHandler from '../../hooks/useApiErrorHandler';
 
 function AdminProductsPage() {
   const [openPopup, setOpenPopup] = useState(false);
-  const dispatch = useDispatch();
   const { data, isLoading, isFetching, isSuccess, isError, error } = useGetProductDataQuery();
   let content;
+  const handleError = useApiErrorHandler();
   if (isLoading || (isFetching && !isSuccess)) {
     content = (
       <Box
         sx={{
           width: '100%',
-          height: '100%',
+          height: '100vh',
           overflowY: 'hidden',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          p: 4,
           '&::-webkit-scrollbar': {
             display: 'none'
           }
@@ -41,23 +40,30 @@ function AdminProductsPage() {
     );
   }
 
-  if (isError) {
-    console.log(error);
-    content = null;
-    dispatch(setToast({ open: true, data: error }));
-  }
   const handlePopupView = () => {
     setOpenPopup((current) => !current);
   };
+
+  useEffect(() => {
+    if (isError) {
+      handleError(error);
+    }
+  }, [isError, error, handleError]);
+
   return (
-    <Box sx={{ overflowX: 'hidden' }}>
+    <Box sx={{ overflowX: 'hidden', pt: 4 }}>
       <Typography variant="h5" sx={{ mb: '1rem', textAlign: 'center', fontWeight: '450' }}>
-        Products List
+        PRODUCTS
       </Typography>
       {content}
       {isSuccess && (
         <>
-          <Button onClick={handlePopupView} sx={{ mt: 5 }} variant="contained" color="success">
+          <Button
+            startIcon={<AddBoxIcon />}
+            onClick={handlePopupView}
+            sx={{ mt: 5, position: 'absolute', right: 16, display: 'flex' }}
+            variant="outlined"
+          >
             Add Product
           </Button>
           <ProductTableList

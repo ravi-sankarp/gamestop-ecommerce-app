@@ -7,8 +7,12 @@ export const extendedViewsApiSlice = apiSlice.injectEndpoints({
       providesTags: ['productdata']
     }),
     getAllProducts: builder.query({
-      query: () => '/getproducts',
+      query: (params) => `/getallproducts${params}`,
       providesTags: ['productdata']
+    }),
+    getNavlist: builder.query({
+      query: () => '/getnavlist',
+      providesTags: ['productdata,categorydata']
     }),
     getSingleProduct: builder.query({
       query: ({ id }) => `/getproduct/${id}`,
@@ -16,6 +20,9 @@ export const extendedViewsApiSlice = apiSlice.injectEndpoints({
     })
   })
 });
-export const { useGetHomePageQuery,
+export const {
+  useGetHomePageQuery,
   useGetAllProductsQuery,
-   useGetSingleProductQuery } = extendedViewsApiSlice;
+  useGetSingleProductQuery,
+  useGetNavlistQuery
+} = extendedViewsApiSlice;
