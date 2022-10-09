@@ -59,14 +59,14 @@ export default function ProductListCards({ products }) {
                       variant="h6"
                       sx={{ color: '#000', fontSize: '1.01rem' }}
                     >
-                      {`₹${product.discountedPrice}`}
+                      {`₹${product.discountedPrice.toLocaleString()}`}
                     </Typography>
                     <Typography
                       gutterBottom
                       sx={{ textDecoration: 'line-through', opacity: 0.5, fontSize: 13 }}
                       variant="subtitle"
                     >
-                      {`₹${product.price}`}
+                      {`₹${product.price.toLocaleString()}`}
                     </Typography>
                     <Typography
                       gutterBottom
@@ -78,7 +78,7 @@ export default function ProductListCards({ products }) {
                   </Box>
 
                   <Rating
-                    sx={{ fontSize: '18px' }}
+                    sx={{ fontSize: '18px', color: '#000' }}
                     name="read-only"
                     value={product.rating}
                     readOnly

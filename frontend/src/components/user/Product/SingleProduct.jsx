@@ -1,22 +1,59 @@
+/* eslint-disable no-unused-vars */
 import { useState, useEffect } from 'react';
 import { Box, Button, Grid, List, ListItem, Typography } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
 import ReactImageMagnify from 'react-image-magnify';
 import { PrimaryButton, SecondaryButton } from '../../../MaterialUiConfig/styled';
+import { useUpdateCartMutation, useUpdateWishlistMutation } from '../../../redux/api/userApiSlice';
+import useApiErrorHandler from '../../../hooks/useApiErrorHandler';
+import useSuccessHandler from '../../../hooks/useSuccessHandler';
 
 function SingleProduct({ product }) {
   const [img, setImg] = useState(product.images[0].imgUrl);
-  const handleImgHover = (e) => {
-    if (e.target.tagName === 'IMG') {
-      setImg(e.target.src);
-    }
-  };
+  const [cartText, setCartText] = useState('Add to Cart');
+  const [wishlistText, setWishlistText] = useState('Add to Wishlist');
+  const [addToCart, { isLoading }] = useUpdateCartMutation();
+  const [addToWishlist, { isLoading: addToWishlistIsLoading }] = useUpdateWishlistMutation();
+  const successToast = useSuccessHandler();
+  const errorToast = useApiErrorHandler();
   useEffect(() => {
     window.scrollTo({
       top: 0,
       behavior: 'smooth'
     });
   }, []);
+
+  const handleImgHover = (e) => {
+    if (e.target.tagName === 'IMG') {
+      setImg(e.target.src);
+    }
+  };
+  const handleAddToCart = async (id) => {
+    try {
+      if (!isLoading) {
+        setCartText('Adding...');
+        const res = await addToCart({ productId: id, count: 1 }).unwrap();
+        successToast(res);
+      }
+    } catch (err) {
+      errorToast(err);
+    } finally {
+      setCartText('Add to Cart');
+    }
+  };
+  const handleAddToWishlist = async (id) => {
+    try {
+      if (!addToWishlistIsLoading) {
+        setWishlistText('Adding...');
+        const res = await addToWishlist({ productId: id }).unwrap();
+        successToast(res);
+      }
+    } catch (err) {
+      errorToast(err);
+    } finally {
+      setWishlistText('Add to Wishlist');
+    }
+  };
   return (
     <Grid
       container
@@ -24,7 +61,13 @@ function SingleProduct({ product }) {
       columnSpacing={{ xs: 1, sm: 2, md: 3, lg: 4 }}
       sx={{ padding: { lg: '0px 3rem', xs: '0px 10px' } }}
     >
-      <Grid item xs={12} md={6} justifyContent="center" alignItems="center">
+      <Grid
+        item
+        xs={12}
+        md={6}
+        justifyContent="center"
+        alignItems="center"
+      >
         <Box
           component="img"
           src={img}
@@ -92,9 +135,22 @@ function SingleProduct({ product }) {
           ))}
         </Box>
       </Grid>
-      <Grid item rowSpacing={2} xs={12} md={6} justifyContent="center" alignItems="center">
-        <Box component="div" sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-          <Typography gutterBottom variant="h5">
+      <Grid
+        item
+        rowSpacing={2}
+        xs={12}
+        md={6}
+        justifyContent="center"
+        alignItems="center"
+      >
+        <Box
+          component="div"
+          sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}
+        >
+          <Typography
+            gutterBottom
+            variant="h5"
+          >
             {product.details}
           </Typography>
           <Button
@@ -111,22 +167,41 @@ function SingleProduct({ product }) {
               variant="subtitle"
               sx={{ color: '#000', opacity: 1, fontWeight: '550', fontSize: 25 }}
             >
-              {`₹${product.discountedPrice}`}
+              {`₹${product.discountedPrice.toLocaleString()}`}
             </Typography>
             <Typography
               gutterBottom
               sx={{ textDecoration: 'line-through', opacity: 0.5 }}
               variant="subtitle"
             >
-              {`₹${product.price}`}
+              {`₹${product.price.toLocaleString()}`}
             </Typography>
-            <Typography gutterBottom sx={{ color: 'green', opacity: 0.8 }} variant="subtitle">
+            <Typography
+              gutterBottom
+              sx={{ color: 'green', opacity: 0.8 }}
+              variant="subtitle"
+            >
               {`(${product.discount}% off )`}
             </Typography>
           </Box>
-          <Typography gutterBottom sx={{ color: 'red', opacity: 0.8 }} variant="subtitle">
-            {`Hurry only ${product.stock} items left `}
-          </Typography>
+          {product.stock > 1 && product.stock < 10 && (
+            <Typography
+              gutterBottom
+              sx={{ color: 'red', opacity: 0.8 }}
+              variant="subtitle"
+            >
+              {`Hurry only ${product.stock} items left `}
+            </Typography>
+          )}
+          {product.stock === 0 && (
+            <Typography
+              gutterBottom
+              sx={{ color: 'red', opacity: 0.8 }}
+              variant="subtitle"
+            >
+              The items is currently out of stock
+            </Typography>
+          )}
         </Box>
         <List
           sx={{
@@ -140,8 +215,14 @@ function SingleProduct({ product }) {
         >
           <Typography variant="h6">Product Highlights : </Typography>
           {product.keyFeatures.split(',').map((feature) => (
-            <ListItem key={feature.split(':')[0]} disablePadding>
-              <Box component="span" sx={{ display: 'flex', gap: 1 }}>
+            <ListItem
+              key={feature.split(':')[0]}
+              disablePadding
+            >
+              <Box
+                component="span"
+                sx={{ display: 'flex', gap: 1 }}
+              >
                 <p>{`${feature.split(':')[0]}  :`}</p>
                 <p>{feature.split(':')[1]}</p>
               </Box>
@@ -149,8 +230,18 @@ function SingleProduct({ product }) {
           ))}
         </List>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', flex: '1' }}>
-          <PrimaryButton sx={{ flex: '1' }}>Add to Cart</PrimaryButton>
-          <SecondaryButton sx={{ flex: '1', height: '50px' }}>Wishlist</SecondaryButton>
+          <PrimaryButton
+            onClick={() => handleAddToCart(product._id)}
+            sx={{ flex: '1' }}
+          >
+            {cartText}
+          </PrimaryButton>
+          <SecondaryButton
+            onClick={() => handleAddToWishlist(product._id)}
+            sx={{ flex: '1', height: '50px' }}
+          >
+            {wishlistText}
+          </SecondaryButton>
         </Box>
       </Grid>
     </Grid>

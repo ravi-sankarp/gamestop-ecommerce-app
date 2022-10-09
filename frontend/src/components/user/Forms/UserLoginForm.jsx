@@ -39,9 +39,9 @@ function UserLoginForm() {
         setBtnText('Loading...');
         const res = await userLogin(data).unwrap();
         if (res.status === 'success') {
+          await dispatch(setToken(res));
           dispatch(setToast({ data: res, open: true }));
           setFormError('');
-          await dispatch(setToken(res));
           navigate('/');
         }
       } catch (err) {

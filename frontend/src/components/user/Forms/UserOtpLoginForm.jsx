@@ -35,7 +35,7 @@ function UserOtpLoginForm() {
   });
   const otpSchema = yup.object().shape({
     code: yup
-      .number()
+      .string()
       .required('Please enter your OTP')
       .min(4, 'OTP is of 4 characters')
       .typeError('Please enter your OTP')
@@ -83,8 +83,9 @@ function UserOtpLoginForm() {
   const onSubmitOtpHandler = async (data) => {
     if (!isLoadingOtpVerify) {
       try {
+        console.log(data);
         setBtnText('Loading...');
-        const res = await verifyOtp({ phoneNumber, code: data.code }).unwrap();
+        const res = await verifyOtp({ phoneNumber, code: `${data.code}` }).unwrap();
         setFormError('');
         dispatch(setToast({ data: res, open: true }));
         await dispatch(setToken(res));

@@ -10,7 +10,8 @@ import {
   ListItem,
   ListItemIcon,
   Tooltip,
-  Typography
+  Typography,
+  Badge
 } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
@@ -21,10 +22,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { deleteToken } from '../../../redux/reducers/authSlice';
 import { setToast } from '../../../redux/reducers/toastSlice';
 import apiSlice from '../../../redux/api/apiSlice';
+import { useGetCartAndWishlistCountQuery } from '../../../redux/api/userApiSlice';
 
 function DesktopIcons() {
   const [openAlert, setOpenAlert] = useState(false);
   const data = useSelector((state) => state.auth.data);
+  const { data: result } = useGetCartAndWishlistCountQuery('Get cart count', { skip: !data });
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const value = data.token ? 'Logout' : 'Login';
@@ -57,22 +60,38 @@ function DesktopIcons() {
       dropDown:
         value === 'Login' ? (
           <>
-            <Typography variant="subtitle2" component={Link} className="text-link" to="/login">
+            <Typography
+              variant="subtitle2"
+              component={Link}
+              className="text-link"
+              to="/login"
+            >
               Login
             </Typography>
-            <Typography variant="subtitle2" component={Link} className="text-link" to="/register">
+            <Typography
+              variant="subtitle2"
+              component={Link}
+              className="text-link"
+              to="/register"
+            >
               Register
             </Typography>
           </>
         ) : (
           <>
-            <Typography variant="subtitle2" component={Link} className="text-link" to="/profile">
+            <Typography
+              variant="subtitle2"
+              component={Link}
+              className="text-link"
+              to="/profile?profile=info"
+            >
               Profile
             </Typography>
-            <Typography variant="subtitle2" component={Link} className="text-link" to="/orders">
-              Orders
-            </Typography>
-            <Typography variant="subtitle2" onClick={handleAlertShow}>
+
+            <Typography
+              variant="subtitle2"
+              onClick={handleAlertShow}
+            >
               Logout
             </Typography>
           </>
@@ -82,7 +101,13 @@ function DesktopIcons() {
       path: 'wishlist',
       icon: (
         <Tooltip title="Wishlist">
-          <FavoriteBorderOutlinedIcon />
+          <Badge
+            variant="dot"
+            invisible={!result?.data['1']?.wishlistCount}
+            color="error"
+          >
+            <FavoriteBorderOutlinedIcon />
+          </Badge>
         </Tooltip>
       )
     },
@@ -90,7 +115,13 @@ function DesktopIcons() {
       path: 'cart',
       icon: (
         <Tooltip title="Cart">
-          <ShoppingCartOutlinedIcon />
+          <Badge
+            variant="dot"
+            invisible={!result?.data['0']?.cartCount}
+            color="error"
+          >
+            <ShoppingCartOutlinedIcon />
+          </Badge>
         </Tooltip>
       )
     }
@@ -110,7 +141,10 @@ function DesktopIcons() {
           key={item.path}
           disablePadding
         >
-          <ListItemIcon className="profile-btn" sx={{ color: '#000', cursor: 'pointer' }}>
+          <ListItemIcon
+            className="profile-btn"
+            sx={{ color: '#000', cursor: 'pointer' }}
+          >
             {item.icon}
             <div className="profile-dropdown">{item.dropDown}</div>
           </ListItemIcon>

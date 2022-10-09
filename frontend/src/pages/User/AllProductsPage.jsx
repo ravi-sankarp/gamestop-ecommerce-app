@@ -5,14 +5,13 @@ import NoResultsFound from '../../components/NoResultsFound';
 import MenuDrawer from '../../components/user/Drawer/MenuDrawer';
 import ProductListCards from '../../components/user/Product/ProductListCards';
 import ProductSort from '../../components/user/ProductSort';
+import HelmetMeta from '../../components/HelmetMeta';
 import { useGetAllProductsQuery } from '../../redux/api/viewsApiSlice';
 import { setToast } from '../../redux/reducers/toastSlice';
 
 function AllProductsPage() {
-  // const [query, setQuery] = useState();
   const dispatch = useDispatch();
   const { search } = useLocation();
-  // setQuery(search);
   const { data, isLoading, isFetching, isError, isSuccess, error } = useGetAllProductsQuery(search);
   let content;
   if (isLoading || isFetching) {
@@ -30,7 +29,10 @@ function AllProductsPage() {
           }
         }}
       >
-        <CircularProgress sx={{ overflow: 'hidden' }} color="primary" />
+        <CircularProgress
+          sx={{ overflow: 'hidden' }}
+          color="primary"
+        />
       </Box>
     );
   }
@@ -47,25 +49,31 @@ function AllProductsPage() {
     return <NoResultsFound />;
   };
   return (
-    <Box sx={{ overflowX: 'hidden', minHeight: '100vh', p: { xs: 1, md: 3, lg: 4 } }}>
-      <Typography variant="h4" sx={{ mb: 4, mt: 2, textAlign: 'center', fontWeight: '450' }}>
-        SHOP
-      </Typography>
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: { xs: 'space-between' },
-          height: '5rem',
-          alignItems: 'center',
-          mb: 3
-        }}
-      >
-        <MenuDrawer />
-        <ProductSort />
+    <>
+      <HelmetMeta title="Products | Gamestop" />
+      <Box sx={{ overflowX: 'hidden', minHeight: '100vh', p: { xs: 1, md: 3, lg: 4 } }}>
+        <Typography
+          variant="h4"
+          sx={{ mb: 4, mt: 2, textAlign: 'center', fontWeight: '450' }}
+        >
+          SHOP
+        </Typography>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: { xs: 'space-between' },
+            height: '5rem',
+            alignItems: 'center',
+            mb: 3
+          }}
+        >
+          <MenuDrawer />
+          <ProductSort />
+        </Box>
+        {content}
+        {isSuccess && checkProductsExists()}
       </Box>
-      {content}
-      {isSuccess && checkProductsExists()}
-    </Box>
+    </>
   );
 }
 

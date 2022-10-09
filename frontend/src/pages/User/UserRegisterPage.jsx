@@ -1,5 +1,6 @@
 import { useSelector } from 'react-redux';
 import { Navigate } from 'react-router-dom';
+import HelmetMeta from '../../components/HelmetMeta';
 import UserRegisterForm from '../../components/user/Forms/UserRegisterForm';
 
 function UserRegisterPage() {
@@ -8,7 +9,13 @@ function UserRegisterPage() {
     return <Navigate to="/" />;
   }
 
-  return <UserRegisterForm />;
+  return (
+    <>
+      <HelmetMeta title="Register New Account | Gamestop" />
+
+      <UserRegisterForm />
+    </>
+  );
 }
 
 export default UserRegisterPage;

@@ -1,6 +1,7 @@
 import { Box, CircularProgress } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
+import HelmetMeta from '../../components/HelmetMeta';
 import SingleProduct from '../../components/user/Product/SingleProduct';
 import { useGetSingleProductQuery } from '../../redux/api/viewsApiSlice';
 import { setToast } from '../../redux/reducers/toastSlice';
@@ -12,7 +13,6 @@ function ProductPage() {
     id
   });
   let content;
-  console.log(data);
   if (isLoading || isFetching) {
     content = (
       <Box
@@ -28,7 +28,10 @@ function ProductPage() {
           }
         }}
       >
-        <CircularProgress sx={{ overflow: 'hidden' }} color="primary" />
+        <CircularProgress
+          sx={{ overflow: 'hidden' }}
+          color="primary"
+        />
       </Box>
     );
   }
@@ -38,10 +41,13 @@ function ProductPage() {
     dispatch(setToast({ open: true, data: error }));
   }
   return (
-    <Box sx={{ overflowX: 'hidden', minHeight: '100vh', p: { xs: 1, md: 3, lg: 4 } }}>
-      {content}
-      {isSuccess && <SingleProduct product={data.data} />}
-    </Box>
+    <>
+      <HelmetMeta title={`${data?.data?.name ?? 'Product'} | Gamestop`} />
+      <Box sx={{ overflowX: 'hidden', minHeight: '100vh', p: { xs: 1, md: 3, lg: 4 } }}>
+        {content}
+        {isSuccess && <SingleProduct product={data.data} />}
+      </Box>
+    </>
   );
 }
 
