@@ -17,7 +17,7 @@ export const extendedAdminApiSlice = apiSlice.injectEndpoints({
 
     getProductData: builder.query({
       query: () => '/admin/getproducts',
-      providesTags: ['productdata']
+      providesTags: ['productdata', 'categorydata', 'branddata']
     }),
 
     addNewProduct: builder.mutation({
@@ -26,7 +26,7 @@ export const extendedAdminApiSlice = apiSlice.injectEndpoints({
         method: 'POST',
         body: data
       }),
-      invalidatesTags: ['productdata']
+      invalidatesTags: ['productdata', 'categorydata', 'branddata']
     }),
     editProduct: builder.mutation({
       query: ({ id, data }) => ({
@@ -34,14 +34,14 @@ export const extendedAdminApiSlice = apiSlice.injectEndpoints({
         method: 'PUT',
         body: data
       }),
-      invalidatesTags: ['productdata']
+      invalidatesTags: ['productdata', 'categorydata', 'branddata']
     }),
     deleteProduct: builder.mutation({
       query: ({ id }) => ({
         url: `/admin/deleteproduct/${id}`,
         method: 'DELETE'
       }),
-      invalidatesTags: ['productdata']
+      invalidatesTags: ['productdata', 'categorydata', 'branddata']
     }),
 
     getCategoryData: builder.query({
@@ -55,7 +55,7 @@ export const extendedAdminApiSlice = apiSlice.injectEndpoints({
         method: 'POST',
         body: data
       }),
-      invalidatesTags: ['categorydata']
+      invalidatesTags: ['categorydata', 'productdata']
     }),
 
     editCategory: builder.mutation({
@@ -64,7 +64,7 @@ export const extendedAdminApiSlice = apiSlice.injectEndpoints({
         method: 'PUT',
         body: data
       }),
-      invalidatesTags: ['categorydata']
+      invalidatesTags: ['categorydata', 'productdata']
     }),
 
     deleteCategory: builder.mutation({
@@ -72,7 +72,7 @@ export const extendedAdminApiSlice = apiSlice.injectEndpoints({
         url: `/admin/deletecategory/${id}`,
         method: 'DELETE'
       }),
-      invalidatesTags: ['categorydata']
+      invalidatesTags: ['categorydata', 'productdata']
     }),
 
     getBrandData: builder.query({
@@ -86,7 +86,7 @@ export const extendedAdminApiSlice = apiSlice.injectEndpoints({
         method: 'POST',
         body: data
       }),
-      invalidatesTags: ['branddata']
+      invalidatesTags: ['branddata', 'productdata']
     }),
 
     editBrand: builder.mutation({
@@ -95,7 +95,7 @@ export const extendedAdminApiSlice = apiSlice.injectEndpoints({
         method: 'PUT',
         body: data
       }),
-      invalidatesTags: ['branddata']
+      invalidatesTags: ['branddata', 'productdata']
     }),
 
     deleteBrand: builder.mutation({
@@ -103,7 +103,31 @@ export const extendedAdminApiSlice = apiSlice.injectEndpoints({
         url: `/admin/deletebrand/${id}`,
         method: 'DELETE'
       }),
-      invalidatesTags: ['branddata']
+      invalidatesTags: ['branddata', 'productdata']
+    }),
+
+    getAllOrders: builder.query({
+      query: () => '/admin/getallorders',
+      providesTags: ['orders']
+    }),
+
+    changeOrderStatus: builder.mutation({
+      query: (data) => ({
+        url: '/admin/changeorderstatus',
+        method: 'PATCH',
+        body: data
+      }),
+      invalidatesTags: ['orders', 'productdata']
+    }),
+
+    getDashboardCardData: builder.query({
+      query: () => '/admin/getdashboardcarddata',
+      providesTags: ['orders', 'productdata']
+    }),
+
+    getDashboardGraphData: builder.query({
+      query: () => '/admin/getdashboardgraphdata',
+      providesTags: ['orders', 'productdata']
     })
   })
 });
@@ -122,5 +146,9 @@ export const {
   useGetBrandDataQuery,
   useAddNewBrandMutation,
   useEditBrandMutation,
-  useDeleteBrandMutation
+  useDeleteBrandMutation,
+  useGetAllOrdersQuery,
+  useChangeOrderStatusMutation,
+  useGetDashboardCardDataQuery,
+  useGetDashboardGraphDataQuery
 } = extendedAdminApiSlice;

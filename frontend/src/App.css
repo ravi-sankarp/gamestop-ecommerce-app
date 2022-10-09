@@ -215,3 +215,14 @@ table th {
 .sort-dropdown {
     left: 10px !important;
 }
+
+.address-dropdown {
+    top: 0px !important;
+    width: 80px !important;
+    height: 80px !important;
+}
+
+.navbar-list .navbar-dropdown p:hover {
+    background-color: #f1f7fd;
+    width: 100%;
+}

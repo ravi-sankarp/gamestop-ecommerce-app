@@ -7,11 +7,11 @@ function useSuccessHandler() {
   const dispatch = useDispatch();
   useEffect(() => {
     if (data?.status) {
-      dispatch(setToast({ open: true, data }));
+      dispatch(setToast({ data, open: true }));
       setData(null);
     }
-  }, [data]);
-return setData;
+  }, [data, dispatch]);
+  return setData;
 }
 
 export default useSuccessHandler;
