@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import adminController from '../contollers/adminController.js';
+import adminController from '../controllers/adminController.js';
 import { protect, checkAdmin } from '../middlewares/authMiddleware.js';
 import upload from '../config/multer.js';
 
@@ -101,7 +101,19 @@ router.put(
   adminController.editBanner
 );
 
-//DELeTE Delete Banner Route
+//DELETE Delete Banner Route
 router.delete('/deletebanner/:id', protect, checkAdmin, adminController.deleteBanner);
+
+//GET All order details
+router.get('/getallorders', protect, checkAdmin, adminController.listAllOrders);
+
+//PUT Update order status
+router.patch('/changeorderstatus', protect, checkAdmin, adminController.updateOrderStatus);
+
+// Get Dashboard Card Data
+router.get('/getdashboardcarddata', protect, checkAdmin, adminController.getDashboardCardData);
+
+// Get Dashboard Card Data
+router.get('/getdashboardgraphdata', protect, checkAdmin, adminController.getDashboardGraphData);
 
 export default router;

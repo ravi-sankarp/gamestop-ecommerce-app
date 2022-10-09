@@ -74,10 +74,13 @@ export default (err, req, res, next) => {
 
   if (process.env.NODE_ENV === 'development') {
     let error = { ...err };
+    error.message = err.message;
+    error.stack = err.stack;
+
     if (error.name === 'CastError') error = handleCastErrorDB(error);
     if (error.name === 'JsonWebTokenError') error = handleJWTError();
     if (error.name === 'TokenExpiredError') error = handleJWTExpiredError();
-    
+
     sendErrorDev(error, req, res);
   } else if (process.env.NODE_ENV === 'production') {
     let error = { ...err };

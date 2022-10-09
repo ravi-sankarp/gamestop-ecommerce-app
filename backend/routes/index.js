@@ -1,34 +1,19 @@
 import express from 'express';
-import userAuth from '../contollers/authController.js';
-import userController from '../contollers/userController.js';
+import paymentController from '../controllers/paymentController.js';
+import viewController from '../controllers/viewController.js';
 
 const router = express.Router();
 
-
-//User login route
-router.post('/login', userAuth.userLogin);
-
-//User request OTP for login
-router.post('/requestotp', userAuth.requestOtp);
-
-
-
-// User verify OTP login
-router.post('/verifyotp', userAuth.verifyUserOtp);
-
-
-//Register New User Route
-router.post('/register', userAuth.registerUser);
-
 //Get all Products
-router.get('/getallproducts', userController.getAllProducts);
+router.get('/getallproducts', viewController.getAllProducts);
 
 //Get single Product details
-router.get('/getproduct/:id', userController.getSingleProduct);
+router.get('/getproduct/:id', viewController.getSingleProduct);
 
 //Get single Category and Product List
-router.get('/getnavlist', userController.getBrandsAndCategoryList);
+router.get('/getnavlist', viewController.getBrandsAndCategoryList);
 
-
+//verify razorpay webhook payment
+router.post('/verifyrazorpaypayment', paymentController.verifyRazorpayPayment);
 
 export default router;

@@ -8,7 +8,8 @@ import { getDb } from '../config/db.js';
 
 const changedPasswordAfter = (user, JwtTimestamp) => {
   if (user.passwordChangedAt) {
-    return JwtTimestamp < user.passwordChangedAt;
+    const passwordChangedAt = parseInt(user.passwordChangedAt.getTime() / 1000, 10);
+    return JwtTimestamp < passwordChangedAt;
   }
   return false;
 };
@@ -43,6 +44,7 @@ export const jwtVerify = asyncHandler(async (req, secret) => {
     if (changedPasswordAfter(currentUser, decoded.iat)) {
       throw new AppError('User recently changed password! Login again', 401);
     }
+    currentUser.password = undefined;
     return currentUser;
   } else {
     throw new AppError('Please Login first', 401);

@@ -21,6 +21,6 @@ export const verifyOtp = asyncHandler(async (phoneNumber, code) => {
   const serviceId = process.env.TWILIO_SERVICE_ID;
   const result = await client.verify.v2
     .services(serviceId)
-    .verificationChecks.create({ to: `+91${phoneNumber}`, code: code });
+    .verificationChecks.create({ to: `+91${phoneNumber}`, code });
   return result;
 });

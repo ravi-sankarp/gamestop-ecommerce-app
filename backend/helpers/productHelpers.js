@@ -58,7 +58,12 @@ export const findAllProducts = asyncHandler(async (query) => {
     }
     if (query.minPrice || query.maxPrice) {
       agg.push({
-        $match: { discountedPrice: { $gte: Number(query.minPrice) ?? 0, $lte: Number(query.maxPrice) ?? 50000 } }
+        $match: {
+          discountedPrice: {
+            $gte: Number(query.minPrice) ?? 0,
+            $lte: Number(query.maxPrice) ?? 50000
+          }
+        }
       });
     }
   }
@@ -66,6 +71,22 @@ export const findAllProducts = asyncHandler(async (query) => {
   // const sortedProducts = await products.sort({ discountedPrice: 1 }).toArray();
   // console.log(sortedProducts);
   return products;
+});
+
+//find total products count
+export const findTotalProducts = asyncHandler(async () => {
+  const agg = [
+    {
+      $group: {
+        _id: null,
+        totalProducts: {
+          $sum: 1
+        }
+      }
+    }
+  ];
+  const [count] = await getDb().collection('products').aggregate(agg).toArray();
+  return count;
 });
 
 //add new product
@@ -114,7 +135,6 @@ export const findProductByIdAggregation = asyncHandler(async (id) => {
     }
   ];
   const product = await getDb().collection('products').aggregate(agg).toArray();
-  console.log(product);
   return product[0];
 });
 
@@ -149,4 +169,19 @@ export const deleteProductsByCategoryId = asyncHandler(async (id) => {
 export const deleteProductsByBrandId = asyncHandler(async (id) => {
   const brandId = ObjectId(id);
   await getDb().collection('products').deleteMany({ brandId });
+});
+
+//Update product stock after a successfull order
+export const updateProductStock = asyncHandler(async (id, count) => {
+  const _id = ObjectId(id);
+  await getDb()
+    .collection('products')
+    .updateOne(
+      { _id },
+      {
+        $inc: {
+          stock: count
+        }
+      }
+    );
 });
