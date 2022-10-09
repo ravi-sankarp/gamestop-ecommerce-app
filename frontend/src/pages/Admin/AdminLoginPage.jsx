@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Navigate, useNavigate } from 'react-router-dom';
@@ -11,6 +10,7 @@ function AdminLoginPage() {
   const [formError, setFormError] = useState('');
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
   const [adminLogin, { isLoading }] = useAdminLoginMutation();
   const stateData = useSelector((state) => state.auth.data);
   if (stateData.admin) {
@@ -21,9 +21,9 @@ function AdminLoginPage() {
       try {
         const res = await adminLogin(data).unwrap();
         if (res.status === 'success') {
+          await dispatch(setToken(res));
           dispatch(setToast({ data: res, open: true }));
           setFormError('');
-          await dispatch(setToken(res));
           navigate('/admin/dashboard');
         }
       } catch (err) {

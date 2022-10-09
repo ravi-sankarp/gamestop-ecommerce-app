@@ -85,17 +85,30 @@ function ProductForm({ categories, brands, close, product }) {
     newProduct.categoryId = newProduct.categoryId.toString();
     reset(newProduct);
     getValues('rating');
-  }, []);
-  console.log(register('name'));
+  }, [getValues, product, reset]);
   return (
-    <Box component="form" noValidate autoComplete="off" onSubmit={handleSubmit(onSubmitHandler)}>
+    <Box
+      component="form"
+      noValidate
+      autoComplete="off"
+      onSubmit={handleSubmit(onSubmitHandler)}
+    >
       {formError && (
-        <Alert sx={{ mb: 5, textAlign: 'center' }} severity="error">
+        <Alert
+          sx={{ mb: 5, textAlign: 'center' }}
+          severity="error"
+        >
           {formError}!
         </Alert>
       )}
-      <Grid container spacing={4}>
-        <Grid item xs={6}>
+      <Grid
+        container
+        spacing={4}
+      >
+        <Grid
+          item
+          xs={6}
+        >
           <TextField
             sx={{ mb: 2 }}
             label="Product Name"
@@ -107,7 +120,10 @@ function ProductForm({ categories, brands, close, product }) {
             {...register('name')}
           />
         </Grid>
-        <Grid item xs={6}>
+        <Grid
+          item
+          xs={6}
+        >
           <TextField
             sx={{ mb: 2 }}
             label="Brand Name"
@@ -115,19 +131,26 @@ function ProductForm({ categories, brands, close, product }) {
             select
             fullWidth
             required
+            value={getValues('brandId')}
             type="text"
             error={!!errors.brandId}
             helperText={errors.brandId ? errors.brandId.message : ''}
             {...register('brandId')}
           >
             {brands.map((brand) => (
-              <MenuItem key={brand.name} selected value={brand._id.toString()}>
+              <MenuItem
+                key={brand.name}
+                value={brand._id.toString()}
+              >
                 {brand.name}
               </MenuItem>
             ))}
           </TextField>
         </Grid>
-        <Grid item xs={6}>
+        <Grid
+          item
+          xs={6}
+        >
           <TextField
             sx={{ mb: 2 }}
             label="Category"
@@ -141,13 +164,19 @@ function ProductForm({ categories, brands, close, product }) {
             {...register('categoryId')}
           >
             {categories.map((category) => (
-              <MenuItem key={category.name} value={category._id.toString()}>
+              <MenuItem
+                key={category.name}
+                value={category._id.toString()}
+              >
                 {category.name}
               </MenuItem>
             ))}
           </TextField>
         </Grid>
-        <Grid item xs={6}>
+        <Grid
+          item
+          xs={6}
+        >
           <TextField
             sx={{ mb: 2 }}
             label="Product Details"
@@ -163,7 +192,10 @@ function ProductForm({ categories, brands, close, product }) {
           />
         </Grid>
 
-        <Grid item xs={6}>
+        <Grid
+          item
+          xs={6}
+        >
           <TextField
             sx={{ mb: 2 }}
             label="Key Features"
@@ -179,7 +211,10 @@ function ProductForm({ categories, brands, close, product }) {
           />
         </Grid>
 
-        <Grid item xs={6}>
+        <Grid
+          item
+          xs={6}
+        >
           <TextField
             sx={{ mb: 2 }}
             label="Product Description"
@@ -194,7 +229,10 @@ function ProductForm({ categories, brands, close, product }) {
             {...register('description')}
           />
         </Grid>
-        <Grid item xs={6}>
+        <Grid
+          item
+          xs={6}
+        >
           <TextField
             sx={{ mb: 2 }}
             label="Price"
@@ -207,7 +245,10 @@ function ProductForm({ categories, brands, close, product }) {
             {...register('price')}
           />
         </Grid>
-        <Grid item xs={6}>
+        <Grid
+          item
+          xs={6}
+        >
           <TextField
             sx={{ mb: 2 }}
             label="Product Discount Percentage"
@@ -220,7 +261,10 @@ function ProductForm({ categories, brands, close, product }) {
             {...register('discount')}
           />
         </Grid>
-        <Grid item xs={6}>
+        <Grid
+          item
+          xs={6}
+        >
           <TextField
             sx={{ mb: 2 }}
             label="Product Stock"
@@ -249,7 +293,7 @@ function ProductForm({ categories, brands, close, product }) {
           <Slider
             sx={{ width: '50%' }}
             aria-label="Always visible"
-            defaultValue={getValues('rating')}
+            value={getValues('rating')}
             min={1}
             max={5}
             size="small"
@@ -276,11 +320,19 @@ function ProductForm({ categories, brands, close, product }) {
       />
       <Box sx={{ display: 'flex', justifyContent: 'space-evenly' }}>
         {product.images.map((item) => (
-          <img width="100px" height="100px" src={item.imgUrl} alt={product.name} />
+          <img
+            width="100px"
+            height="100px"
+            src={item.imgUrl}
+            alt={product.name}
+          />
         ))}
       </Box>
 
-      <PrimaryButton sx={{ width: '200px', mx: 'auto', p: 1, display: 'block' }} type="submit">
+      <PrimaryButton
+        sx={{ width: '200px', mx: 'auto', p: 1, display: 'block' }}
+        type="submit"
+      >
         {text}
       </PrimaryButton>
     </Box>

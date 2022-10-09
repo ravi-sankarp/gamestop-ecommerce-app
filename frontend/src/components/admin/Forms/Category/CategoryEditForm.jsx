@@ -69,7 +69,7 @@ function CategoryEditForm({ categoryData, close }) {
     const newProduct = { ...categoryData };
     newProduct.bannerImg = [];
     reset(newProduct);
-  }, []);
+  }, [categoryData, reset]);
   return (
     <Box component="form" noValidate autoComplete="off" onSubmit={handleSubmit(onSubmitHandler)}>
       {formError && (

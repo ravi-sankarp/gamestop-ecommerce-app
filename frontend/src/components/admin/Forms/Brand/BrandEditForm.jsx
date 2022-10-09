@@ -71,7 +71,7 @@ function BrandEditForm({ brandData, close }) {
     const newProduct = { ...brandData };
     newProduct.bannerImg = [];
     reset(newProduct);
-  }, []);
+  }, [brandData, reset]);
   return (
     <Box component="form" noValidate autoComplete="off" onSubmit={handleSubmit(onSubmitHandler)}>
       {formError && (
