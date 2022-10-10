@@ -294,7 +294,6 @@ const editProduct = asyncHandler(async (req, res) => {
   const {
     name = product.name,
     price = product.price,
-    discount = product.discount,
     categoryId = product.categoryId,
     brandId = product.brandId,
     details = product.details,
@@ -328,8 +327,6 @@ const editProduct = asyncHandler(async (req, res) => {
   const dataToInsert = {
     name,
     price: price,
-    discountedPrice: Math.ceil(price - price * discount * 0.01),
-    discount: discount,
     categoryId: categoryId,
     brandId: brandId,
     details,
@@ -652,7 +649,10 @@ const getDashboardCardData = asyncHandler(async (req, res) => {
 //@route  GET /api/getdashboardgraphdata
 //@access private
 const getDashboardGraphData = asyncHandler(async (req, res) => {
-  const result = await Promise.all([orderHelpers.countOrdersWithSamePaymentMethod(),orderHelpers.getLastWeekOrders()]);
+  const result = await Promise.all([
+    orderHelpers.countOrdersWithSamePaymentMethod(),
+    orderHelpers.getLastWeekOrders()
+  ]);
   const resData = {
     status: 'success',
     data: result

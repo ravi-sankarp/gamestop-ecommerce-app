@@ -247,7 +247,7 @@ export const getLastWeekOrders = asyncHandler(async () => {
           $ne: 'Order Pending'
         },
         'order.orderedOn': {
-          $gte: new Date(new Date() - 7 * 60 * 60 * 24 * 1000)
+          $gt: new Date(new Date() - 6 * 60 * 60 * 24 * 1000)
         }
       }
     },

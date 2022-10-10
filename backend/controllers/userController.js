@@ -744,12 +744,12 @@ const checkPaymentStatus = asyncHandler(async (req, res) => {
 //@access private
 const listUserOrders = asyncHandler(async (req, res) => {
   const user = req.userDetails;
-  const { orders } = await findOrdersByUserId(user._id);
+  const orders  = await findOrdersByUserId(user._id);
   let resData;
   if (orders) {
     resData = {
       status: 'success',
-      data: orders
+      data: orders.orders
     };
   } else {
     resData = {
