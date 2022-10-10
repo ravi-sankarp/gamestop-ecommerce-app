@@ -15,26 +15,23 @@ import {
   DialogContentText,
   DialogTitle,
   IconButton,
-  TablePagination,
-  Typography
+  TablePagination
 } from '@mui/material';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import { useDeleteProductMutation } from '../../../redux/api/adminApiSlice';
 import { setToast } from '../../../redux/reducers/toastSlice';
 
-import ProductEditForm from '../Forms/Product/ProductEditForm';
-
-export default function UserTableList({ data, categories, brands }) {
+export default function UserTableList({ data }) {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [productData, setProductData] = useState({});
-  const [operation, setOperation] = useState('');
   const [sendDeleteProduct, { isLoading }] = useDeleteProductMutation();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -50,9 +47,8 @@ export default function UserTableList({ data, categories, brands }) {
   };
 
   // open delete confirm dialog
-  const handleAction = (selectedProduct, currentOperation) => {
+  const handleAction = (selectedProduct) => {
     setProductData(selectedProduct);
-    setOperation(currentOperation);
     handleAlertShow();
   };
 
@@ -91,45 +87,68 @@ export default function UserTableList({ data, categories, brands }) {
                 <TableRow
                   key={product.name}
                   sx={{
-                    p: 0,
                     '& td': {
-                      p: { md: 0 }
+                      p: { md: 2 }
                     },
                     '&:last-child td, &:last-child th': { border: 0 },
                     '&:nth-of-type(even) ': { backgroundColor: '#f4f8fd' }
                   }}
                 >
-                  <TableCell data-label="Name" align="center">
+                  <TableCell
+                    data-label="Name"
+                    align="center"
+                  >
                     {product.name}
                   </TableCell>
-                  <TableCell data-label="Brand" align="center">
+                  <TableCell
+                    data-label="Brand"
+                    align="center"
+                  >
                     {product.brand[0].name}
                   </TableCell>
-                  <TableCell data-label="Category" align="center">
+                  <TableCell
+                    data-label="Category"
+                    align="center"
+                  >
                     {product.category[0].name}
                   </TableCell>
-                  <TableCell data-label="Original Price" align="center">
-                    {product.price}
+                  <TableCell
+                    data-label="Original Price"
+                    align="center"
+                  >
+                    {`₹ ${product.price.toLocaleString()}`}
                   </TableCell>
-                  <TableCell data-label="Discounted Price" align="center">
-                    {product.discountedPrice}
+                  <TableCell
+                    data-label="Discounted Price"
+                    align="center"
+                  >
+                    {`₹ ${product.discountedPrice.toLocaleString()}`}
                   </TableCell>
-                  <TableCell data-label="Stock" align="center">
+                  <TableCell
+                    data-label="Stock"
+                    align="center"
+                  >
                     {product.stock}
                   </TableCell>
-                  <TableCell data-label="Rating" align="center">
+                  <TableCell
+                    data-label="Rating"
+                    align="center"
+                  >
                     {product.rating}
                   </TableCell>
-                  <TableCell data-label="Action" align="center">
+                  <TableCell
+                    data-label="Action"
+                    align="center"
+                  >
                     <IconButton
-                      onClick={() => handleAction(product, 'edit')}
+                      onClick={() => navigate(`/admin/editproduct/${product._id}`)}
                       aria-label="edit"
                       color="primary"
                     >
                       <EditOutlinedIcon />
                     </IconButton>
                     <IconButton
-                      onClick={() => handleAction(product, 'delete')}
+                      onClick={() => handleAction(product)}
                       aria-label="delete"
                       color="primary"
                     >
@@ -157,57 +176,32 @@ export default function UserTableList({ data, categories, brands }) {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        {operation === 'delete' ? (
-          <>
-            <DialogTitle id="alert-dialog-title">Confirm Delete </DialogTitle>
-            <DialogContent>
-              <DialogContentText id="alert-dialog-description">
-                Are you sure you want to delete the product {productData.name}
-              </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-              <Button
-                variant="contained"
-                sx={{ backgroundColor: '#339af0', '&:hover': { backgroundColor: '#1c7ed6' } }}
-                onClick={handleAlertShow}
-              >
-                No
-              </Button>
-              <Button
-                variant="contained"
-                sx={{
-                  backgroundColor: '#fa5252',
-                  '&:hover': { backgroundColor: '#e03131' }
-                }}
-                onClick={handleConfirmProductDelete}
-                autoFocus
-              >
-                Yes
-              </Button>
-            </DialogActions>
-          </>
-        ) : (
-          <>
-            <DialogTitle>
-              <div style={{ display: 'flex' }}>
-                <Typography variant="h6" component="div" style={{ flexGrow: 1 }}>
-                  Edit Product
-                </Typography>
-                <Button color="primary" variant="outlined" onClick={handleAlertShow}>
-                  <CloseOutlinedIcon />
-                </Button>
-              </div>
-            </DialogTitle>
-            <DialogContent dividers>
-              <ProductEditForm
-                product={productData}
-                categories={categories}
-                brands={brands}
-                close={handleAlertShow}
-              />
-            </DialogContent>
-          </>
-        )}
+        <DialogTitle id="alert-dialog-title">Confirm Delete </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to delete the product {productData.name}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant="contained"
+            sx={{ backgroundColor: '#339af0', '&:hover': { backgroundColor: '#1c7ed6' } }}
+            onClick={handleAlertShow}
+          >
+            No
+          </Button>
+          <Button
+            variant="contained"
+            sx={{
+              backgroundColor: '#fa5252',
+              '&:hover': { backgroundColor: '#e03131' }
+            }}
+            onClick={handleConfirmProductDelete}
+            autoFocus
+          >
+            Yes
+          </Button>
+        </DialogActions>
       </Dialog>
     </>
   );

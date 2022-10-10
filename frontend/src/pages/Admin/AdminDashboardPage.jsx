@@ -22,7 +22,6 @@ function AdminDashboardPage() {
     error: errorGraph
   } = useGetDashboardGraphDataQuery();
   const handleError = useApiErrorHandler();
-  console.log(graphData);
   useEffect(() => {
     if (isErrorGraph) {
       handleError(error);
@@ -77,15 +76,15 @@ function AdminDashboardPage() {
             value={`₹ ${data.data.totalAmount.toLocaleString()}`}
           />
           <DashboardCard
-            title="Total Users"
+            title="Customers"
             value={data.data.totalUsers}
           />
           <DashboardCard
-            title="Total Products"
+            title="Products"
             value={data.data.totalProducts}
           />
           <DashboardCard
-            title="Total Orders"
+            title="Orders"
             value={data.data.totalOrders}
           />
         </Box>

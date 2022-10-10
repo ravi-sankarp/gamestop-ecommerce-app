@@ -1,25 +1,22 @@
-import {
-  Box,
-  Button,
-  CircularProgress,
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  Typography
-} from '@mui/material';
-import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { Box, Button, CircularProgress, Typography } from '@mui/material';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import ProductTableList from '../../components/admin/Table/ProductTableList';
 import { useGetProductDataQuery } from '../../redux/api/adminApiSlice';
-import ProductForm from '../../components/admin/Forms/Product/ProductForm';
 import useApiErrorHandler from '../../hooks/useApiErrorHandler';
 
 function AdminProductsPage() {
-  const [openPopup, setOpenPopup] = useState(false);
   const { data, isLoading, isFetching, isSuccess, isError, error } = useGetProductDataQuery();
   let content;
   const handleError = useApiErrorHandler();
+
+  useEffect(() => {
+    if (isError) {
+      handleError(error);
+    }
+  }, [isError, error, handleError]);
+
   if (isLoading || (isFetching && !isSuccess)) {
     content = (
       <Box
@@ -29,30 +26,30 @@ function AdminProductsPage() {
           overflowY: 'hidden',
           display: 'flex',
           alignItems: 'center',
+          position: 'fixed',
+          left: '50%',
+          top: '50%',
+          transform: 'translate(-50%,-50%)',
           justifyContent: 'center',
           '&::-webkit-scrollbar': {
             display: 'none'
           }
         }}
       >
-        <CircularProgress sx={{ overflow: 'hidden' }} color="primary" />
+        <CircularProgress
+          sx={{ overflow: 'hidden' }}
+          color="primary"
+        />
       </Box>
     );
   }
 
-  const handlePopupView = () => {
-    setOpenPopup((current) => !current);
-  };
-
-  useEffect(() => {
-    if (isError) {
-      handleError(error);
-    }
-  }, [isError, error, handleError]);
-
   return (
     <Box sx={{ overflowX: 'hidden', pt: 4 }}>
-      <Typography variant="h5" sx={{ mb: '1rem', textAlign: 'center', fontWeight: '450' }}>
+      <Typography
+        variant="h5"
+        sx={{ mb: '1rem', textAlign: 'center', fontWeight: '450' }}
+      >
         PRODUCTS
       </Typography>
       {content}
@@ -60,9 +57,16 @@ function AdminProductsPage() {
         <>
           <Button
             startIcon={<AddBoxIcon />}
-            onClick={handlePopupView}
-            sx={{ mt: 5, position: 'absolute', right: 16, display: 'flex' }}
-            variant="outlined"
+            component={Link}
+            to="/admin/addnewproduct"
+            sx={{
+              mt: 5,
+              position: 'absolute',
+              right: 16,
+              display: 'flex',
+              backgroundColor: '#343a40'
+            }}
+            variant="contained"
           >
             Add Product
           </Button>
@@ -71,25 +75,6 @@ function AdminProductsPage() {
             categories={data.data.categories}
             brands={data.data.brands}
           />
-          <Dialog sx={{ height: '100vh' }} onClose={handlePopupView} open={openPopup} maxWidth="md">
-            <DialogTitle>
-              <div style={{ display: 'flex' }}>
-                <Typography variant="h6" component="div" style={{ flexGrow: 1 }}>
-                  Add Product
-                </Typography>
-                <Button color="primary" variant="outlined" onClick={handlePopupView}>
-                  <CloseOutlinedIcon />
-                </Button>
-              </div>
-            </DialogTitle>
-            <DialogContent dividers>
-              <ProductForm
-                categories={data.data.categories}
-                brands={data.data.brands}
-                close={handlePopupView}
-              />
-            </DialogContent>
-          </Dialog>
         </>
       )}
     </Box>

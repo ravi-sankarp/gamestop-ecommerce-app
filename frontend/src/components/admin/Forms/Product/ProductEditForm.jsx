@@ -1,8 +1,10 @@
+/* eslint-disable react/no-array-index-key */
 /* eslint-disable function-paren-newline */
 /* eslint-disable implicit-arrow-linebreak */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable react/jsx-one-expression-per-line */
 /* eslint-disable react/jsx-props-no-spreading */
+import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
@@ -13,11 +15,14 @@ import { PrimaryButton } from '../../../../MaterialUiConfig/styled';
 import { useEditProductMutation } from '../../../../redux/api/adminApiSlice';
 import { setToast } from '../../../../redux/reducers/toastSlice';
 
-function ProductForm({ categories, brands, close, product }) {
+function ProductEditForm({ categories, brands, product }) {
   const [formError, setFormError] = useState('');
   const [text, setText] = useState('Update Product');
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const SUPPORTED_FORMATS = ['image/jpg', 'image/jpeg', 'image/png', 'image/webp'];
+
   const schema = yup.object().shape({
     name: yup.string().min(3, 'Product Name must be atleast 3 character'),
     price: yup
@@ -45,7 +50,6 @@ function ProductForm({ categories, brands, close, product }) {
   });
   const {
     register,
-    getValues,
     handleSubmit,
     reset,
     formState: { errors }
@@ -71,7 +75,7 @@ function ProductForm({ categories, brands, close, product }) {
         setText('Updating Product...');
         const res = await editProduct({ id: product._id, data: form }).unwrap();
         dispatch(setToast({ data: res, open: true }));
-        close();
+        navigate('/admin/products');
       } catch (err) {
         setText('Update Product');
         setFormError(err.data.message);
@@ -84,8 +88,7 @@ function ProductForm({ categories, brands, close, product }) {
     newProduct.brandId = newProduct.brandId.toString();
     newProduct.categoryId = newProduct.categoryId.toString();
     reset(newProduct);
-    getValues('rating');
-  }, [getValues, product, reset]);
+  }, [product, reset]);
   return (
     <Box
       component="form"
@@ -131,7 +134,7 @@ function ProductForm({ categories, brands, close, product }) {
             select
             fullWidth
             required
-            value={getValues('brandId')}
+            defaultValue={product.brandId}
             type="text"
             error={!!errors.brandId}
             helperText={errors.brandId ? errors.brandId.message : ''}
@@ -157,6 +160,7 @@ function ProductForm({ categories, brands, close, product }) {
             select
             fullWidth
             required
+            defaultValue={product.categoryId}
             name="categoryId"
             type="text"
             error={!!errors.categoryId}
@@ -293,7 +297,7 @@ function ProductForm({ categories, brands, close, product }) {
           <Slider
             sx={{ width: '50%' }}
             aria-label="Always visible"
-            value={getValues('rating')}
+            defaultValue={product.rating}
             min={1}
             max={5}
             size="small"
@@ -307,9 +311,9 @@ function ProductForm({ categories, brands, close, product }) {
       <TextField
         sx={{ mb: 2 }}
         inputProps={{
-          multiple: true
+          multiple: true,
+          accept: '.jpg, .jpeg, .png'
         }}
-        accept=".jpg, .jpeg, .png"
         name="images"
         fullWidth
         required
@@ -319,8 +323,9 @@ function ProductForm({ categories, brands, close, product }) {
         {...register('images')}
       />
       <Box sx={{ display: 'flex', justifyContent: 'space-evenly' }}>
-        {product.images.map((item) => (
+        {product.images.map((item, i) => (
           <img
+            key={i}
             width="100px"
             height="100px"
             src={item.imgUrl}
@@ -339,4 +344,4 @@ function ProductForm({ categories, brands, close, product }) {
   );
 }
 
-export default ProductForm;
+export default ProductEditForm;

@@ -114,7 +114,7 @@ function OrderTable({ data }) {
                         sx={{
                           p: 0,
                           '& td': {
-                            p: { md: 0 }
+                            p: { md: 2 }
                           },
                           '&:last-child td, &:last-child th': { border: 0 },
                           '&:nth-of-type(even) ': { backgroundColor: '#f4f8fd' }
@@ -291,7 +291,6 @@ function OrderTable({ data }) {
           >
             <Typography>
               Select the status for the order for the product
-              {' '}
               {changeOrderDetails?.item?.productName}
               {changeOrderDetails?.items?.map((item) => (
                 <Typography component="span">{`${item.productName},`}</Typography>

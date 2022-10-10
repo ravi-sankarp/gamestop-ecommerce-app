@@ -25,7 +25,9 @@ function LineChart({ graphData }) {
     }
   };
 
-  const labels = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const labels = new Array(7).fill(9).map((ele, i) => new Date(new Date().getTime() + (i + 1) * 1000 * 24 * 3600).toLocaleDateString('en-us', {
+      weekday: 'long'
+    }));
 
   const data = {
     labels,
@@ -36,7 +38,6 @@ function LineChart({ graphData }) {
           const found = graphData.find(
             (date) => new Date(date._id).toLocaleDateString('en-us', { weekday: 'long' }) === labels[i]
           );
-          console.log(found);
           if (found) {
             return found.orders;
           }
