@@ -60,7 +60,7 @@ function UserNavBar() {
     if (isError) {
       dispatch(setToast({ open: true, data: error.data || error.message }));
     }
-  }, [isSuccess, data, error, isError]);
+  }, [isSuccess, data, error, isError, dispatch]);
 
   return (
     <Box sx={{ display: 'flex' }}>
