@@ -109,6 +109,9 @@ const registerUser = asyncHandler(async (req, res) => {
     isBlocked: false,
     isAdmin: false
   });
+
+  // create a wallet for the user
+  
   const data = {
     status: 'success',
     token: generateToken(result.insertedId),

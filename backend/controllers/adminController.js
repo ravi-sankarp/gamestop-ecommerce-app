@@ -697,10 +697,13 @@ const getDashboardGraphData = asyncHandler(async (req, res) => {
 //@route  GET /api/getalloffers
 //@access private
 const getAllOffers = asyncHandler(async (req, res) => {
-  const result = await offerHelpers.findAllOffers();
+  const [categoryOffers, productOffers] = await Promise.all([
+    offerHelpers.findAllCategoryOffers(),
+    offerHelpers.findAllProductOffers()
+  ]);
   const resData = {
     status: 'success',
-    data: result
+    data: { productOffers, categoryOffers }
   };
   sendResponse(200, resData, res);
 });
@@ -774,7 +777,7 @@ const addNewOffer = asyncHandler(async (req, res) => {
     // add the new offer
     const data = {
       type,
-      produtctId: id,
+      productId: id,
       discount
     };
     await offerHelpers.addNewOffer(data, 'Product Offer');

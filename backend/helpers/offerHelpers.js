@@ -4,13 +4,62 @@ import { getDb } from '../config/db.js';
 
 // Find All Offers
 export const findAllOffers = asyncHandler(async () => {
+  const result = await getDb().collection('offers').find({}).toArray();
+  return result;
+});
+
+//Find All Category Offers
+export const findAllCategoryOffers = asyncHandler(async () => {
   const agg = [
     {
-      $group: {
-        _id: '$type'
+      $match: {
+        type: 'Category Offer'
+      }
+    },
+    {
+      $lookup: {
+        from: 'categories',
+        localField: 'categoryId',
+        foreignField: '_id',
+        as: 'categoryDetails'
+      }
+    },
+    {
+      $unwind: {
+        path: '$categoryDetails',
+        preserveNullAndEmptyArrays: false
       }
     }
   ];
+
+  const result = await getDb().collection('offers').aggregate(agg).toArray();
+  return result;
+});
+
+//Find All Product Offers
+export const findAllProductOffers = asyncHandler(async () => {
+  const agg = [
+    {
+      $match: {
+        type: 'Product Offer'
+      }
+    },
+    {
+      $lookup: {
+        from: 'products',
+        localField: 'productId',
+        foreignField: '_id',
+        as: 'productDetails'
+      }
+    },
+    {
+      $unwind: {
+        path: '$productDetails',
+        preserveNullAndEmptyArrays: false
+      }
+    }
+  ];
+
   const result = await getDb().collection('offers').aggregate(agg).toArray();
   return result;
 });
