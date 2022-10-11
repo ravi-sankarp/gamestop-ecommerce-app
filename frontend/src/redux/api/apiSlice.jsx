@@ -50,7 +50,9 @@ const apiSlice = createApi({
     'wishlist',
     'userdata',
     'address',
-    'orders'
+    'orders',
+    'payments',
+    'offers'
   ],
   endpoints: (builder) => ({})
 });

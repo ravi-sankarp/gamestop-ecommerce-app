@@ -2,6 +2,16 @@ import apiSlice from './apiSlice';
 
 export const extendedAdminApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
+    getDashboardCardData: builder.query({
+      query: () => '/admin/getdashboardcarddata',
+      providesTags: ['orders', 'productdata']
+    }),
+
+    getDashboardGraphData: builder.query({
+      query: () => '/admin/getdashboardgraphdata',
+      providesTags: ['orders', 'productdata']
+    }),
+
     getUserData: builder.query({
       query: () => '/admin/getusers',
       providesTags: ['userdata']
@@ -120,14 +130,40 @@ export const extendedAdminApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: ['orders', 'productdata']
     }),
 
-    getDashboardCardData: builder.query({
-      query: () => '/admin/getdashboardcarddata',
-      providesTags: ['orders', 'productdata']
+    getAllPayments: builder.query({
+      query: () => '/admin/getallpayments',
+      providesTags: ['orders', 'payments']
     }),
 
-    getDashboardGraphData: builder.query({
-      query: () => '/admin/getdashboardgraphdata',
-      providesTags: ['orders', 'productdata']
+    getAllOffers: builder.query({
+      query: () => '/admin/getalloffers',
+      providesTags: ['offers', 'productdata']
+    }),
+
+    addNewOffer: builder.mutation({
+      query: (data) => ({
+        url: '/admin/addnewoffer',
+        method: 'POST',
+        body: data
+      }),
+      invalidatesTags: ['offers', 'productdata']
+    }),
+
+    editOffer: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/admin/editoffer/${id}`,
+        method: 'PUT',
+        body: data
+      }),
+      invalidatesTags: ['offers', 'productdata']
+    }),
+
+    deleteOffer: builder.mutation({
+      query: ({ id }) => ({
+        url: `/admin/deleteoffer/${id}`,
+        method: 'DELETE'
+      }),
+      invalidatesTags: ['offers', 'productdata']
     })
   })
 });
@@ -150,5 +186,10 @@ export const {
   useGetAllOrdersQuery,
   useChangeOrderStatusMutation,
   useGetDashboardCardDataQuery,
-  useGetDashboardGraphDataQuery
+  useGetDashboardGraphDataQuery,
+  useGetAllPaymentsQuery,
+  useGetAllOffersQuery,
+  useAddNewOfferMutation,
+  useEditOfferMutation,
+  useDeleteOfferMutation
 } = extendedAdminApiSlice;
