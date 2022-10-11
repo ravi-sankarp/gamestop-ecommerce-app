@@ -49,7 +49,7 @@ export default function IconTabs() {
         color: '#000',
         display: 'flex',
         flexDirection: 'column',
-        maxWidth: '95vw',
+        maxWidth: '100vw',
         pt: 4,
         // padding: { xs: '15px 10px', md: '30px 100px' },
         backgroundColor: '#f1f3f6',
@@ -60,7 +60,7 @@ export default function IconTabs() {
       <TabContext value={value}>
         <Box
           sx={{
-            width: 'max-content',
+            width: { xs: '100vw', md: 'max-content' },
             height: 'max-content',
             backgroundColor: '#fff',
             boxShadow: 'rgba(100, 100, 111, 0.2) 0px 7px 29px 0px'

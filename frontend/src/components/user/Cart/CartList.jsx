@@ -78,7 +78,7 @@ function CartList({ data }) {
         display: 'flex',
         justifyContent: { md: 'space-around' },
         flexDirection: { xs: 'column', md: 'row' },
-        pl: 5
+        pl: { xs: 1, md: 5 }
       }}
     >
       <Box
@@ -88,7 +88,8 @@ function CartList({ data }) {
           flexDirection: 'column',
           gap: 2,
           pb: 7,
-          pr: { xs: 5, md: 0 },
+          pr: { xs: 2, md: 0 },
+          pl: { xs: 1, md: 0 },
           width: {
             md: '60vw'
           }
@@ -133,14 +134,20 @@ function CartList({ data }) {
                   ml: { md: 4 }
                 }}
               >
-                <Typography>{item.productDetails.name}</Typography>
+                <Typography
+                  textAlign="left"
+                  sx={{ whiteSpace: 'nowrap' }}
+                >
+                  {item.productDetails.name}
+                </Typography>
                 <Box
                   sx={{
                     display: 'flex',
                     gap: 1,
-                    justifyContent: 'flex-start',
+                    justifyContent: { xs: 'flex-end', md: 'flex-start' },
                     alignItems: 'center',
-                    pl: 3
+                    pl: { xs: 0, md: 3 },
+                    pr: { xs: 2, md: 0 }
                   }}
                 >
                   <Typography
@@ -159,7 +166,12 @@ function CartList({ data }) {
                   </Typography>
                   <Typography
                     gutterBottom
-                    sx={{ color: 'green', opacity: 0.8 }}
+                    sx={{
+                      color: 'green',
+                      opacity: 0.8,
+                      whiteSpace: 'nowrap',
+                      fontSize: { xs: 15 }
+                    }}
                     variant="subtitle"
                   >
                     {`(${item.productDetails.discount}% off )`}
@@ -169,12 +181,12 @@ function CartList({ data }) {
               <Box
                 sx={{
                   ml: 'auto',
-                  display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'center',
                   alignItems: 'center',
                   color: '',
-                  gap: 1,
+                  display: { xs: 'none', md: 'flex' },
+                  gap: { xs: 0, md: 1 },
                   p: 1,
                   '& p': { color: '#000', fontSize: '1.1rem', opacity: 0.8 }
                 }}
@@ -186,6 +198,7 @@ function CartList({ data }) {
             <Box
               sx={{
                 display: 'flex',
+                flexDirection: { xs: 'column', md: 'row' },
                 justifyContent: 'flex-start',
                 alignItems: 'center',
                 gap: 4,
@@ -196,7 +209,7 @@ function CartList({ data }) {
               <Box
                 sx={{
                   display: 'flex',
-                  justifyContent: 'center',
+                  justifyContent: { xs: 'flex-start', md: 'center' },
                   alignItems: 'center',
                   gap: 2
                 }}
@@ -216,18 +229,20 @@ function CartList({ data }) {
                   <AddIcon />
                 </IconButton>
               </Box>
-              <Typography
-                onClick={() => handleProductRemove(item.productDetails._id)}
-                sx={{ pl: { md: 4 }, '&:hover': { color: '#1a6aed', cursor: 'pointer' } }}
-              >
-                REMOVE
-              </Typography>
-              <Typography
-                onClick={() => handleMoveToWishlist(item.productDetails._id)}
-                sx={{ '&:hover': { color: '#1a6aed', cursor: 'pointer' } }}
-              >
-                MOVE TO WISHLIST
-              </Typography>
+              <Box sx={{ display: 'flex', justifyContent: 'space-around', gap: 3 }}>
+                <Typography
+                  onClick={() => handleProductRemove(item.productDetails._id)}
+                  sx={{ pl: { md: 4 }, '&:hover': { color: '#1a6aed', cursor: 'pointer' } }}
+                >
+                  REMOVE
+                </Typography>
+                <Typography
+                  onClick={() => handleMoveToWishlist(item.productDetails._id)}
+                  sx={{ '&:hover': { color: '#1a6aed', cursor: 'pointer' } }}
+                >
+                  MOVE TO WISHLIST
+                </Typography>
+              </Box>
             </Box>
             {item.productDetails.stock < item.count && (
               <Typography
@@ -249,12 +264,13 @@ function CartList({ data }) {
           display: 'flex',
           flexDirection: 'column',
           gap: 2,
-          mr: { xs: 5, md: 4 },
+          mr: { xs: 3, md: 4 },
           background: '#fff !important',
           boxShadow: ' 0 2px 5px 0 rgba(0, 0, 0, 0.1)',
           mb: 7,
           padding: '10px 0',
           width: { md: '20vw' },
+          ml: 2,
           height: 'max-content',
           '& div': {
             pl: 2,
@@ -293,7 +309,7 @@ function CartList({ data }) {
         {checkoutError && <Alert severity="error">{checkoutError}</Alert>}
         <PrimaryButton
           onClick={handleCheckout}
-          sx={{ mx: { xs: 20, md: 4 } }}
+          sx={{ mx: { xs: 5, md: 4 } }}
         >
           Proceed to Checkout
         </PrimaryButton>

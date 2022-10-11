@@ -102,7 +102,7 @@ function UserAddressForm({ open, toggleForm }) {
       aria-describedby="alert-dialog-description"
     >
       <DialogTitle>
-        <div style={{ display: 'flex' }}>
+        <Box sx={{ display: 'flex' }}>
           <Typography
             variant="h6"
             align="center"
@@ -115,10 +115,11 @@ function UserAddressForm({ open, toggleForm }) {
             color="primary"
             variant="outlined"
             onClick={toggleForm}
+            sx={{ fontSize: { xs: 10 }, p: 0, m: 0, border: 0, justifySelf: 'flex-end' }}
           >
             <CloseOutlinedIcon />
           </Button>
-        </div>
+        </Box>
       </DialogTitle>
       <Box
         sx={{
@@ -136,7 +137,7 @@ function UserAddressForm({ open, toggleForm }) {
             maxHeight: '60vh',
             display: 'flex',
             flexDirection: 'column',
-            padding: '40px 80px'
+            padding: { xs: '20px 20px', md: '40px 80px' }
           }}
           component="form"
           noValidate

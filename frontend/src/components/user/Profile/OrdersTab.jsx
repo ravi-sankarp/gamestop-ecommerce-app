@@ -56,6 +56,9 @@ export default function CollapsibleTable() {
               height: '100%',
               alignItems: 'center',
               justifyContent: 'center',
+              backgroundColor: '#fff',
+              pt: 4,
+              p: 3,
               mx: 'auto',
 
               '& img': {
@@ -63,7 +66,12 @@ export default function CollapsibleTable() {
               }
             }}
           >
-            <Typography variant="h6">{data.message}</Typography>
+            <Typography
+              sx={{ whiteSpace: 'nowrap' }}
+              variant="h6"
+            >
+              {data.message}
+            </Typography>
             <Typography sx={{ color: '#333333' }}>Buy some products to see it here!</Typography>
             <PrimaryButton
               component={Link}

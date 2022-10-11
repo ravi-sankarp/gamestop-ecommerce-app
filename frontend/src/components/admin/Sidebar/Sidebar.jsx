@@ -16,6 +16,8 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
 import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
+import AppShortcutOutlinedIcon from '@mui/icons-material/AppShortcutOutlined';
+import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined';
 import InventoryOutlinedIcon from '@mui/icons-material/InventoryOutlined';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import PaymentOutlinedIcon from '@mui/icons-material/PaymentOutlined';
@@ -138,49 +140,91 @@ function Sidebar() {
     switch (text) {
       case 'Dashboard':
         return (
-          <Tooltip title="Dashboard" placement="right-end">
+          <Tooltip
+            title="Dashboard"
+            placement="right-end"
+          >
             <DashboardOutlinedIcon />
           </Tooltip>
         );
       case 'Users':
         return (
-          <Tooltip title="Users" placement="right-end">
+          <Tooltip
+            title="Users"
+            placement="right-end"
+          >
             <GroupsOutlinedIcon />
           </Tooltip>
         );
       case 'Products':
         return (
-          <Tooltip title="Products" placement="right-end">
+          <Tooltip
+            title="Products"
+            placement="right-end"
+          >
             <InventoryOutlinedIcon />
           </Tooltip>
         );
       case 'Categories':
         return (
-          <Tooltip title="Categories" placement="right-end">
+          <Tooltip
+            title="Categories"
+            placement="right-end"
+          >
             <CategoryOutlinedIcon />
           </Tooltip>
         );
       case 'Brands':
         return (
-          <Tooltip title="Brands" placement="right-end">
+          <Tooltip
+            title="Brands"
+            placement="right-end"
+          >
             <ClassOutlinedIcon />
           </Tooltip>
         );
       case 'Banners':
         return (
-          <Tooltip title="Banners" placement="right-end">
+          <Tooltip
+            title="Banners"
+            placement="right-end"
+          >
             <WallpaperOutlinedIcon />
+          </Tooltip>
+        );
+      case 'Offers':
+        return (
+          <Tooltip
+            title="Offers"
+            placement="right-end"
+          >
+            <AppShortcutOutlinedIcon />
+          </Tooltip>
+        );
+      case 'Coupons':
+        return (
+          <Tooltip
+            title="Coupons"
+            placement="right-end"
+          >
+            <LocalOfferOutlinedIcon />
           </Tooltip>
         );
       case 'Orders':
         return (
-          <Tooltip title="Orders" placement="right-end">
+          <Tooltip
+            title="Orders"
+            placement="right-end"
+          >
             <ShoppingCartOutlinedIcon />
           </Tooltip>
         );
       case 'Payments':
         return (
-          <Tooltip title="Payments" placement="right-end">
+          <Tooltip
+            title="Payments"
+            placement="right-end"
+          >
             <PaymentOutlinedIcon />
           </Tooltip>
         );
@@ -200,7 +244,10 @@ function Sidebar() {
   return (
     <>
       <Box sx={{ flexGrow: 0 }}>
-        <AppBar position="fixed" open={open}>
+        <AppBar
+          position="fixed"
+          open={open}
+        >
           <Toolbar sx={{ backgroundColor: '#1976d2' }}>
             <IconButton
               color="inherit"
@@ -214,14 +261,27 @@ function Sidebar() {
             >
               <MenuIcon />
             </IconButton>
-            <Typography variant="h6" noWrap component="div">
+            <Typography
+              variant="h6"
+              noWrap
+              component="div"
+            >
               Admin Panel
             </Typography>
           </Toolbar>
         </AppBar>
-        <Drawer variant="permanent" open={open} sx={{ backgroundColor: '#000000 !important' }}>
+        <Drawer
+          variant="permanent"
+          open={open}
+          sx={{ backgroundColor: '#000000 !important' }}
+        >
           <DrawerHeader>
-            <Typography variant="h6" sx={{ margin: 'auto' }} noWrap component="div">
+            <Typography
+              variant="h6"
+              sx={{ margin: 'auto' }}
+              noWrap
+              component="div"
+            >
               GameStop
             </Typography>
             <IconButton onClick={handleDrawerClose}>
@@ -237,6 +297,8 @@ function Sidebar() {
               'Categories',
               'Brands',
               'Banners',
+              'Offers',
+              'Coupons',
               'Orders',
               'Payments'
             ].map((text) => (
@@ -265,17 +327,25 @@ function Sidebar() {
                       mr: open ? 3 : 'auto',
                       mt: 1,
                       justifyContent: 'center',
-                      color: '#000000'
+                      color: '#000000',
+                      my: 'auto'
                     }}
                   >
                     {setListLogo(text)}
                   </ListItemIcon>
-                  <ListItemText primary={text} sx={{ opacity: open ? 1 : 0, color: 'black' }} />
+                  <ListItemText
+                    primary={text}
+                    sx={{ opacity: open ? 1 : 0, color: 'black' }}
+                  />
                 </ListItemButton>
               </ListItem>
             ))}
 
-            <ListItem onClick={handleAlertShow} disablePadding sx={{ mt: '2rem' }}>
+            <ListItem
+              onClick={handleAlertShow}
+              disablePadding
+              sx={{ mt: '2rem' }}
+            >
               <ListItemButton
                 sx={{
                   minHeight: 48,

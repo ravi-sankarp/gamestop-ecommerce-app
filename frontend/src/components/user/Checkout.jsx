@@ -391,7 +391,7 @@ function Checkout({ cartData, addressData, addressMessage }) {
 
         <PrimaryButton
           onClick={handleConfirmOrder}
-          sx={{ mx: { xs: 20, md: 4 } }}
+          sx={{ mx: { xs: 2, md: 4 } }}
         >
           {btnText}
         </PrimaryButton>
@@ -433,7 +433,6 @@ function Checkout({ cartData, addressData, addressMessage }) {
               textAlign="center"
               component="span"
             >
-              {' '}
               to go to orders page
             </Typography>
           </Box>

@@ -92,7 +92,6 @@ function AddressTab() {
           >
             <Typography variant="h6">{data.message}</Typography>
             <Typography sx={{ color: '#333333' }}>Click here to add One</Typography>
-            <PrimaryButton sx={{ mt: 0 }}>Add Address</PrimaryButton>
           </Box>
         )}
         {data?.data && (
@@ -152,14 +151,11 @@ function AddressTab() {
                 <Typography>{address.pincode}</Typography>
               </Box>
             ))}
-            <PrimaryButton
-              onClick={toggleForm}
-              sx={{ mx: 'auto' }}
-            >
-              Add Address
-            </PrimaryButton>
           </Box>
         )}
+        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+          <PrimaryButton onClick={toggleForm}>Add Address</PrimaryButton>
+        </Box>
         {open && (
           <UserAddressForm
             open={open}

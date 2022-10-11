@@ -131,7 +131,7 @@ function ProfileTab() {
           >
             <Box
               sx={{
-                width: { xs: '50vw', md: '50vw' },
+                width: { xs: '60vw', md: '50vw' },
                 maxWidth: { md: '30vw' },
                 minHeight: '22rem',
                 p: 5,

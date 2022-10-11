@@ -13,6 +13,8 @@ import AdminPaymentsPage from '../../pages/Admin/AdminPaymentsPage';
 import Sidebar from '../../components/admin/Sidebar/Sidebar';
 import AdminAddNewProductPage from '../../pages/Admin/AdminAddNewProductPage';
 import AdminEditProductPage from '../../pages/Admin/AdminEditProductPage';
+import AdminCouponsPage from '../../pages/Admin/AdminCouponsPage';
+import AdminOffersPage from '../../pages/Admin/AdminOffersPage';
 
 function AdminRoutes() {
   return (
@@ -46,6 +48,8 @@ function AdminRoutes() {
             <Route path="categories" element={<AdminCategoryPage />} />
             <Route path="brands" element={<AdminBrandsPage />} />
             <Route path="banners" element={<AdminBannersPage />} />
+            <Route path="offers" element={<AdminOffersPage />} />
+            <Route path="coupons" element={<AdminCouponsPage />} />
             <Route path="orders" element={<AdminOrdersPage />} />
             <Route path="payments" element={<AdminPaymentsPage />} />
           </Route>
