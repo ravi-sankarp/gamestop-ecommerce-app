@@ -107,6 +107,9 @@ router.delete('/deletebanner/:id', protect, checkAdmin, adminController.deleteBa
 //GET All order details
 router.get('/getallorders', protect, checkAdmin, adminController.listAllOrders);
 
+//GET All payment details
+router.get('/getallpayments', protect, checkAdmin, adminController.listAllOrders);
+
 //PUT Update order status
 router.patch('/changeorderstatus', protect, checkAdmin, adminController.updateOrderStatus);
 
@@ -115,5 +118,17 @@ router.get('/getdashboardcarddata', protect, checkAdmin, adminController.getDash
 
 // Get Dashboard Card Data
 router.get('/getdashboardgraphdata', protect, checkAdmin, adminController.getDashboardGraphData);
+
+// View Category and Product Offers
+router.get('/getalloffers', protect, checkAdmin, adminController.getAllOffers);
+
+// Add New Category or Product Offer
+router.post('/addnewoffer', protect, checkAdmin, adminController.addNewOffer);
+
+// Edit an existing offer
+router.put('/editoffer/:id', protect, checkAdmin, adminController.editOffer);
+
+// Delete an existing offer
+router.delete('/deleteoffer/:id', protect, checkAdmin, adminController.deleteOffer);
 
 export default router;

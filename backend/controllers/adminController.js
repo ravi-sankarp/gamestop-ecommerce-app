@@ -8,6 +8,7 @@ import * as categoryHelpers from '../helpers/categoryHelpers.js';
 import * as brandHelpers from '../helpers/brandHelpers.js';
 import * as bannerHelpers from '../helpers/bannerHelpers.js';
 import * as adminHelpers from '../helpers/adminHelpers.js';
+import * as offerHelpers from '../helpers/offerHelpers.js';
 import cloudinarySingleUpload from '../utils/uploadToCloudinary.js';
 import * as orderHelpers from '../helpers/orderHelpers.js';
 
@@ -128,7 +129,12 @@ const addCategory = asyncHandler(async (req, res) => {
   };
   const modifiedName = name.trim();
   //adding data to database
-  await categoryHelpers.createNewCategory({ name: modifiedName, description, bannerImg });
+  await categoryHelpers.createNewCategory({
+    name: modifiedName,
+    description,
+    bannerImg,
+    isDeleted: false
+  });
   const resData = {
     status: 'success',
     message: 'Successfully added the category'
@@ -217,7 +223,6 @@ const addProduct = asyncHandler(async (req, res) => {
   const {
     name,
     price,
-    discount = 0,
     categoryId,
     brandId,
     details,
@@ -258,12 +263,18 @@ const addProduct = asyncHandler(async (req, res) => {
     })
   );
 
+  // check if offer exists for the selected category
+  const result = await offerHelpers.findOfferByCategoryId(categoryId);
+  const categoryDiscount = result?.discount ?? 0;
+  const discountedPrice = Number(price) - Number(price) * categoryDiscount * 0.01;
   //inserting data to the database
   const dataToInsert = {
     name,
     price: price,
-    discountedPrice: Math.ceil(price - price * discount * 0.01),
-    discount: discount,
+    discount: categoryDiscount ?? 0,
+    discountedPrice: categoryDiscount ? discountedPrice : price,
+    productDiscount: 0,
+    categoryDiscount,
     categoryId: categoryId,
     brandId: brandId,
     details,
@@ -271,7 +282,8 @@ const addProduct = asyncHandler(async (req, res) => {
     description,
     stock: stock,
     rating: rating,
-    images
+    images,
+    isDeleted: false
   };
 
   await productHelpers.createNewProduct(dataToInsert);
@@ -323,10 +335,26 @@ const editProduct = asyncHandler(async (req, res) => {
   images?.forEach((img, i) => {
     product.images[i] = img;
   });
+
+  let discountedPrice;
+  let categoryDiscount;
+  // checking if category has changed if changed then update the offer accordingly
+  if (categoryId.toString() !== product.categoryId.toString()) {
+    // check if offer exists for the selected category
+    const result = await offerHelpers.findOfferByCategoryId(categoryId);
+    categoryDiscount = result?.discount ?? 0;
+    discountedPrice = Number(price) - Number(price) * categoryDiscount * 0.01;
+    if (discountedPrice > product.discountedPrice) {
+      ({ discountedPrice } = product);
+    }
+  }
+
   //updating data to the database
   const dataToInsert = {
     name,
     price: price,
+    categoryDiscount: categoryDiscount ?? product.categoryDiscount,
+    discountedPrice: discountedPrice ?? product.discountedPrice,
     categoryId: categoryId,
     brandId: brandId,
     details,
@@ -391,7 +419,12 @@ const addBrand = asyncHandler(async (req, res) => {
     public_id: result.public_id,
     imgUrl: result.secure_url
   };
-  await brandHelpers.createNewBrand({ name: modifiedName, description, bannerImg });
+  await brandHelpers.createNewBrand({
+    name: modifiedName,
+    description,
+    bannerImg,
+    isDeleted: false
+  });
   const resData = {
     status: 'success',
     message: 'Successfully added the brand'
@@ -404,7 +437,7 @@ const addBrand = asyncHandler(async (req, res) => {
 //@access private
 const editBrand = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const brandDetails = await brandHelpers.finBrandByID(id);
+  const brandDetails = await brandHelpers.findBrandByID(id);
 
   //checking if id is valid
   if (!brandDetails) {
@@ -660,6 +693,213 @@ const getDashboardGraphData = asyncHandler(async (req, res) => {
   sendResponse(200, resData, res);
 });
 
+//@desc   Get All the offers
+//@route  GET /api/getalloffers
+//@access private
+const getAllOffers = asyncHandler(async (req, res) => {
+  const result = await offerHelpers.findAllOffers();
+  const resData = {
+    status: 'success',
+    data: result
+  };
+  sendResponse(200, resData, res);
+});
+
+//@desc   Add a New Offer
+//@route  POST /api/addnewoffer
+//@access private
+const addNewOffer = asyncHandler(async (req, res) => {
+  const { type, discount: stringDiscount, id } = req.body;
+
+  // throw error if data is not present
+  if (!type || !stringDiscount || !id) {
+    throw new AppError('Please send all the required data', 400);
+  }
+
+  // checking if offer type is valid
+  if (type !== 'Product Offer' && type !== 'Category Offer') {
+    throw new AppError('Offer type must be either product offer or category offer', 400);
+  }
+
+  const discount = parseInt(stringDiscount, 10);
+  // check if discount value is an of range 1 and 99
+  if (discount <= 0 || discount >= 100) {
+    throw new AppError('Discount value must be between 1 and 99', 400);
+  }
+
+  // check category details it the offer type is category offer
+  if (type === 'Category Offer') {
+    // check if category exists
+    const category = await categoryHelpers.findCategoryById(id);
+
+    // throw error if category does not exists
+    if (!category) {
+      throw new AppError('Category does not exists', 400);
+    }
+
+    //check if category offer already exists
+    const offer = await offerHelpers.findOfferByCategoryId(id);
+    if (offer) {
+      throw new AppError('Category offer already exists', 400);
+    }
+
+    // add the new offer
+    const data = {
+      type,
+      categoryId: id,
+      discount
+    };
+    await offerHelpers.addNewOffer(data, 'Category Offer');
+
+    // update the discount in product collection
+    await productHelpers.updateDiscountedPrice(id, 'categoryDiscount', discount);
+  }
+
+  // check product details if the offer type is product offer
+  if (type === 'Product Offer') {
+    // check if product exists
+    const product = await productHelpers.findProductById(id);
+
+    // throw error if product does not exists
+    if (!product) {
+      throw new AppError('Product does not exists', 400);
+    }
+
+    //check if product offer already exists
+    const offer = await offerHelpers.findOfferByProductId(id);
+    if (offer) {
+      throw new AppError('Product offer already exists', 400);
+    }
+
+    // add the new offer
+    const data = {
+      type,
+      produtctId: id,
+      discount
+    };
+    await offerHelpers.addNewOffer(data, 'Product Offer');
+
+    // upddate the offer in the product collection
+    await productHelpers.updateDiscountedPrice(id, 'productDiscount', discount);
+  }
+
+  const resData = {
+    status: 'success',
+    message: `Successfully added new ${type}`
+  };
+  sendResponse(200, resData, res);
+});
+
+//@desc   Edit an existing offer details
+//@route  PUT /api/editoffer/:id
+//@access private
+const editOffer = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  // Throw error if id is not present
+  if (!id) {
+    throw new AppError('Send the corresponding Id', 400);
+  }
+
+  // Find the corresponding offer details
+  const offerDetails = await offerHelpers.findOfferById(id);
+
+  // Throw an error if the offerdetails was not found
+  if (!offerDetails) {
+    throw new AppError('Invalid Id ! Please enter a valid Id ', 400);
+  }
+
+  //Get the other corresponding details from the body
+  const { discount: stringDiscount = offerDetails.discount } = req.body;
+
+  const discount = Number(stringDiscount);
+
+  // check if discount value is an of range 1 and 99
+  if (discount <= 0 || discount >= 100) {
+    throw new AppError('Discount value must be between 1 and 99', 400);
+  }
+
+  // check category details it the offer type is category offer
+  if (offerDetails.type === 'Category Offer') {
+    // check if category exists
+    const category = await categoryHelpers.findCategoryById(offerDetails.categoryId);
+
+    // throw error if category does not exists
+    if (!category) {
+      throw new AppError('Category does not exists', 400);
+    }
+
+    // update the offer
+
+    await offerHelpers.updateOfferById(id, discount);
+
+    // upddate the offer in the product collection
+    await productHelpers.updateDiscountedPrice(
+      offerDetails.categoryId,
+      'categoryDiscount',
+      discount
+    );
+  }
+
+  // check product details it the offer type is product offer
+  if (offerDetails.type === 'Product Offer') {
+    // check if product exists
+    const product = await productHelpers.findProductById(offerDetails.productId);
+
+    // throw error if product does not exists
+    if (!product) {
+      throw new AppError('Product does not exists', 400);
+    }
+
+    // update the offer
+
+    await offerHelpers.updateOfferById(id, discount);
+
+    // update the offer in the product collection
+    await productHelpers.updateDiscountedPrice(offerDetails.productId, 'productDiscount', discount);
+  }
+  const resData = {
+    status: 'success',
+    message: `Successfully updated the ${offerDetails.type}`
+  };
+  sendResponse(200, resData, res);
+});
+
+//@desc   Delete an existing offer
+//@route  DELETE /api/deleteoffer/:id
+//@access private
+const deleteOffer = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  // Throw error if id is not present
+  if (!id) {
+    throw new AppError('Please send all the required data', 400);
+  }
+
+  // Get the appropriate offer details
+  const offerDetails = await offerHelpers.findOfferById(id);
+
+  // Throw error if the offerdetails was not found
+  if (!offerDetails) {
+    throw new AppError('The offer was not found !', 400);
+  }
+
+  // delete the offer
+  await offerHelpers.deleteOfferById(id);
+
+  // Update the corresponding product accordingly
+  if (offerDetails.type === 'Product Offer') {
+    await productHelpers.updateDiscountedPrice(offerDetails.productId, 'productDiscount', 0);
+  } else {
+    await productHelpers.updateDiscountedPrice(offerDetails.categoryId, 'categoryDiscount', 0);
+  }
+  const resData = {
+    status: 'success',
+    message: 'Successfully deleted the offer'
+  };
+  sendResponse(200, resData, res);
+});
+
 export default {
   listUsers,
   editUser,
@@ -683,5 +923,9 @@ export default {
   listAllOrders,
   updateOrderStatus,
   getDashboardCardData,
-  getDashboardGraphData
+  getDashboardGraphData,
+  getAllOffers,
+  addNewOffer,
+  editOffer,
+  deleteOffer
 };

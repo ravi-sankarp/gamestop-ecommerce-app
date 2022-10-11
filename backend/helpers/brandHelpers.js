@@ -7,6 +7,11 @@ import { deleteProductsByBrandId } from './productHelpers.js';
 export const findAllBrands = asyncHandler(async () => {
   const agg = [
     {
+      $match: {
+        isDeleted: false
+      }
+    },
+    {
       $lookup: {
         from: 'products',
         localField: '_id',
@@ -31,9 +36,9 @@ export const findAllBrands = asyncHandler(async () => {
 });
 
 //Get all brands details
-export const finBrandByID = asyncHandler(async (id) => {
+export const findBrandByID = asyncHandler(async (id) => {
   const _id = ObjectId(id);
-  const brands = await getDb().collection('brands').findOne({ _id });
+  const brands = await getDb().collection('brands').findOne({ _id, isDeleted: false });
   return brands;
 });
 
@@ -42,8 +47,11 @@ export const checkBrandNameExists = asyncHandler(async (id, name) => {
   const objId = ObjectId(id);
   const brand = await getDb()
     .collection('brands')
-    .findOne({ _id: { $ne: objId }, name: { $regex: `^${name.trim()}$`, $options: 'i' } });
-  console.log({ brand });
+    .findOne({
+      _id: { $ne: objId },
+      isDeleted: false,
+      name: { $regex: `^${name.trim()}$`, $options: 'i' }
+    });
   return brand;
 });
 
@@ -63,6 +71,8 @@ export const updateBrandById = asyncHandler(async (id, data) => {
 //Delete an existing Brand and products belonging to that brand
 export const deleteBrandById = asyncHandler(async (id) => {
   const _id = ObjectId(id);
-  await getDb().collection('brands').deleteOne({ _id });
+  await getDb()
+    .collection('brands')
+    .updateOne({ _id }, { $set: { isDeleted: false } });
   await deleteProductsByBrandId(id);
 });

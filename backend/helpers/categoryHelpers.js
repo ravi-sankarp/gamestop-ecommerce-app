@@ -7,6 +7,11 @@ import { deleteProductsByCategoryId } from './productHelpers.js';
 export const findAllCategories = asyncHandler(async () => {
   const agg = [
     {
+      $match: {
+        isDeleted: false
+      }
+    },
+    {
       $lookup: {
         from: 'products',
         localField: '_id',
@@ -32,10 +37,14 @@ export const findAllCategories = asyncHandler(async () => {
 
 //check if category name already exists
 export const checkCategoryNameExists = asyncHandler(async (id, name) => {
- const objId = ObjectId(id);
- const category = await getDb()
-   .collection('categories')
-   .findOne({ _id: { $ne: objId }, name: { $regex: `^${name.trim()}$`, $options: 'i' } });
+  const objId = ObjectId(id);
+  const category = await getDb()
+    .collection('categories')
+    .findOne({
+      _id: { $ne: objId },
+      isDeleted: false,
+      name: { $regex: `^${name.trim()}$`, $options: 'i' }
+    });
   return category;
 });
 
@@ -47,7 +56,7 @@ export const createNewCategory = asyncHandler(async (data) => {
 //find a category by Object Id
 export const findCategoryById = asyncHandler(async (id) => {
   const _id = ObjectId(id);
-  const category = await getDb().collection('categories').findOne({ _id });
+  const category = await getDb().collection('categories').findOne({ _id, isDeleted: false });
   return category;
 });
 
@@ -62,6 +71,8 @@ export const updateCategoryById = asyncHandler(async (id, data) => {
 //delete a category and products belonging to that category
 export const deleteCategoryById = asyncHandler(async (id) => {
   const _id = ObjectId(id);
-  await getDb().collection('categories').deleteOne({ _id });
+  await getDb()
+    .collection('categories')
+    .updateOne({ _id }, { $set: { isDeleted: true } });
   await deleteProductsByCategoryId(id);
 });

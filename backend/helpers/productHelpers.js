@@ -6,6 +6,11 @@ import { getDb } from '../config/db.js';
 export const findAllProducts = asyncHandler(async (query) => {
   const agg = [
     {
+      $match: {
+        isDeleted: false
+      }
+    },
+    {
       $lookup: {
         from: 'categories',
         localField: 'categoryId',
@@ -77,6 +82,11 @@ export const findAllProducts = asyncHandler(async (query) => {
 export const findTotalProducts = asyncHandler(async () => {
   const agg = [
     {
+      $match: {
+        isDeleted: false
+      }
+    },
+    {
       $group: {
         _id: null,
         totalProducts: {
@@ -104,7 +114,7 @@ export const createNewProduct = asyncHandler(async (data) => {
 export const findProductById = asyncHandler(async (id) => {
   const _id = ObjectId(id);
 
-  const product = await getDb().collection('products').findOne({ _id });
+  const product = await getDb().collection('products').findOne({ _id, isDeleted: false });
   return product;
 });
 
@@ -114,7 +124,8 @@ export const findProductByIdAggregation = asyncHandler(async (id) => {
   const agg = [
     {
       $match: {
-        _id
+        _id,
+        isDeleted: false
       }
     },
     {
@@ -156,19 +167,25 @@ export const updateProductById = asyncHandler(async (id, data) => {
 //Delete a product by product Id
 export const deleteProductById = asyncHandler(async (id) => {
   const _id = ObjectId(id);
-  await getDb().collection('products').deleteOne({ _id });
+  await getDb()
+    .collection('products')
+    .updateOne({ _id }, { $set: { isDeleted: true } });
 });
 
 //Delete all products by category Id
 export const deleteProductsByCategoryId = asyncHandler(async (id) => {
   const categoryId = ObjectId(id);
-  await getDb().collection('products').deleteMany({ categoryId });
+  await getDb()
+    .collection('products')
+    .updateMany({ categoryId }, { $set: { isDeleted: true } });
 });
 
 //Delete all products by Brand Id
 export const deleteProductsByBrandId = asyncHandler(async (id) => {
   const brandId = ObjectId(id);
-  await getDb().collection('products').deleteMany({ brandId });
+  await getDb()
+    .collection('products')
+    .updateMany({ brandId }, { $set: { isDeleted: true } });
 });
 
 //Update product stock after a successfull order
@@ -184,4 +201,47 @@ export const updateProductStock = asyncHandler(async (id, count) => {
         }
       }
     );
+});
+
+//Update product discount after adding a new product offer
+export const updateDiscountedPrice = asyncHandler(async (id, type, discount) => {
+  const updatequery = [
+    { $set: { [type]: discount } },
+    {
+      $set: {
+        discount: {
+          $switch: {
+            branches: [
+              {
+                case: { $gte: ['$categoryDiscount', '$productDiscount'] },
+                then: '$categoryDiscount'
+              },
+              {
+                case: { $gte: ['$productDiscount', '$categoryDiscount'] },
+                then: '$productDiscount'
+              }
+            ],
+            default: 0
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        discountedPrice: {
+          $trunc: [
+            { $subtract: ['$price', { $multiply: [{ $divide: ['$discount', 100] }, '$price'] }] },
+            0
+          ]
+        }
+      }
+    }
+  ];
+  const matchquery = {};
+  if (type === 'categoryDiscount') {
+    matchquery.categoryId = ObjectId(id);
+  } else if (type === 'productDiscount') {
+    matchquery._id = ObjectId(id);
+  }
+  await getDb().collection('products').updateMany(matchquery, updatequery);
 });
