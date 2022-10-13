@@ -170,7 +170,7 @@
                     {{#with this.item}}
                     <td>{{this.productName}}</td>
                     <td>{{this.count}}</td>
-                    <td>₹{{this.price}}</td>
+                    <td>₹{{this.priceDiscounted}}</td>
                     {{/with}}
                 </tr>
                 {{/if}}
@@ -190,8 +190,8 @@
                     <td>{{this.productName}}</td>
 
                     <td>{{this.count}}</td>
-                    <td>₹{{this.price}}</td>
-                    <td>₹{{this.subTotal}}</td>
+                    <td>₹{{this.priceDiscounted}}</td>
+                    <td>₹{{this.subTotalDiscounted}}</td>
                 </tr>
 
                 {{/each}}
@@ -209,7 +209,7 @@
                 <tr class='item'>
                     <td>Total Amount</td>
 
-                    <td>₹{{this.totalAmount}}</td>
+                    <td>₹{{this.totalAmountDiscounted}}</td>
                 </tr>
 
                 <tr class='item'>
