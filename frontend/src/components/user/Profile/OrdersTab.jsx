@@ -109,7 +109,7 @@ export default function CollapsibleTable() {
                     flexGrow: 1,
                     display: 'flex',
                     width: '95%',
-                    justifyContent: 'space-between',
+                    justifyContent: 'space-evenly',
                     gap: 5,
                     alignItems: 'flex-start',
                     p: 2
@@ -121,7 +121,10 @@ export default function CollapsibleTable() {
                       flexDirection: 'column'
                     }}
                   >
-                    <Typography sx={{ color: '#868e96' }}>
+                    <Typography
+                      textAlign="center"
+                      sx={{ color: '#868e96', fontSize: 12 }}
+                    >
                       {order.items ? 'Products Name' : 'Product Name'}
                     </Typography>
                     <Typography>{order?.item?.productName}</Typography>
@@ -130,16 +133,7 @@ export default function CollapsibleTable() {
                     ))}
                   </Box>
                   <Box>
-                    <Typography
-                      textAlign="right"
-                      sx={{ whiteSpace: 'nowrap', color: '#868e96' }}
-                    >
-                      Payment Method
-                    </Typography>
-                    <Typography textAlign="center">{order.paymentMethod}</Typography>
-                  </Box>
-                  <Box>
-                    <Typography sx={{ color: '#868e96' }}>Order Status</Typography>
+                    <Typography textAlign="center" sx={{ color: '#868e96', fontSize: 12 }}>Order Status</Typography>
                     {order.orderStatus.includes('Cancelled') ||
                     order.orderStatus.includes('Retured') ? (
                       <Box
@@ -177,8 +171,10 @@ export default function CollapsibleTable() {
                           })} `}
                   </Box>
                   <Box>
-                    <Typography sx={{ color: '#868e96' }}>Total Amount </Typography>
-                    <Typography>{`₹ ${order.totalAmount.toLocaleString()}`}</Typography>
+                    <Typography sx={{ color: '#868e96', fontSize: 12 }}>Total Amount </Typography>
+                    <Typography sx={{ whiteSpace: 'nowrap' }}>
+                      {`₹ ${order?.totalAmountOriginal.toLocaleString()}`}
+                    </Typography>
                   </Box>
                 </Box>
                 <OrderTable

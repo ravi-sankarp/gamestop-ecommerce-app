@@ -27,6 +27,7 @@ import {
   useGetInvoiceQuery,
   useReturnOrderMutation
 } from '../../../redux/api/userApiSlice';
+import OrderPriceDetails from './OrderPriceDetails';
 
 function OrderTable({ items, order }) {
   const [open, setOpen] = useState(false);
@@ -126,16 +127,20 @@ function OrderTable({ items, order }) {
       errorToast(err);
     }
   };
-  const calcDayDifference = useCallback((orderedDate) => {
-    const orderedTimeStamp = new Date(orderedDate).getTime();
-    const todayTimeStamp = new Date().getTime();
-    const differenceInTime = todayTimeStamp - orderedTimeStamp;
-    const dayDifference = differenceInTime / (1000 * 3600 * 24);
-    if (dayDifference > 7) {
-      return false;
-    }
-    return true;
-  }, []);
+  const calcDayDifference = useCallback(
+    (orderedDate) => {
+      const orderedTimeStamp = new Date(orderedDate).getTime();
+      const todayTimeStamp = new Date().getTime();
+      const differenceInTime = todayTimeStamp - orderedTimeStamp;
+      const dayDifference = differenceInTime / (1000 * 3600 * 24);
+      if (dayDifference > 7) {
+        return false;
+      }
+      return true;
+    },
+    []
+  );
+  console.log(order);
   return (
     <>
       <Box sx={{ display: 'flex', alignItems: 'center', ml: 'auto' }}>
@@ -201,7 +206,7 @@ function OrderTable({ items, order }) {
                       data-label="Price"
                       align="center"
                     >
-                      {`₹ ${item.price.toLocaleString()}`}
+                      {`₹ ${item?.originalPrice?.toLocaleString()}`}
                     </TableCell>
                     <TableCell
                       data-label="Quantity"
@@ -333,7 +338,7 @@ function OrderTable({ items, order }) {
                     data-label="Price"
                     align="center"
                   >
-                    {`₹ ${items.price.toLocaleString()}`}
+                    {`₹ ${items?.originalPrice?.toLocaleString()}`}
                   </TableCell>
                   <TableCell
                     data-label="Quantity"
@@ -345,7 +350,7 @@ function OrderTable({ items, order }) {
                     data-label="Subtotal"
                     align="center"
                   >
-                    {`₹ ${items.price.toLocaleString()}`}
+                    {`₹ ${items?.subTotal?.toLocaleString()}`}
                   </TableCell>
                   <TableCell
                     data-label="Order Status"
@@ -437,20 +442,41 @@ function OrderTable({ items, order }) {
               )}
             </TableBody>
           </Table>
-          <Box sx={{ display: 'flex', flexDirection: 'column', mt: 1 }}>
-            <Typography variant="h6">Delivery Address</Typography>
-            <Box sx={{ display: 'flex', gap: 1, pl: 1 }}>
-              <Typography>{order.deliveryAddress.name}</Typography>
-              <Typography>{order.deliveryAddress.phoneNumber}</Typography>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: { xs: 'column', md: 'row' },
+              alignItems: 'space-between',
+              justifyContent: 'space-between'
+            }}
+          >
+            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+              <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column' }}>
+                <Typography
+                  variant="h6"
+                  sx={{ whiteSpace: 'nowrap' }}
+                >
+                  Payment Method
+                </Typography>
+                <Typography sx={{ pl: 1 }}>{order.paymentMethod}</Typography>
+              </Box>
+              <Box sx={{ display: 'flex', flexDirection: 'column', mt: 1 }}>
+                <Typography variant="h6">Delivery Address</Typography>
+                <Box sx={{ display: 'flex', gap: 1, pl: 1 }}>
+                  <Typography>{order.deliveryAddress.name}</Typography>
+                  <Typography>{order.deliveryAddress.phoneNumber}</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', gap: 1, whiteSpace: 'nowrap', pl: 1 }}>
+                  <Typography>{`${order.deliveryAddress.houseName},`}</Typography>
+                  <Typography>{`${order.deliveryAddress.streetName},`}</Typography>
+                  <Typography>{`${order.deliveryAddress.city},`}</Typography>
+                  <Typography>{`${order.deliveryAddress.district},`}</Typography>
+                  <Typography>{`${order.deliveryAddress.state} -`}</Typography>
+                  <Typography>{order.deliveryAddress.pincode}</Typography>
+                </Box>
+              </Box>
             </Box>
-            <Box sx={{ display: 'flex', gap: 1, whiteSpace: 'nowrap', pl: 1 }}>
-              <Typography>{`${order.deliveryAddress.houseName},`}</Typography>
-              <Typography>{`${order.deliveryAddress.streetName},`}</Typography>
-              <Typography>{`${order.deliveryAddress.city},`}</Typography>
-              <Typography>{`${order.deliveryAddress.district},`}</Typography>
-              <Typography>{`${order.deliveryAddress.state} -`}</Typography>
-            <Typography>{order.deliveryAddress.pincode}</Typography>
-            </Box>
+            <OrderPriceDetails order={order} />
           </Box>
         </Box>
       </Collapse>

@@ -80,6 +80,7 @@ export default function IconTabs() {
               iconPosition="start"
               aria-label="phone"
               value="info"
+              sx={{ borderRight: '2px solid rgba(0,0,0,0.8)' }}
             />
             <StyledTab
               label="Manage Addresses"
@@ -87,6 +88,7 @@ export default function IconTabs() {
               aria-label="favorite"
               iconPosition="start"
               value="address"
+              sx={{ borderRight: '2px solid rgba(0,0,0,0.8)' }}
             />
             <StyledTab
               label="My Orders  "

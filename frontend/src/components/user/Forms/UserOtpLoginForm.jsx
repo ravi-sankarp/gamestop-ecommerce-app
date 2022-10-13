@@ -83,7 +83,6 @@ function UserOtpLoginForm() {
   const onSubmitOtpHandler = async (data) => {
     if (!isLoadingOtpVerify) {
       try {
-        console.log(data);
         setBtnText('Loading...');
         const res = await verifyOtp({ phoneNumber, code: `${data.code}` }).unwrap();
         setFormError('');

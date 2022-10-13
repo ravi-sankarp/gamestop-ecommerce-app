@@ -52,7 +52,9 @@ const apiSlice = createApi({
     'address',
     'orders',
     'payments',
-    'offers'
+    'offers',
+    'wallet',
+    'coupons'
   ],
   endpoints: (builder) => ({})
 });

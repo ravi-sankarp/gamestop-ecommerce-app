@@ -13,6 +13,7 @@ import {
   RadioGroup,
   Typography
 } from '@mui/material';
+import LoadingButton from '@mui/lab/LoadingButton';
 import RemoveIcon from '@mui/icons-material/Remove';
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -31,30 +32,6 @@ function loadScript(src) {
     const script = document.createElement('script');
     script.src = src;
     script.onload = () => {
-      // window.paypal
-      //   .Buttons({
-      //     createOrder: (data, actions) =>
-      //       actions.order.create({
-      //         intent: 'CAPTURE',
-      //         purchase_units: [
-      //           {
-      //             description: 'Your description',
-      //             amount: {
-      //               currency_code: 'USD',
-      //               value: 500.0
-      //             }
-      //           }
-      //         ]
-      //       }),
-      //     onApprove: async (data, actions) => {
-      //       const order = await actions.order.capture();
-      //       console.log(order);
-      //     },
-      //     onError: (err) => {
-      //       console.error(err);
-      //     }
-      //   })
-      //   .render('#paypal-container');
       resolve(true);
     };
     script.onerror = () => {
@@ -71,6 +48,7 @@ function Checkout({ cartData, addressData, addressMessage }) {
   const payerId = search.get('PayerID');
   const [open, setOpen] = useState(false);
   const [btnText, setBtnText] = useState('Confirm Order');
+  const [paypalLoading, setPaypalLoading] = useState(false);
   const [addressId, setAddressId] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('');
   const [razorpayOrderDetails, setRazorpayOrderDetails] = useState(false);
@@ -104,17 +82,17 @@ function Checkout({ cartData, addressData, addressMessage }) {
       const handleVerifyPaypal = async () => {
         try {
           if (!paypalVerifyIsLoading) {
-            setBtnText('Loading...');
+            setPaypalLoading(true);
             const res = await paypalVerify({ paymentId, payerId }).unwrap();
+            setPaypalLoading(false);
             setMessage(res.message);
             setSuccessModal(true);
             setError('');
-            setBtnText('Confirm Order');
           }
         } catch (err) {
+          setPaypalLoading(false);
           console.error(err);
           setError(err.data.message ?? 'Something went wrong');
-          setBtnText('Confirm Order');
           search.delete('paymentId');
           search.delete('PayerId');
           setSearch(search);
@@ -122,7 +100,7 @@ function Checkout({ cartData, addressData, addressMessage }) {
       };
       handleVerifyPaypal();
     }
-  }, [paymentId, payerId, paypalVerifyIsLoading, paypalVerify]);
+  }, [paymentId, payerId, paypalVerifyIsLoading, paypalVerify, search, setSearch]);
   const toggleForm = () => {
     setOpen((current) => !current);
   };
@@ -434,6 +412,31 @@ function Checkout({ cartData, addressData, addressMessage }) {
               component="span"
             >
               to go to orders page
+            </Typography>
+          </Box>
+        </DialogContent>
+      </Dialog>
+      <Dialog
+        open={paypalLoading}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        sx={{ minWidth: '30vw', minHeight: '40vh' }}
+      >
+        <DialogTitle>Payment Verification </DialogTitle>
+        <DialogContent sx={{ textAlign: 'center' }}>
+          <Typography variant="h5">{message}</Typography>
+          <Box sx={{ mt: 4 }}>
+            <Typography
+              component="span"
+              variant="h5"
+              textAlign="center"
+              sx={{ textDecoration: 'underline', color: 'blue', cursor: 'pointer' }}
+            >
+              Payment is currently being verified
+              <LoadingButton
+                loading
+                variant="text"
+              />
             </Typography>
           </Box>
         </DialogContent>

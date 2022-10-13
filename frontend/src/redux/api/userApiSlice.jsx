@@ -78,6 +78,11 @@ export const extendedUserApiSlice = apiSlice.injectEndpoints({
       providesTags: ['address']
     }),
 
+    getUseWalletDetails: builder.query({
+      query: () => '/user/getwalletdetails',
+      providesTags: ['wallet']
+    }),
+
     getUserDetails: builder.query({
       query: () => '/user/getuserdetails',
       providesTags: ['userdata']
@@ -125,6 +130,14 @@ export const extendedUserApiSlice = apiSlice.injectEndpoints({
         method: 'DELETE'
       }),
       invalidatesTags: ['address']
+    }),
+
+    checkCoupon: builder.mutation({
+      query: (data) => ({
+        url: '/user/checkcoupon',
+        method: 'POST',
+        body: data
+      })
     }),
 
     purchaseWithCod: builder.mutation({
@@ -240,5 +253,6 @@ export const {
   useGetUserOrdersQuery,
   useCancelOrderMutation,
   useReturnOrderMutation,
-  useGetInvoiceQuery
+  useGetInvoiceQuery,
+  useCheckCouponMutation
 } = extendedUserApiSlice;

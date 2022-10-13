@@ -164,6 +164,37 @@ export const extendedAdminApiSlice = apiSlice.injectEndpoints({
         method: 'DELETE'
       }),
       invalidatesTags: ['offers', 'productdata']
+    }),
+
+    getAllCoupons: builder.query({
+      query: () => '/admin/getallcoupons',
+      providesTags: ['coupons']
+    }),
+
+    addNewCoupn: builder.mutation({
+      query: (data) => ({
+        url: '/admin/addnewcoupon',
+        method: 'POST',
+        body: data
+      }),
+      invalidatesTags: ['coupons']
+    }),
+
+    editCoupon: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/admin/editcoupon/${id}`,
+        method: 'PUT',
+        body: data
+      }),
+      invalidatesTags: ['coupons']
+    }),
+
+    deleteCoupon: builder.mutation({
+      query: ({ id }) => ({
+        url: `/admin/deletecoupon/${id}`,
+        method: 'DELETE'
+      }),
+      invalidatesTags: ['coupons']
     })
   })
 });
@@ -191,5 +222,9 @@ export const {
   useGetAllOffersQuery,
   useAddNewOfferMutation,
   useEditOfferMutation,
-  useDeleteOfferMutation
+  useDeleteOfferMutation,
+  useGetAllCouponsQuery,
+  useAddNewCoupnMutation,
+  useEditCouponMutation,
+  useDeleteCouponMutation
 } = extendedAdminApiSlice;
