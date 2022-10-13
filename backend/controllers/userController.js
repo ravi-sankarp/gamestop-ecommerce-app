@@ -32,6 +32,7 @@ import generatePdf from '../utils/generatePdf.js';
 import { hashPassword } from './authController.js';
 import { generateRefreshToken, generateToken } from '../utils/jwtHelper.js';
 import { paypal, razorpayInstance } from '../config/payment.js';
+import { findByCouponCode } from '../helpers/couponHelpers.js';
 
 //@desc   Add items to cart or increase/decrease product quantity
 //@route  GET /api/user/updatecart
@@ -531,15 +532,72 @@ const deleteAddress = asyncHandler(async (req, res) => {
   sendResponse(200, resData, res);
 });
 
+//@desc   Check if a coupon is valid
+//@route  POST /api/checkcoupon
+//@access private
+const checkCoupon = asyncHandler(async (req, res) => {
+  const { code } = req.body;
+  const { userDetails: user } = req;
+  console.log(user);
+  // check if code exists
+  if (!code) {
+    throw new AppError('Please provide a coupon code', 400);
+  }
+
+  // get corresponding coupon details
+  const couponDetails = await findByCouponCode(code);
+
+  // check if coupon code is valid
+  if (!couponDetails) {
+    throw new AppError('Invalid Coupon Code', 400);
+  }
+
+  //check if coupon code has expired
+  if (couponDetails.expiryDate <= new Date()) {
+    throw new AppError('Coupon has expired', 400);
+  }
+
+  //check if user has already applied the coupon
+  const found = couponDetails?.users?.find((userId) => userId.toString() === user._id.toString());
+  if (found) {
+    throw new AppError('You have already applied the coupon!', 400);
+  }
+
+  // Finding the cart of the user to verify that minimum purchase limit is satisfied
+  const [cart] = await cartHelpers.findCartByUserId(user._id);
+
+  //checking if cart is empty
+  if (!cart) {
+    throw new AppError('Your cart is empty ! Add items to cart to add a coupon', 400);
+  }
+  // check if the minimum purchase limit of the coupon is satisfied
+  if (couponDetails.minPrice > cart.discountedTotal) {
+    throw new AppError(
+      `Minimum purchase for this coupon is ${couponDetails.minPrice.toLocaleString(
+        'en-IN'
+      )} rupees`,
+      400
+    );
+  }
+  const resData = {
+    status: 'success',
+    message: 'Successfully applied coupon ',
+    data: {
+      discount: couponDetails.discount
+    }
+  };
+  sendResponse(200, resData, res);
+});
+
 //@desc   purchase an item with cash on deliver
 //@route  POST /api/purchasewithcode
 //@access private
 const purchaseWithCod = asyncHandler(async (req, res) => {
   const user = req.userDetails;
-  const { addressId } = req.body;
+  const { addressId, couponCode } = req.body;
 
   //creating order
-  await createOrder(user, addressId);
+  await createOrder(user, addressId, couponCode);
 
   //empty cart after placing the order
   await cartHelpers.deleteCartByUserId(user._id);
@@ -557,9 +615,9 @@ const purchaseWithCod = asyncHandler(async (req, res) => {
 //@access private
 const createRazorpayOder = asyncHandler(async (req, res) => {
   const user = req.userDetails;
-  const { addressId } = req.body;
+  const { addressId, couponCode } = req.body;
   //creating order
-  const orderId = await createOrder(user, addressId, 'Order Pending', 'Razorpay');
+  const orderId = await createOrder(user, addressId, couponCode, 'Order Pending', 'Razorpay');
 
   // getting cart details
   const [cart] = await cartHelpers.findCartByUserId(user._id);
@@ -606,9 +664,9 @@ const createRazorpayOder = asyncHandler(async (req, res) => {
 //@access private
 const createPaypalOrder = asyncHandler(async (req, res) => {
   const user = req.userDetails;
-  const { addressId } = req.body;
+  const { addressId, couponCode } = req.body;
   // creating order
-  const orderId = await createOrder(user, addressId, 'Order Pending', 'Paypal');
+  const orderId = await createOrder(user, addressId, couponCode, 'Order Pending', 'Paypal');
 
   // getting cart details
   const [cart] = await cartHelpers.findCartByUserId(user._id);
@@ -690,13 +748,16 @@ const verifyPaypal = asyncHandler(async (req, res) => {
       }
     ]
   };
-  paypal.payment.execute(paymentId, executePaymentJson, asyncHandler(async (error, payment) => {
-    if (error) {
-      console.log(error.response);
-      res.status(400).json({
-        ...error.response
-      });
-    } else if (payment.state === 'approved') {
+  paypal.payment.execute(
+    paymentId,
+    executePaymentJson,
+    asyncHandler(async (error, payment) => {
+      if (error) {
+        console.log(error.response);
+        res.status(400).json({
+          ...error.response
+        });
+      } else if (payment.state === 'approved') {
         const updateData = {
           status: 'success',
           method: payment?.transactions[0]?.related_resources[0]?.sale?.payment_mode
@@ -717,7 +778,8 @@ const verifyPaypal = asyncHandler(async (req, res) => {
       } else {
         throw new AppError('Payment Failed!', 400);
       }
-  }));
+    })
+  );
 });
 
 //@desc   Verify that the payment was successfull
@@ -744,7 +806,7 @@ const checkPaymentStatus = asyncHandler(async (req, res) => {
 //@access private
 const listUserOrders = asyncHandler(async (req, res) => {
   const user = req.userDetails;
-  const orders  = await findOrdersByUserId(user._id);
+  const orders = await findOrdersByUserId(user._id);
   let resData;
   if (orders) {
     resData = {
@@ -765,7 +827,7 @@ const listUserOrders = asyncHandler(async (req, res) => {
 //@access private
 const cancelOrder = asyncHandler(async (req, res) => {
   const { orderId, productId } = req.body;
-  console.log(req.body);
+
   //check if all the data is present
   if (!orderId || !productId) {
     throw new AppError('Please send all the data', 400);
@@ -799,12 +861,12 @@ const cancelOrder = asyncHandler(async (req, res) => {
     }
 
     //change the order status of the product to cancelled
-    await cancelIndividualOrder(orderId, productId);
+    await cancelIndividualOrder(orderId, productId, orderedItemDetails.subTotalDiscounted);
 
     // recalculate the total price of the order
-    const updatedTotal = order.totalAmount - orderedItemDetails.subTotal;
+    const updatedTotal = order.totalAmountDiscounted - orderedItemDetails.subTotalDiscounted;
 
-    //change the product stock after cancelling the order
+    //change the product stock after cancelling the order,update the total order price
     await Promise.all([
       updateProductStock(orderedItemDetails.productId, orderedItemDetails.count),
       updateOrderTotal(orderId, updatedTotal)
@@ -817,11 +879,11 @@ const cancelOrder = asyncHandler(async (req, res) => {
 
     //cancelling the full order
     if (isAllCancelled) {
-      await cancelOrderById(orderId);
+      await cancelOrderById(orderId,0);
     }
   } else {
     // cancel the order
-    await cancelOrderById(orderId);
+    await cancelOrderById(orderId,0);
 
     //increase the product count after increasing the order
     await updateProductStock(order.item.productId, order.item.count);
@@ -867,17 +929,19 @@ const returnOrder = asyncHandler(async (req, res) => {
       throw new AppError('Order has already been cancelled', 400);
     }
     //change the order status of the product to returned
-    await returnIndividualOrder(orderId, productId);
+    await returnIndividualOrder(orderId, productId, orderedItemDetails.subTotalDiscounted);
 
-    // recalculate the total price of the order
-    const updatedTotal = order.totalAmount - orderedItemDetails.subTotal;
-    await updateOrderTotal(orderId, updatedTotal);
+    //recalculate the total price of the order
+    const updatedTotal = order.totalAmountDiscounted - orderedItemDetails.subTotalDiscounted;
 
-    //change the product stock after returning the order
-    await updateProductStock(orderedItemDetails.productId, orderedItemDetails.count);
+    //change the product stock after cancelling the order,update the total order price
+    await Promise.all([
+      updateProductStock(orderedItemDetails.productId, orderedItemDetails.count),
+      updateOrderTotal(orderId, updatedTotal)
+    ]);
   } else {
     // return the order
-    await returnOrderById(orderId);
+    await returnOrderById(orderId, order?.subTotalDiscounted);
 
     //increase the product count after returning the product
     await updateProductStock(order.item.productId, order.item.count);
@@ -927,13 +991,13 @@ const generateInvoice = asyncHandler(async (req, res) => {
     month: 'short',
     day: 'numeric'
   });
-  order.totalAmount = order.totalAmount.toLocaleString();
+  order.totalAmountDiscounted = order.totalAmountDiscounted.toLocaleString();
   if (order?.item) {
-    order.item.price = order.item.price.toLocaleString();
+    order.item.discountedPrice = order.item.discountedPrice.toLocaleString();
   }
   if (order?.items) {
     order.items = order.items.filter((item) => {
-      item.price = item.price.toLocaleString();
+      item.discountedPrice = item.discountedPrice.toLocaleString();
       return !item.returned && !item.cancelled;
     });
   }
@@ -966,6 +1030,7 @@ export default {
   addNewAddress,
   editAddress,
   deleteAddress,
+  checkCoupon,
   purchaseWithCod,
   createRazorpayOder,
   createPaypalOrder,

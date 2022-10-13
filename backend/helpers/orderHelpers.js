@@ -80,7 +80,7 @@ export const findOrderByOrderId = asyncHandler(async (id) => {
 });
 
 //cancel order
-export const cancelOrderById = asyncHandler(async (odID) => {
+export const cancelOrderById = asyncHandler(async (odID, amount = 0) => {
   const orderId = ObjectId(odID);
   await getDb()
     .collection('orders')
@@ -89,14 +89,17 @@ export const cancelOrderById = asyncHandler(async (odID) => {
       {
         $set: {
           'order.orderStatus': 'Cancelled By User',
-          'order.orderStatusUpdatedOn': new Date()
-        }
+          'order.orderStatusUpdatedOn': new Date(),
+          'order.totalAmountDiscounted': 0
+        },
+
+        $inc: { 'order.returnedAmount': amount }
       }
     );
 });
 
 //cancel an individual order in an order with multiple products
-export const cancelIndividualOrder = asyncHandler(async (odId, proId) => {
+export const cancelIndividualOrder = asyncHandler(async (odId, proId, cancelledAmount) => {
   const orderId = ObjectId(odId);
   const productId = ObjectId(proId);
   await getDb()
@@ -106,13 +109,15 @@ export const cancelIndividualOrder = asyncHandler(async (odId, proId) => {
       {
         $set: {
           'order.items.$.cancelled': true
-        }
+        },
+
+        $inc: { 'order.cancelledAmount': cancelledAmount }
       }
     );
 });
 
 //return an individual order in an order with multiple products
-export const returnIndividualOrder = asyncHandler(async (odId, proId) => {
+export const returnIndividualOrder = asyncHandler(async (odId, proId, returnedAmount) => {
   const orderId = ObjectId(odId);
   const productId = ObjectId(proId);
   await getDb()
@@ -122,20 +127,27 @@ export const returnIndividualOrder = asyncHandler(async (odId, proId) => {
       {
         $set: {
           'order.items.$.returned': true
-        }
+        },
+        $inc: { 'order.returnedAmount': returnedAmount }
       }
     );
 });
 
 //return order
-export const returnOrderById = asyncHandler(async (odID) => {
+export const returnOrderById = asyncHandler(async (odID, amount = 0) => {
   const orderId = ObjectId(odID);
   await getDb()
     .collection('orders')
     .updateOne(
       { 'order.orderId': orderId },
       {
-        $set: { 'orders.orderStatus': 'Returned', 'orders.orderStatusUpdatedOn': new Date() }
+        $set: {
+          'order.orderStatus': 'Returned',
+          'order.orderStatusUpdatedOn': new Date(),
+          'order.totalAmountDiscounted': 0
+        },
+
+        $inc: { 'order.returnedAmount': amount }
       }
     );
 });
@@ -148,7 +160,7 @@ export const updateOrderTotal = asyncHandler(async (odID, total) => {
     .updateOne(
       { 'order.orderId': orderId },
       {
-        $set: { 'order.totalAmount': total }
+        $set: { 'order.totalAmountDiscounted': total }
       }
     );
 });
@@ -215,24 +227,23 @@ export const findTotalOrderAmount = asyncHandler(async () => {
 
 // find the number of orders with each payment method
 export const countOrdersWithSamePaymentMethod = asyncHandler(async () => {
- const agg = [
-   {
-     $match: {
-       'order.orderStatus': {
-         $ne: 'Order Pending'
-       }
-     }
-   },
-   {
-     $group: {
-       _id: '$order.paymentMethod',
-       orders: {
-         $sum: 1
-       }
-     }
-   }
- ];
-
+  const agg = [
+    {
+      $match: {
+        'order.orderStatus': {
+          $ne: 'Order Pending'
+        }
+      }
+    },
+    {
+      $group: {
+        _id: '$order.paymentMethod',
+        orders: {
+          $sum: 1
+        }
+      }
+    }
+  ];
 
   const count = await getDb().collection('orders').aggregate(agg).toArray();
   return count;

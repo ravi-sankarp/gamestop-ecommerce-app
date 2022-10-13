@@ -131,4 +131,16 @@ router.put('/editoffer/:id', protect, checkAdmin, adminController.editOffer);
 // Delete an existing offer
 router.delete('/deleteoffer/:id', protect, checkAdmin, adminController.deleteOffer);
 
+// Get All coupons
+router.get('/getallcoupons', protect, checkAdmin, adminController.getAllCoupons);
+
+// Add New Coupon
+router.post('/addnewcoupon', protect, checkAdmin, adminController.addNewCoupon);
+
+// Edit an existing coupon
+router.put('/editcoupon/:id', protect, checkAdmin, adminController.editCoupon);
+
+// Delete an existing coupon
+router.delete('/deletecoupon/:id', protect, checkAdmin, adminController.deleteCoupon);
+
 export default router;

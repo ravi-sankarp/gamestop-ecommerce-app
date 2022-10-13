@@ -55,6 +55,9 @@ router.put('/editaddress/:id', protect, userController.editAddress);
 //route for deleting an address
 router.delete('/deleteaddress/:id', protect, userController.deleteAddress);
 
+//route for checking if a coupon is valid
+router.post('/checkcoupon', protect, userController.checkCoupon);
+
 //route for placing an order with cash on delivery
 router.post('/purchasewithcod', protect, userController.purchaseWithCod);
 
@@ -69,6 +72,9 @@ router.post('/createpaypalorder', protect, userController.createPaypalOrder);
 
 //route for verifying paypal payment
 router.post('/verifypaypal', protect, userController.verifyPaypal);
+
+// route for listing wallet details of the user
+router.get('/getwalletdetails', protect, userController.addNewAddress);
 
 //route for listing all orders of user
 router.get('/getallorders', protect, userController.listUserOrders);

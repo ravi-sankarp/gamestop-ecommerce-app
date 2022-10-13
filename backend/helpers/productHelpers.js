@@ -169,7 +169,7 @@ export const deleteProductById = asyncHandler(async (id) => {
   const _id = ObjectId(id);
   await getDb()
     .collection('products')
-    .updateOne({ _id }, { $set: { isDeleted: true } });
+    .updateOne({ _id }, { $set: { isDeleted: true, stock: 0 } });
 });
 
 //Delete all products by category Id
@@ -177,7 +177,7 @@ export const deleteProductsByCategoryId = asyncHandler(async (id) => {
   const categoryId = ObjectId(id);
   await getDb()
     .collection('products')
-    .updateMany({ categoryId }, { $set: { isDeleted: true } });
+    .updateMany({ categoryId }, { $set: { isDeleted: true, stock: 0 } });
 });
 
 //Delete all products by Brand Id
@@ -185,7 +185,7 @@ export const deleteProductsByBrandId = asyncHandler(async (id) => {
   const brandId = ObjectId(id);
   await getDb()
     .collection('products')
-    .updateMany({ brandId }, { $set: { isDeleted: true } });
+    .updateMany({ brandId }, { $set: { isDeleted: true, stock: 0 } });
 });
 
 //Update product stock after a successfull order

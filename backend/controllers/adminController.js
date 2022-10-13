@@ -8,9 +8,10 @@ import * as categoryHelpers from '../helpers/categoryHelpers.js';
 import * as brandHelpers from '../helpers/brandHelpers.js';
 import * as bannerHelpers from '../helpers/bannerHelpers.js';
 import * as adminHelpers from '../helpers/adminHelpers.js';
-import * as offerHelpers from '../helpers/offerHelpers.js';
-import cloudinarySingleUpload from '../utils/uploadToCloudinary.js';
 import * as orderHelpers from '../helpers/orderHelpers.js';
+import * as offerHelpers from '../helpers/offerHelpers.js';
+import * as couponHelpers from '../helpers/couponHelpers.js';
+import cloudinarySingleUpload from '../utils/uploadToCloudinary.js';
 
 //@desc   get all user data
 //@route  GET /api/admin/getusers
@@ -903,6 +904,197 @@ const deleteOffer = asyncHandler(async (req, res) => {
   sendResponse(200, resData, res);
 });
 
+//@desc   Get all coupons
+//@route  GET /api/getallcoupns
+//@access private
+const getAllCoupons = asyncHandler(async (req, res) => {
+  const result = await couponHelpers.findAllCoupons();
+  const resData = {
+    status: 'success',
+    data: result
+  };
+  sendResponse(200, resData, res);
+});
+
+//@desc   Add a new coupon
+//@route  POST /api/addnewcoupon
+//@access private
+const addNewCoupon = asyncHandler(async (req, res) => {
+  const {
+    code,
+    minPrice: stringMinPrice,
+    discount: discountString,
+    expiryDate: stringExpiryDate
+  } = req.body;
+
+  // check if all the data is present
+  if (!code || !stringMinPrice || !discountString || !stringExpiryDate) {
+    throw new AppError('Please send all the necessary data', 400);
+  }
+
+  // check if coupon code already exists
+  const coupon = await couponHelpers.findByCouponCode(code);
+
+  // if code already exists then throw an error
+  if (coupon) {
+    throw new AppError('Coupon code already exists', 400);
+  }
+
+  // check if coupon code is atleast 5 characters
+  if (code.length < 5) {
+    throw new AppError('Coupon code must be atleast 5 characters', 400);
+  }
+
+  // converting discount to number
+  const discount = Number(discountString);
+
+  // check if dicount is valid
+  if (discount <= 1 && discount >= 99) {
+    throw new AppError('Discount must be value between 1 and 99', 400);
+  }
+
+  // check if expiry date is valid date
+  if (!Date.parse(stringExpiryDate)) {
+    throw new AppError('Enter a valid date', 400);
+  }
+
+  const expiryDate = new Date(stringExpiryDate);
+
+  // check if expiry date is not before the current Date
+  if (!(expiryDate >= new Date())) {
+    throw new AppError('Enter a Date after today!', 400);
+  }
+
+  const minPrice = Number(stringMinPrice);
+
+  // check if minprice is valid
+  if (minPrice <= 1000) {
+    throw new AppError('Minimum purchase amount must be atleast 1000 ', 400);
+  }
+  const data = {
+    code:code.trim(),
+    minPrice,
+    expiryDate,
+    discount
+  };
+  await couponHelpers.createNewCoupon(data);
+  const resData = {
+    status: 'success',
+    message: 'Successfully added the new coupon'
+  };
+  sendResponse(200, resData, res);
+});
+
+//@desc   Edit a coupon
+//@route  PUT /api/editcoupon/:id
+//@access private
+const editCoupon = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  // throw error if id is not present
+  if (!id) {
+    throw new AppError('Please sent all the required data', 400);
+  }
+
+  // get the corresponding coupon details
+  const couponDetails = await couponHelpers.findCouponById(id);
+
+  // throw error if coupon was not found
+  if (!couponDetails) {
+    throw new AppError('Please enter a valid Id !', 400);
+  }
+
+  // get data from request
+  const {
+    code = couponDetails.code,
+    discount = couponDetails.discount,
+    expiryDate = couponDetails.expiryDate,
+    minPrice = couponDetails.minPrice
+  } = req.body;
+
+  // validate code
+  if (code !== couponDetails.code) {
+    // check if coupon code already exists
+    const coupon = await couponHelpers.findByCouponCode(code);
+
+    // if code already exists then throw an error
+    if (coupon) {
+      throw new AppError('Coupon code already exists', 400);
+    }
+
+    // check if coupon code is atleast 5 characters
+    if (code.length < 5) {
+      throw new AppError('Coupon code must be atleast 5 characters', 400);
+    }
+  }
+
+  // validate discount
+  if (Number(discount) !== couponDetails.code) {
+    // check if dicount is valid
+    if (discount <= 1 && discount >= 99) {
+      throw new AppError('Discount must be value between 1 and 99', 400);
+    }
+  }
+
+  // validate min price
+  if (Number(minPrice) !== couponDetails.minPrice) {
+    // check if minprice is valid
+    if (minPrice <= 1000) {
+      throw new AppError('Minimum purchase amount must be atleast 1000 ', 400);
+    }
+  }
+
+  // validate expiry date
+  if (new Date(expiryDate) !== couponDetails.expiryDate) {
+    // check if expiry date is valid date
+    if (!Date.parse(expiryDate)) {
+      throw new AppError('Enter a valid date', 400);
+    }
+
+    // check if expiry date is not before the current Date
+    if (!(new Date(expiryDate) >= new Date())) {
+      throw new AppError('Enter a Date after today!', 400);
+    }
+  }
+
+  const data = {
+    code:code.trim(),
+    expiryDate: new Date(expiryDate),
+    discount: Number(discount),
+    minPrice: Number(minPrice)
+  };
+
+  // update the data
+  await couponHelpers.updateCouponById(id, data);
+
+  // send response
+  const resData = {
+    status: 'success',
+    message: 'Successfully Updated the coupon'
+  };
+  sendResponse(200, resData, res);
+});
+
+//@desc   Delete a coupon
+//@route  DELETE /api/deletecoupon/:id
+//@access private
+const deleteCoupon = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  // check if id is present
+  if (!id) {
+    throw new AppError('Please send all the required data', 400);
+  }
+
+  // delete the coupon
+  await couponHelpers.deleteCouponById(id);
+  const resData = {
+    status: 'success',
+    message: 'Successfully deleted the coupon'
+  };
+  sendResponse(200, resData, res);
+});
+
 export default {
   listUsers,
   editUser,
@@ -930,5 +1122,9 @@ export default {
   getAllOffers,
   addNewOffer,
   editOffer,
-  deleteOffer
+  deleteOffer,
+  getAllCoupons,
+  addNewCoupon,
+  editCoupon,
+  deleteCoupon
 };
