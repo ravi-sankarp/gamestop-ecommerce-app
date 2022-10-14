@@ -30,9 +30,9 @@ export const findTotalUsers = asyncHandler(async () => {
 });
 
 //create new user
-export const createNewUser = asyncHandler(async (data) => {
-  await getDb().collection('users').insertOne(data);
-});
+export const createNewUser = asyncHandler(
+  async (data) => await getDb().collection('users').insertOne(data)
+);
 
 //find user details with ObjectId
 export const findUserById = asyncHandler(async (id) => {
@@ -147,4 +147,26 @@ export const deleteAddressById = asyncHandler(async (userId, adId) => {
         }
       }
     );
+});
+
+// find by referral code
+export const findUserByReferralCode = asyncHandler(async (id) => {
+  const user = await getDb().collection('users').findOne({ 'referral.id': id });
+  return user;
+});
+
+//update referal data
+export const updateUserReferralDetails = asyncHandler(async (id, amount) => {
+  const userId = ObjectId(id);
+  await getDb()
+    .collection('users')
+    .updateOne({ _id: userId }, { $inc: { 'referral.count': 1, 'referral.amount': amount } });
+});
+
+//update verifed OTP
+export const updateVerifiedOtp = asyncHandler(async (id) => {
+  const userId = ObjectId(id);
+  await getDb()
+    .collection('users')
+    .updateOne({ _id: userId }, { $set: { verifiedOtp: true } });
 });

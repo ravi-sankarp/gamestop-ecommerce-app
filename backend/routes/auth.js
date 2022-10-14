@@ -21,4 +21,10 @@ router.post('/register', authController.registerUser);
 //Generate new token with refresh Token
 router.get('/refreshtoken', authController.handleRefreshToken);
 
+//Generate new token with refresh Token
+router.post('/forgotpassword', authController.handleForgotPassword);
+
+//Generate new token with refresh Token
+router.post('/changepassword', authController.handleChangePassword);
+
 export default router;

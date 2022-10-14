@@ -7,6 +7,7 @@ import sendResponse from '../utils/sendResponse.js';
 import * as cartHelpers from '../helpers/cartHelpers.js';
 import * as wishlistHelpers from '../helpers/wishlistHelpers.js';
 import * as paymentHelpers from '../helpers/paymentHelpers.js';
+import * as walletHelpers from '../helpers/walletHelpers.js';
 import { findProductById, updateProductStock } from '../helpers/productHelpers.js';
 import {
   checkEmailAlreadyExists,
@@ -24,8 +25,7 @@ import {
   findOrderByOrderId,
   findOrdersByUserId,
   returnIndividualOrder,
-  returnOrderById,
-  updateOrderTotal
+  returnOrderById
 } from '../helpers/orderHelpers.js';
 import createOrder from '../helpers/createNewOrder.js';
 import generatePdf from '../utils/generatePdf.js';
@@ -33,6 +33,7 @@ import { hashPassword } from './authController.js';
 import { generateRefreshToken, generateToken } from '../utils/jwtHelper.js';
 import { paypal, razorpayInstance } from '../config/payment.js';
 import { findByCouponCode } from '../helpers/couponHelpers.js';
+import asyncRandomBytes from '../utils/asyncRandomBytes.js';
 
 //@desc   Add items to cart or increase/decrease product quantity
 //@route  GET /api/user/updatecart
@@ -394,7 +395,7 @@ const editUserDetails = asyncHandler(async (req, res) => {
 const changeUserPassword = asyncHandler(async (req, res) => {
   const { _id: id } = req.userDetails;
   const { confirmPassword, newPassword, confirmNewPassword } = req.body;
-  if ((!confirmPassword, !newPassword, !confirmNewPassword)) {
+  if (!confirmPassword || !newPassword || !confirmNewPassword) {
     throw new AppError('Please send all the required data !', 400);
   }
 
@@ -589,6 +590,67 @@ const checkCoupon = asyncHandler(async (req, res) => {
   sendResponse(200, resData, res);
 });
 
+//@desc   Get details of user wallet
+//@route  GET /api/getwalletdetails
+//@access private
+const getWalletDetails = asyncHandler(async (req, res) => {
+  const { _id, referral } = req.userDetails;
+
+  // Get wallet details of the user
+  const wallet = walletHelpers.findWalletByUserId(_id);
+
+  const resData = {
+    status: 'success',
+    data: { wallet, referral }
+  };
+  sendResponse(200, resData, res);
+});
+
+//@desc   Add amount to wallet
+//@route  POST /api/addtowallet
+//@access private
+const addToWallet = asyncHandler(async (req, res) => {
+  const user = req.userDetails;
+  const { amount } = req.body;
+
+  const options = {
+    amount: amount * 100,
+    currency: 'INR',
+    receipt: user._id
+  };
+
+  const razorpayOrder = await razorpayInstance.orders.create(options);
+  if (!razorpayOrder) {
+    throw new AppError('Some error occured', 500);
+  }
+  //Add the request to payment collection
+  const data = {
+    gateway: 'Razorpay',
+    paymentId: razorpayOrder.id,
+    operation: 'Add to Wallet',
+    mode: 'credit',
+    amount,
+    status: 'pending'
+  };
+  await paymentHelpers.createNewPayment(user._id, null, data);
+
+  //send the order details as response
+  const resData = {
+    status: 'Success',
+    data: {
+      orderId: razorpayOrder.id,
+      amount: razorpayOrder.amount,
+      currency: 'INR',
+      prefill: {
+        name: `${user.firstName} ${user.lastName}`,
+        email: user.email,
+        contact: user.phoneNumber
+      }
+    }
+  };
+  sendResponse(200, resData, res);
+});
+
 //@desc   purchase an item with cash on deliver
 //@route  POST /api/purchasewithcode
 //@access private
@@ -610,6 +672,62 @@ const purchaseWithCod = asyncHandler(async (req, res) => {
   sendResponse(200, resData, res);
 });
 
+//@desc   purchase an item with cash on deliver
+//@route  POST /api/purchasewithwallet
+//@access private
+const purchaseWithWallet = asyncHandler(async (req, res) => {
+  const user = req.userDetails;
+  const { addressId, couponCode } = req.body;
+
+  //creating order
+  const { orderId, total } = await createOrder(
+    user,
+    addressId,
+    couponCode,
+    'Order Placed',
+    'Wallet'
+  );
+
+  // add to payment list
+  //empty cart after placing the order
+  // decrease the wallet amount
+
+  // payment update data
+  const paymentId = (await asyncRandomBytes(6)).toString('hex');
+  const data = {
+    gateway: 'Online',
+    paymentId,
+    operation: 'Product Purchase',
+    mode: 'credit',
+    amount: total,
+    status: 'success',
+    method: 'Wallet'
+  };
+
+  // wallet update data
+  const walletData = {
+    operation: 'Product Purchase',
+    paymentId,
+    mode: 'debit',
+    amount: -total
+  };
+
+  await Promise.all([
+    paymentHelpers.createNewPayment(req.userDetails._id, orderId, data),
+
+    cartHelpers.deleteCartByUserId(user._id),
+
+    walletHelpers.updateWalletBalance(user._id, walletData)
+  ]);
+
+  // sending success response
+  const resData = {
+    status: 'success',
+    message: 'Successfully placed the order'
+  };
+  sendResponse(200, resData, res);
+});
+
 //@desc   create razorpay order details
 //@route  POST /api/createrazorpayorder
 //@access private
@@ -617,13 +735,16 @@ const createRazorpayOder = asyncHandler(async (req, res) => {
   const user = req.userDetails;
   const { addressId, couponCode } = req.body;
   //creating order
-  const orderId = await createOrder(user, addressId, couponCode, 'Order Pending', 'Razorpay');
-
-  // getting cart details
-  const [cart] = await cartHelpers.findCartByUserId(user._id);
+  const { orderId, total } = await createOrder(
+    user,
+    addressId,
+    couponCode,
+    'Order Pending',
+    'Razorpay'
+  );
 
   const options = {
-    amount: cart.discountedTotal * 100,
+    amount: total * 100,
     currency: 'INR',
     receipt: orderId
   };
@@ -634,13 +755,15 @@ const createRazorpayOder = asyncHandler(async (req, res) => {
   }
 
   //update the returned razorpay order id to the payment document
-  await paymentHelpers.createNewPayment(
-    user._id,
-    orderId,
-    'Razorpay',
-    razorpayOrder.id,
-    cart.discountedTotal
-  );
+  const data = {
+    gateway: 'Razorpay',
+    paymentId: razorpayOrder.id,
+    operation: 'Product Purchase',
+    mode: 'credit',
+    amount: total,
+    status: 'pending'
+  };
+  await paymentHelpers.createNewPayment(user._id, orderId, data);
 
   //send the order details as response
   const resData = {
@@ -666,10 +789,14 @@ const createPaypalOrder = asyncHandler(async (req, res) => {
   const user = req.userDetails;
   const { addressId, couponCode } = req.body;
   // creating order
-  const orderId = await createOrder(user, addressId, couponCode, 'Order Pending', 'Paypal');
+  const { orderId, total } = await createOrder(
+    user,
+    addressId,
+    couponCode,
+    'Order Pending',
+    'Paypal'
+  );
 
-  // getting cart details
-  const [cart] = await cartHelpers.findCartByUserId(user._id);
   const paymentJson = {
     intent: 'SALE',
     payer: {
@@ -683,7 +810,7 @@ const createPaypalOrder = asyncHandler(async (req, res) => {
       {
         amount: {
           currency: 'USD',
-          total: Math.ceil(cart.discountedTotal / 80)
+          total: Math.ceil(total / 80)
         },
         description: 'Gamestop checkout'
       }
@@ -700,13 +827,15 @@ const createPaypalOrder = asyncHandler(async (req, res) => {
         const { length } = payment.links;
 
         //update the returned paypal order id to the payment document
-        await paymentHelpers.createNewPayment(
-          user._id,
-          orderId,
-          'Paypal',
-          payment.id,
-          cart.discountedTotal
-        );
+        const data = {
+          gateway: 'Paypal',
+          paymentId: payment.id,
+          operation: 'Product Purchase',
+          mode: 'credit',
+          amount: total,
+          status: 'pending'
+        };
+        await paymentHelpers.createNewPayment(user._id, orderId, data);
 
         for (let i = 0; i < length; i += 1) {
           if (payment.links[i].rel === 'approval_url') {
@@ -850,6 +979,8 @@ const cancelOrder = asyncHandler(async (req, res) => {
     throw new AppError(`Order has already been ${order.orderStatus} !`, 400);
   }
 
+  let cancelledAmount;
+
   // checking if the order has multiple products
   if (order?.items) {
     // find the corresponding item details
@@ -863,14 +994,11 @@ const cancelOrder = asyncHandler(async (req, res) => {
     //change the order status of the product to cancelled
     await cancelIndividualOrder(orderId, productId, orderedItemDetails.subTotalDiscounted);
 
-    // recalculate the total price of the order
-    const updatedTotal = order.totalAmountDiscounted - orderedItemDetails.subTotalDiscounted;
+    // set the cancelled amount
+    cancelledAmount = orderedItemDetails.subTotalDiscounted;
 
-    //change the product stock after cancelling the order,update the total order price
-    await Promise.all([
-      updateProductStock(orderedItemDetails.productId, orderedItemDetails.count),
-      updateOrderTotal(orderId, updatedTotal)
-    ]);
+    // change the product stock after cancelling the order
+    await updateProductStock(orderedItemDetails.productId, orderedItemDetails.count);
 
     // if all the products in the order have been cancelled then cancel the order as a whole
     const isAllCancelled = order.items
@@ -879,14 +1007,41 @@ const cancelOrder = asyncHandler(async (req, res) => {
 
     //cancelling the full order
     if (isAllCancelled) {
-      await cancelOrderById(orderId,0);
+      await cancelOrderById(orderId, 0);
     }
   } else {
-    // cancel the order
-    await cancelOrderById(orderId,0);
+    // set the cancelled amount
+    cancelledAmount = order.totalAmountDiscounted;
 
-    //increase the product count after increasing the order
-    await updateProductStock(order.item.productId, order.item.count);
+    // cancel the order and increase the product count after increasing the order
+    await Promise.all([
+      cancelOrderById(orderId, 0),
+      updateProductStock(order.item.productId, order.item.count)
+    ]);
+  }
+
+  // if user has already paid the amount refund the amount to the user wallet
+  // add the data to payments collection
+  if (order.orderStatus !== 'COD') {
+    const paymentId = (await asyncRandomBytes(6)).toString('hex');
+    const paymentData = {
+      paymentId,
+      operation: 'Refund Cancelled Product',
+      mode: 'debit',
+      amount: cancelledAmount,
+      status: 'success',
+      method: 'Wallet Transfer'
+    };
+    const walletData = {
+      operation: 'Refund cancelled product',
+      paymentId,
+      mode: 'credit',
+      amount: cancelledAmount
+    };
+    await Promise.all([
+      paymentHelpers.createNewPayment(req.userDetails._id, order.orderId, paymentData),
+      walletHelpers.updateWalletBalance(req.userDetails._id, walletData)
+    ]);
   }
 
   const resData = {
@@ -919,6 +1074,9 @@ const returnOrder = asyncHandler(async (req, res) => {
   if (order.orderStatus !== 'Delivered') {
     throw new AppError('Order has not been delivered !', 400);
   }
+
+  let returnedAmount;
+
   // checking if the order has multiple products
   if (order?.items) {
     // find the corresponding item details
@@ -931,21 +1089,46 @@ const returnOrder = asyncHandler(async (req, res) => {
     //change the order status of the product to returned
     await returnIndividualOrder(orderId, productId, orderedItemDetails.subTotalDiscounted);
 
-    //recalculate the total price of the order
-    const updatedTotal = order.totalAmountDiscounted - orderedItemDetails.subTotalDiscounted;
+    // set the returned amount
+    returnedAmount = orderedItemDetails.subTotalDiscounted;
 
     //change the product stock after cancelling the order,update the total order price
-    await Promise.all([
-      updateProductStock(orderedItemDetails.productId, orderedItemDetails.count),
-      updateOrderTotal(orderId, updatedTotal)
-    ]);
+    await updateProductStock(orderedItemDetails.productId, orderedItemDetails.count);
   } else {
-    // return the order
-    await returnOrderById(orderId, order?.subTotalDiscounted);
+    // set the returned amount
+    returnedAmount = order.totalAmountDiscounted;
 
-    //increase the product count after returning the product
-    await updateProductStock(order.item.productId, order.item.count);
+    // return the order and increase the product count after returning the product
+    await Promise.all([
+      returnOrderById(orderId, order?.subTotalDiscounted),
+      updateProductStock(order.item.productId, order.item.count)
+    ]);
   }
+
+  // if user has already paid the amount refund the amount to the user wallet
+  // add the data to payments collection
+  if (order.orderStatus !== 'COD') {
+    const paymentId = (await asyncRandomBytes(6)).toString('hex');
+    const paymentData = {
+      paymentId,
+      operation: 'Refund returned Product',
+      mode: 'debit',
+      amount: returnedAmount,
+      status: 'success',
+      method: 'Wallet Transfer'
+    };
+    const walletData = {
+      operation: 'Refund returned product',
+      paymentId,
+      mode: 'credit',
+      amount: returnedAmount
+    };
+    await Promise.all([
+      paymentHelpers.createNewPayment(req.userDetails._id, order.orderId, paymentData),
+      walletHelpers.updateWalletBalance(req.userDetails._id, walletData)
+    ]);
+  }
+
   const resData = {
     status: 'success',
     message: 'Successfully made the return product request'
@@ -1031,7 +1214,10 @@ export default {
   editAddress,
   deleteAddress,
   checkCoupon,
+  getWalletDetails,
+  addToWallet,
   purchaseWithCod,
+  purchaseWithWallet,
   createRazorpayOder,
   createPaypalOrder,
   verifyPaypal,

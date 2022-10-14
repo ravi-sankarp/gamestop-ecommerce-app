@@ -27,12 +27,13 @@ const verifyRazorpayPayment = asyncHandler(async (req, res) => {
 
     // updating the payment data to the database
     const result = await paymentHelpers.updatePaymentDetails(paymentId, updateData);
+    if (result.operation !== 'Add to Wallet') {
+      // changing the order status to order placed
+      await changeOrderStatus(result?.orderId, 'Order Placed');
 
-    // changing the order status to order placed
-    await changeOrderStatus(result?.orderId, 'Order Placed');
-
-    //empty cart after placing the order
-    await deleteCartByUserId(result.userId);
+      //empty cart after placing the order
+      await deleteCartByUserId(result.userId);
+    }
 
     res.json({
       status: 'success'
@@ -81,6 +82,6 @@ const verifyRazorpayPayment = asyncHandler(async (req, res) => {
 // });
 
 export default {
-  verifyRazorpayPayment,
+  verifyRazorpayPayment
   // verifyPaypalPayment
 };

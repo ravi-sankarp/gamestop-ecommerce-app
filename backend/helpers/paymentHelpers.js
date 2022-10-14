@@ -9,18 +9,20 @@ export const findAllPayments = asyncHandler(async () => {
 });
 
 //create new payment
-export const createNewPayment = asyncHandler(async (id, odId, gateway, paymentId,amount) => {
+export const createNewPayment = asyncHandler(async (id, odId, data) => {
   const userId = ObjectId(id);
-  const orderId = ObjectId(odId);
-  const result = await getDb().collection('payments').insertOne({
-    userId,
-    orderId,
-    status: 'pending',
-    gateway,
-    paymentId,
-    amount,
-    createdOn: new Date()
-  });
+  let orderId = odId;
+  if (odId) {
+    orderId = ObjectId(odId);
+  }
+  const result = await getDb()
+    .collection('payments')
+    .insertOne({
+      userId,
+      orderId,
+      createdOn: new Date(),
+      ...data
+    });
   return result.insertedId;
 });
 

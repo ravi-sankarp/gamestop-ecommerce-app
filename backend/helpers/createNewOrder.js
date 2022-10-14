@@ -4,6 +4,7 @@ import { findCartByUserId } from './cartHelpers.js';
 import { addUserToCouponAppliedList, findByCouponCode } from './couponHelpers.js';
 import { createNewOrder } from './orderHelpers.js';
 import { updateProductStock } from './productHelpers.js';
+import { findWalletByUserId } from './walletHelpers.js';
 
 const createAnOrder = asyncHandler(
   async (user, addressId, couponCode, orderStatus, paymentMethod) => {
@@ -73,6 +74,14 @@ const createAnOrder = asyncHandler(
     const cartDiscountAmount = couponDetails
       ? Math.ceil(cart.discountedTotal * couponDetails.discount * 0.01)
       : 0;
+
+    // if payment method is via wallet check if the user has available balance
+    if (paymentMethod === 'Wallet') {
+      const wallet = await findWalletByUserId(user._id);
+      if (wallet?.balance < cart.discountedTotal - cartDiscountAmount) {
+        throw new AppError('Insufficient Balance in Wallet !', 400);
+      }
+    }
 
     //If cart contains more than 1 product then create and order and each item as a suborder
     if (cart.items.length > 1) {
@@ -152,7 +161,7 @@ const createAnOrder = asyncHandler(
     if (couponDetails) {
       await addUserToCouponAppliedList(couponDetails.code, user._id);
     }
-    return orderId;
+    return { orderId, total: cart.discountedTotal - cartDiscountAmount };
   }
 );
 

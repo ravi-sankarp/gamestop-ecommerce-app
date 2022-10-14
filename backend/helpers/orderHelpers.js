@@ -111,7 +111,10 @@ export const cancelIndividualOrder = asyncHandler(async (odId, proId, cancelledA
           'order.items.$.cancelled': true
         },
 
-        $inc: { 'order.cancelledAmount': cancelledAmount }
+        $inc: {
+          'order.cancelledAmount': cancelledAmount,
+          'order.totalAmountDiscounted': -cancelledAmount
+        }
       }
     );
 });
@@ -128,7 +131,10 @@ export const returnIndividualOrder = asyncHandler(async (odId, proId, returnedAm
         $set: {
           'order.items.$.returned': true
         },
-        $inc: { 'order.returnedAmount': returnedAmount }
+        $inc: {
+          'order.returnedAmount': returnedAmount,
+          'order.totalAmountDiscounted': -returnedAmount
+        }
       }
     );
 });
@@ -215,7 +221,7 @@ export const findTotalOrderAmount = asyncHandler(async () => {
       $group: {
         _id: null,
         totalAmount: {
-          $sum: '$order.totalAmount'
+          $sum: '$order.totalAmountDiscounted'
         }
       }
     }

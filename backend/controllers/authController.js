@@ -10,7 +10,18 @@ import {
   generateToken,
   generateTokenWithRefreshToken
 } from '../utils/jwtHelper.js';
-import { createNewUser, findUserByEmail, findUserByPhoneNumber } from '../helpers/userHelpers.js';
+import {
+  createNewUser,
+  findUserByEmail,
+  findUserByPhoneNumber,
+  findUserByReferralCode,
+  updateUserById,
+  updateUserReferralDetails,
+  updateVerifiedOtp
+} from '../helpers/userHelpers.js';
+import { createNewWallet, updateWalletBalance } from '../helpers/walletHelpers.js';
+import asyncRandomBytes from '../utils/asyncRandomBytes.js';
+import { createNewPayment } from '../helpers/paymentHelpers.js';
 
 //function for hashing user passords
 export const hashPassword = async (pwd) => {
@@ -69,7 +80,8 @@ const userLogin = asyncHandler(async (req, res) => {
 //@route  POST /api/auth/register
 //@access public
 const registerUser = asyncHandler(async (req, res) => {
-  const { email, password, confirmPassword, firstName, lastName, phoneNumber } = req.body;
+  const { email, password, confirmPassword, firstName, lastName, phoneNumber, referralCode } =
+    req.body;
 
   //checking if entered data is valid
   if (!email || !password || !firstName || !lastName || !phoneNumber || !confirmPassword) {
@@ -100,18 +112,40 @@ const registerUser = asyncHandler(async (req, res) => {
   }
   email.toLowerCase().trim();
   const hashedPwd = await hashPassword(password);
+
+  const isReferred = {
+    status: false,
+    userId: null
+  };
+  // check if referral code is valid
+  if (referralCode) {
+    // checking if referred user exists
+    const result = await findUserByReferralCode(referralCode);
+    if (!result) {
+      throw new AppError('Invalid referral code', 400);
+    }
+    isReferred.status = true;
+    isReferred.userId = result._id;
+  }
+
+  // create a referal code for the user
+  const code = (await asyncRandomBytes(6)).toString('hex');
   const result = await createNewUser({
     email: modifiedEmail,
     firstName,
     lastName,
+    referral: {
+      id: code,
+      count: 0,
+      amount: 0
+    },
     phoneNumber: modifiedNumber,
     password: hashedPwd,
     isBlocked: false,
     isAdmin: false
   });
 
-  // create a wallet for the user
-  
+  // sending token as response
   const data = {
     status: 'success',
     token: generateToken(result.insertedId),
@@ -119,6 +153,50 @@ const registerUser = asyncHandler(async (req, res) => {
     message: 'Successfully created your account'
   };
   sendResponse(201, data, res);
+
+  // create a wallet for the user
+  await createNewWallet(result.insertedId);
+
+  // if user was referred then add some amount to the user wallet
+  if (isReferred.status) {
+    const paymentIdNewUser = (await asyncRandomBytes(6)).toString('hex');
+    const paymentIdReferredUser = (await asyncRandomBytes(6)).toString('hex');
+    const paymentDataNewUser = {
+      paymentId: paymentIdNewUser,
+      operation: 'Referral Bonus',
+      mode: 'debit',
+      amount: 100,
+      status: 'success',
+      method: 'Wallet Transfer'
+    };
+    const paymentDataReferredUser = {
+      paymentId: paymentIdReferredUser,
+      operation: 'Referral Bonus',
+      mode: 'debit',
+      amount: 100,
+      status: 'success',
+      method: 'Wallet Transfer'
+    };
+    const walletDataNewUser = {
+      operation: 'Referral Bonus',
+      paymentId: paymentIdNewUser,
+      mode: 'credit',
+      amount: 100
+    };
+    const walletDataReferredUser = {
+      operation: 'Referral Bonus',
+      paymentId: paymentIdNewUser,
+      mode: 'credit',
+      amount: 100
+    };
+    await Promise.all([
+      createNewPayment(result.insertedId, null, paymentDataNewUser),
+      createNewPayment(isReferred.userId, null, paymentDataReferredUser),
+      updateWalletBalance(result.insertedId, walletDataNewUser),
+      updateWalletBalance(isReferred.userId, walletDataReferredUser),
+      updateUserReferralDetails(isReferred.userId, 100)
+    ]);
+  }
 });
 
 //@desc   request OTP for login
@@ -140,7 +218,7 @@ const requestOtp = asyncHandler(async (req, res) => {
 //@route  GET /api/auth/verifyotp
 //@access public
 const verifyUserOtp = asyncHandler(async (req, res) => {
-  const { phoneNumber, code } = req.body;
+  const { phoneNumber, code, method } = req.body;
   if (!phoneNumber || !code) {
     throw new AppError('Please send both the phone number and otp', 400);
   }
@@ -152,14 +230,23 @@ const verifyUserOtp = asyncHandler(async (req, res) => {
     if (user.isBlocked) {
       throw new AppError('Your Account is currently blocked', 403);
     }
-    const data = {
-      status: 'success',
-      message: 'Login Successfull',
-      token: generateToken(user._id),
-      refreshToken: generateRefreshToken(user._id),
-      admin: user.isAdmin
-    };
-    sendResponse(200, data, res);
+    if (method === 'Forgot Password') {
+      await updateVerifiedOtp(user._id);
+      const data = {
+        status: 'success',
+        message: 'Otp Verification Successfull'
+      };
+      sendResponse(200, data, res);
+    } else {
+      const data = {
+        status: 'success',
+        message: 'Login Successfull',
+        token: generateToken(user._id),
+        refreshToken: generateRefreshToken(user._id),
+        admin: user.isAdmin
+      };
+      sendResponse(200, data, res);
+    }
   } else {
     throw new AppError('Otp verification failed! Please try again', 400);
   }
@@ -199,11 +286,89 @@ const adminLogin = asyncHandler(async (req, res) => {
   }
 });
 
+//@desc   Forgot password request
+//@route  GET /api/auth/forgotpassword
+//@access public
+const handleForgotPassword = asyncHandler(async (req, res) => {
+  const { email, phoneNumber } = req.body;
+
+  // checking if data exists
+  if (!email || !phoneNumber) {
+    throw new AppError('Please send all the required data', 400);
+  }
+
+  // find the data of the requested user
+  const user = await findUserByEmail(email.toLowerCase().trim());
+
+  // if no user was found
+  if (!user) {
+    throw new AppError('Cannot find any user with this email address', 400);
+  }
+
+  // checking if phonenumber matches the current user
+  if (phoneNumber.trim() !== user.phoneNumber) {
+    throw new AppError('Email and phone number does not match', 400);
+  }
+
+  // sending the otp
+  sendOtp(req, res);
+});
+
+//@desc   Change password of the user
+//@route  PUT /api/auth/changeuserpassword
+//@access private
+const handleChangePassword = asyncHandler(async (req, res) => {
+  const { newPassword, confirmNewPassword, email } = req.body;
+
+  // checking if all the data exists
+  if (!newPassword || !confirmNewPassword || !email) {
+    throw new AppError('Please send all the required data !', 400);
+  }
+
+  // checking if new password and confirm new password
+  if (newPassword !== confirmNewPassword) {
+    throw new AppError('Passwords does not match', 400);
+  }
+
+  // finding user details by email address
+  const user = await findUserByEmail(email.toLowerCase().trim());
+
+  // if user does not exist
+  if (!user) {
+    throw new AppError('Cannot a find a user with this email address', 400);
+  }
+
+  // check if OTP was verifed
+  if (!user?.verifiedOtp) {
+    throw new AppError('OTP was not verified ! Verify OTP first', 400);
+  }
+
+  // hashing new password
+  const hashedPwd = await hashPassword(newPassword);
+  const updatedData = {
+    password: hashedPwd,
+    verifiedOtp: false,
+    passwordChangedAt: new Date()
+  };
+  await updateUserById(user._id, updatedData);
+
+  const resData = {
+    status: 'success',
+    message: 'Successfully updated your password',
+    token: generateToken(user._id),
+    refreshToken: generateRefreshToken(user._id),
+    admin: user.isAdmin
+  };
+  sendResponse(200, resData, res);
+});
+
 export default {
   userLogin,
   registerUser,
   requestOtp,
   verifyUserOtp,
   handleRefreshToken,
-  adminLogin
+  adminLogin,
+  handleForgotPassword,
+  handleChangePassword
 };
