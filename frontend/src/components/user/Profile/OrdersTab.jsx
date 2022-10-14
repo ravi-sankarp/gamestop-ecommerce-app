@@ -173,7 +173,7 @@ export default function CollapsibleTable() {
                   <Box>
                     <Typography sx={{ color: '#868e96', fontSize: 12 }}>Total Amount </Typography>
                     <Typography sx={{ whiteSpace: 'nowrap' }}>
-                      {`₹ ${order?.totalAmountOriginal.toLocaleString()}`}
+                      {`₹ ${order?.totalAmountDiscountedOriginal.toLocaleString()}`}
                     </Typography>
                   </Box>
                 </Box>
