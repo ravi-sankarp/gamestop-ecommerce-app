@@ -21,6 +21,7 @@ function UserOtpLoginForm() {
   const [formError, setFormError] = useState('');
   const [formSucess, setFormSuccess] = useState('');
   const [btnText, setBtnText] = useState('Send OTP');
+  const [verifyBtnText, setVerifyBtnText] = useState('Verify OTP');
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
   const dispatch = useDispatch();
@@ -83,14 +84,14 @@ function UserOtpLoginForm() {
   const onSubmitOtpHandler = async (data) => {
     if (!isLoadingOtpVerify) {
       try {
-        setBtnText('Loading...');
+        setVerifyBtnText('Loading...');
         const res = await verifyOtp({ phoneNumber, code: `${data.code}` }).unwrap();
         setFormError('');
         dispatch(setToast({ data: res, open: true }));
         await dispatch(setToken(res));
         navigate('/');
       } catch (err) {
-        setBtnText('Verify OTP');
+        setVerifyBtnText('Verify OTP');
         setFormError(err.data.message);
       }
     }
@@ -143,7 +144,11 @@ function UserOtpLoginForm() {
           autoComplete="off"
           onSubmit={handleSubmit(onSubmitHandler)}
         >
-          <Typography variant="h4" component="h1" sx={{ mb: '2rem', textAlign: 'center' }}>
+          <Typography
+            variant="h4"
+            component="h1"
+            sx={{ mb: '2rem', textAlign: 'center' }}
+          >
             OTP Login
           </Typography>
           <Typography
@@ -154,13 +159,19 @@ function UserOtpLoginForm() {
             Enter your mobile number to continue
           </Typography>
           {formSucess && (
-            <Alert sx={{ mb: 5 }} severity="info">
+            <Alert
+              sx={{ mb: 5 }}
+              severity="info"
+            >
               {formSucess}!
             </Alert>
           )}
 
           {formError && (
-            <Alert sx={{ mb: 5 }} severity="error">
+            <Alert
+              sx={{ mb: 5 }}
+              severity="error"
+            >
               {formError}!
             </Alert>
           )}
@@ -182,11 +193,17 @@ function UserOtpLoginForm() {
           >
             {btnText}
           </PrimaryButton>
-          <Typography sx={{ mt: 3, color: '#862e9c' }} variant="subtitle2">
+          <Typography
+            sx={{ mt: 3, color: '#862e9c' }}
+            variant="subtitle2"
+          >
             New to GameStop ?
           </Typography>
           <Link to="/register">
-            <Typography variant="subtitle2" sx={{ m: 0, color: '#000' }}>
+            <Typography
+              variant="subtitle2"
+              sx={{ m: 0, color: '#000' }}
+            >
               Create your account
             </Typography>{' '}
           </Link>
@@ -209,7 +226,11 @@ function UserOtpLoginForm() {
           autoComplete="off"
           onSubmit={handleOtpSubmit(onSubmitOtpHandler)}
         >
-          <Typography variant="h4" component="h1" sx={{ mb: '2rem', textAlign: 'center' }}>
+          <Typography
+            variant="h4"
+            component="h1"
+            sx={{ mb: '2rem', textAlign: 'center' }}
+          >
             Login with OTP
           </Typography>
           <Typography
@@ -220,12 +241,18 @@ function UserOtpLoginForm() {
             Enter OTP to continue
           </Typography>
           {formSucess && (
-            <Alert sx={{ mb: 5 }} severity="info">
+            <Alert
+              sx={{ mb: 5 }}
+              severity="info"
+            >
               {formSucess}!
             </Alert>
           )}
           {formError && (
-            <Alert sx={{ mb: 5 }} severity="error">
+            <Alert
+              sx={{ mb: 5 }}
+              severity="error"
+            >
               {formError}!
             </Alert>
           )}
@@ -241,8 +268,11 @@ function UserOtpLoginForm() {
             {...otpLogin('code')}
           />
 
-          <PrimaryButton sx={{ p: 1, mx: 'auto', letterSpacing: 1 }} type="submit">
-            Verify
+          <PrimaryButton
+            sx={{ p: 1, mx: 'auto', letterSpacing: 1 }}
+            type="submit"
+          >
+            {verifyBtnText}
           </PrimaryButton>
           <Box>
             {minutes === 0 && seconds === 0 ? (

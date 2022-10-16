@@ -116,6 +116,37 @@ export const extendedAdminApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: ['branddata', 'productdata']
     }),
 
+    getBannerData: builder.query({
+      query: () => '/admin/getbanners',
+      providesTags: ['banners']
+    }),
+
+    addNewBannerr: builder.mutation({
+      query: (data) => ({
+        url: '/admin/addbanner',
+        method: 'POST',
+        body: data
+      }),
+      invalidatesTags: ['banners']
+    }),
+
+    editBanner: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/admin/editbanner/${id}`,
+        method: 'PUT',
+        body: data
+      }),
+      invalidatesTags: ['banners']
+    }),
+
+    deleteBanner: builder.mutation({
+      query: ({ id }) => ({
+        url: `/admin/deletebanner/${id}`,
+        method: 'DELETE'
+      }),
+      invalidatesTags: ['banners']
+    }),
+
     getAllOrders: builder.query({
       query: () => '/admin/getallorders',
       providesTags: ['orders']
@@ -226,5 +257,9 @@ export const {
   useGetAllCouponsQuery,
   useAddNewCoupnMutation,
   useEditCouponMutation,
-  useDeleteCouponMutation
+  useDeleteCouponMutation,
+  useGetBannerDataQuery,
+  useAddNewBannerrMutation,
+  useEditBannerMutation,
+  useDeleteBannerMutation
 } = extendedAdminApiSlice;

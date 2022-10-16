@@ -64,7 +64,7 @@ function UserLoginForm() {
     >
       <Box
         sx={{
-          width: { xs: '50vw', md: 'max-content' },
+          width: { xs: 'max-content', md: 'max-content' },
           maxWidth: { md: '30vw' },
           p: 5,
           textAlign: 'center',
@@ -78,7 +78,11 @@ function UserLoginForm() {
         autoComplete="off"
         onSubmit={handleSubmit(onSubmitHandler)}
       >
-        <Typography variant="h4" component="h1" sx={{ mb: '2rem', textAlign: 'center' }}>
+        <Typography
+          variant="h4"
+          component="h1"
+          sx={{ mb: '2rem', textAlign: 'center' }}
+        >
           Login
         </Typography>
         <Typography
@@ -89,7 +93,10 @@ function UserLoginForm() {
           Enter your email and password to continue
         </Typography>
         {formError && (
-          <Alert sx={{ mb: 5 }} severity="error">
+          <Alert
+            sx={{ mb: 5 }}
+            severity="error"
+          >
             {formError}!
           </Alert>
         )}
@@ -113,26 +120,53 @@ function UserLoginForm() {
           helperText={errors.password ? errors.password.message : ''}
           {...register('password')}
         />
-        <PrimaryButton sx={{ width: '100%', p: 1, mx: 'auto' }} type="submit">
+        <Box
+          component={Link}
+          to="/forgotpassword"
+          sx={
+            isLoading
+              ? { pointerEvents: 'none', color: 'rgba(0,0,0,0.6)' }
+              : { color: 'rgba(0,0,0,0.9)' }
+          }
+        >
+          <Typography
+            variant="subtitle2"
+            sx={{ m: 0 }}
+          >
+            Forgot your Password ?
+          </Typography>
+        </Box>
+        <PrimaryButton
+          sx={{ width: { xs: '10rem', md: '100%' }, p: 1, mx: 'auto' }}
+          type="submit"
+        >
           {btnText}
         </PrimaryButton>
         <SecondaryButton
           component={Link}
           to="/otplogin"
           disabled={isLoading}
-          sx={{ width: '100%', p: 1, mx: 'auto' }}
+          sx={{ width: { xs: '10rem', md: '100%' }, p: 1, px: 2, mx: 'auto', whiteSpace: 'nowrap' }}
         >
           Login with OTP
         </SecondaryButton>
-        <Typography sx={{ mt: 3, color: '#862e9c' }} variant="subtitle2">
+        <Typography
+          sx={{ mt: 3, color: '#862e9c' }}
+          variant="subtitle2"
+        >
           New to GameStop ?
         </Typography>
         <Box
           component={Link}
           to="/register"
-          sx={isLoading ? { pointerEvents: 'none', color: '#101010' } : { color: '#101010' }}
+          sx={
+            isLoading ? { pointerEvents: 'none', color: 'rgba(0,0,0,0.6)' } : { color: '#101010' }
+          }
         >
-          <Typography variant="subtitle2" sx={{ m: 0 }}>
+          <Typography
+            variant="subtitle2"
+            sx={{ m: 0 }}
+          >
             Create your account
           </Typography>
         </Box>

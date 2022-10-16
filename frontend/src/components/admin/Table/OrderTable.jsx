@@ -74,7 +74,6 @@ function OrderTable({ data }) {
         successToast(res);
       }
     } catch (err) {
-      console.error(err);
       setError(err.data.message);
     }
   };
@@ -132,7 +131,7 @@ function OrderTable({ data }) {
                         >
                           {order?.item?.productName}
                           {order?.items?.map((item) => (
-                            <span>{item.productName}</span>
+                            <span key={item.productName}>{item.productName}</span>
                           ))}
                         </TableCell>
                         <TableCell
@@ -150,7 +149,7 @@ function OrderTable({ data }) {
                           data-label="Total Price"
                           align="center"
                         >
-                          {`₹ ${order.totalAmount.toLocaleString()}`}
+                          {`₹ ${order.totalAmountDiscountedOriginal?.toLocaleString()}`}
                         </TableCell>
                         <TableCell
                           data-label="Payment Method"
@@ -162,7 +161,8 @@ function OrderTable({ data }) {
                           data-label="Order Status"
                           align="center"
                         >
-                          {order.orderStatus === 'Cancelled' ? (
+                          {order.orderStatus?.includes('Cancelled') ||
+                          order?.orderStatus?.includes('Returned') ? (
                             <Box
                               component="span"
                               sx={{

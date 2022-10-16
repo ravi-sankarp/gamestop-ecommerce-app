@@ -116,14 +116,16 @@ function RazorPayPayment({ setSuccessModal, setMessage, data }) {
       </Box>
     );
   }
-  if (isSuccessPaymentStatus) {
-    if (paymentStatus?.status === 'success') {
-      setSuccessModal(true);
-      setMessage(paymentStatus?.message);
-    } else {
-      handleError(paymentStatus);
+  useEffect(() => {
+    if (isSuccessPaymentStatus) {
+      if (paymentStatus?.status === 'success') {
+        setSuccessModal(true);
+        setMessage(paymentStatus?.message);
+      } else {
+        handleError(paymentStatus);
+      }
     }
-  }
+  }, [handleError, isSuccessPaymentStatus, paymentStatus, setMessage, setSuccessModal]);
   return content;
 }
 

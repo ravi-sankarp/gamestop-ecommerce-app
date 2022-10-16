@@ -83,6 +83,19 @@ export const extendedUserApiSlice = apiSlice.injectEndpoints({
       providesTags: ['wallet']
     }),
 
+    getWalletBalance: builder.query({
+      query: () => '/user/getwalletbalance',
+      providesTags: ['wallet']
+    }),
+
+    addToWallet: builder.mutation({
+      query: (data) => ({
+        url: '/user/addtowallet',
+        method: 'POST',
+        body: data
+      })
+    }),
+
     getUserDetails: builder.query({
       query: () => '/user/getuserdetails',
       providesTags: ['userdata']
@@ -149,6 +162,15 @@ export const extendedUserApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: ['orders', 'cart', 'productdata']
     }),
 
+    purchaseWithWallet: builder.mutation({
+      query: (data) => ({
+        url: '/user/purchasewithwallet',
+        method: 'POST',
+        body: data
+      }),
+      invalidatesTags: ['orders', 'cart', 'productdata']
+    }),
+
     createRazorpayOrder: builder.mutation({
       query: (data) => ({
         url: '/user/createrazorpayorder',
@@ -161,7 +183,7 @@ export const extendedUserApiSlice = apiSlice.injectEndpoints({
     checkPaymentStatus: builder.query({
       query: ({ id }) => `/user/checkpaymentstatus/${id}`,
       keepUnusedDataFor: 0,
-      invalidatesTags: ['orders', 'cart', 'productdata']
+      invalidatesTags: ['orders', 'cart', 'productdata', 'wallet']
     }),
 
     createPaypalOrder: builder.mutation({
@@ -194,7 +216,7 @@ export const extendedUserApiSlice = apiSlice.injectEndpoints({
         method: 'PATCH',
         body: data
       }),
-      invalidatesTags: ['orders']
+      invalidatesTags: ['orders', 'wallet']
     }),
 
     returnOrder: builder.mutation({
@@ -203,7 +225,7 @@ export const extendedUserApiSlice = apiSlice.injectEndpoints({
         method: 'PATCH',
         body: data
       }),
-      invalidatesTags: ['orders']
+      invalidatesTags: ['orders', 'wallet']
     }),
 
     getInvoice: builder.query({
@@ -254,5 +276,9 @@ export const {
   useCancelOrderMutation,
   useReturnOrderMutation,
   useGetInvoiceQuery,
-  useCheckCouponMutation
+  useCheckCouponMutation,
+  useGetUseWalletDetailsQuery,
+  useGetWalletBalanceQuery,
+  useAddToWalletMutation,
+  usePurchaseWithWalletMutation
 } = extendedUserApiSlice;

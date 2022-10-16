@@ -11,7 +11,8 @@ function UserFooter() {
         padding: '45px 0 20px',
         fontSize: '15px',
         lineHeight: '24px',
-        color: '#737373'
+        color: '#737373',
+        width: '100vw'
       }}
     >
       <Box sx={{ padding: '10px 30px' }}>

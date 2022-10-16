@@ -6,10 +6,12 @@ import { TabContext, TabList, TabPanel } from '@mui/lab';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import UploadFileOutlinedIcon from '@mui/icons-material/UploadFileOutlined';
+import WalletOutlinedIcon from '@mui/icons-material/WalletOutlined';
 import { Box, styled } from '@mui/material';
 import ProfileTab from './ProfileTab';
 import AddressTab from './AddressTab';
 import OrdersTab from './OrdersTab';
+import WalletTab from './WalletTab';
 
 const StyledTab = styled((props) => (
   <Tab
@@ -31,7 +33,6 @@ const StyledTab = styled((props) => (
 export default function IconTabs() {
   const [search, setSearch] = useSearchParams();
   if (!search.get('profile')) {
-    console.log(search.get('profile'));
     search.set('profile', 'info');
     setSearch(search);
   }
@@ -91,11 +92,19 @@ export default function IconTabs() {
               sx={{ borderRight: '2px solid rgba(0,0,0,0.8)' }}
             />
             <StyledTab
-              label="My Orders  "
+              label="My Orders"
               icon={<UploadFileOutlinedIcon />}
               aria-label="person"
               iconPosition="start"
               value="orders"
+              sx={{ borderRight: '2px solid rgba(0,0,0,0.8)' }}
+            />
+            <StyledTab
+              label="Wallet"
+              icon={<WalletOutlinedIcon />}
+              aria-label="person"
+              iconPosition="start"
+              value="wallet"
             />
           </TabList>
         </Box>
@@ -123,6 +132,12 @@ export default function IconTabs() {
             index={2}
           >
             <OrdersTab />
+          </TabPanel>
+          <TabPanel
+            value="wallet"
+            index={3}
+          >
+            <WalletTab />
           </TabPanel>
         </Box>
       </TabContext>

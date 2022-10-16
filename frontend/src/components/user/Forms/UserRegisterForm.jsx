@@ -42,7 +42,8 @@ function UserRegisterForm() {
     confirmPassword: yup
       .string()
       .oneOf([yup.ref('password'), null], 'Passwords must match')
-      .required('Please confirm your password')
+      .required('Please confirm your password'),
+    referralCode: yup.string()
   });
 
   const {
@@ -75,20 +76,22 @@ function UserRegisterForm() {
       sx={{
         display: 'flex',
         minWidth: '100vw',
-        minHeight: '100vh',
+        minHeight: { xs: 'max-content', md: '100vh' },
         backgroundColor: '#1098ad',
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: { xs: 'flex-start', md: 'center' }
       }}
     >
       <Box
         sx={{
-          width: { xs: '50vw', md: '50vw' },
+          width: { xs: '100', md: '50vw' },
           maxWidth: { md: '30vw' },
-          p: 5,
+          p: { xs: 0, md: 5 },
+          px: { xs: 2 },
+          py: { xs: 3 },
           textAlign: 'center',
           backgroundColor: '#ffffff',
-          minHeight: '50vh',
+          minHeight: { xs: 'max-content', md: '50vh' },
           display: 'flex',
           flexDirection: 'column'
         }}
@@ -97,7 +100,11 @@ function UserRegisterForm() {
         autoComplete="off"
         onSubmit={handleSubmit(onSubmitHandler)}
       >
-        <Typography variant="h4" component="h1" sx={{ mb: '2rem', textAlign: 'center' }}>
+        <Typography
+          variant="h4"
+          component="h1"
+          sx={{ mb: '2rem', textAlign: 'center' }}
+        >
           Register
         </Typography>
         <Typography
@@ -108,13 +115,22 @@ function UserRegisterForm() {
           Enter your details to continue
         </Typography>
         {formError && (
-          <Alert sx={{ mb: 5 }} severity="error">
+          <Alert
+            sx={{ mb: 5 }}
+            severity="error"
+          >
             {formError}!
           </Alert>
         )}
 
-        <Grid container spacing={2}>
-          <Grid item xs={6}>
+        <Grid
+          container
+          spacing={2}
+        >
+          <Grid
+            item
+            xs={6}
+          >
             <TextField
               sx={{ mb: 2 }}
               label="First Name"
@@ -126,7 +142,10 @@ function UserRegisterForm() {
               {...register('firstName')}
             />
           </Grid>
-          <Grid item xs={6}>
+          <Grid
+            item
+            xs={6}
+          >
             <TextField
               sx={{ mb: 2 }}
               label="Last Name"
@@ -138,7 +157,10 @@ function UserRegisterForm() {
               {...register('lastName')}
             />
           </Grid>
-          <Grid item xs={6}>
+          <Grid
+            item
+            xs={6}
+          >
             <TextField
               sx={{ mb: 2 }}
               label="Email"
@@ -150,7 +172,10 @@ function UserRegisterForm() {
               {...register('email')}
             />
           </Grid>
-          <Grid item xs={6}>
+          <Grid
+            item
+            xs={6}
+          >
             <TextField
               sx={{ mb: 2 }}
               label="Phone Number"
@@ -162,7 +187,10 @@ function UserRegisterForm() {
               {...register('phoneNumber')}
             />
           </Grid>
-          <Grid item xs={6}>
+          <Grid
+            item
+            xs={6}
+          >
             <TextField
               sx={{ mb: 2 }}
               label="Password"
@@ -174,7 +202,10 @@ function UserRegisterForm() {
               {...register('password')}
             />
           </Grid>
-          <Grid item xs={6}>
+          <Grid
+            item
+            xs={6}
+          >
             <TextField
               sx={{ mb: 2 }}
               label="Confirm Password"
@@ -186,16 +217,51 @@ function UserRegisterForm() {
               {...register('confirmPassword')}
             />
           </Grid>
+          <Grid
+            item
+            xs={12}
+          >
+            <Typography
+              textAlign="left"
+              variant="subtitle2"
+              sx={{ color: 'rgba(0,0,0,0.5)', mb: 1 }}
+            >
+              Have a referral Code ?
+            </Typography>
+            <TextField
+              sx={{ mb: 2 }}
+              label="Referral Code"
+              fullWidth
+              required
+              type="text"
+              error={!!errors.referralCode}
+              helperText={errors.referralCode ? errors.referralCode.message : ''}
+              {...register('referralCode')}
+            />
+          </Grid>
         </Grid>
-        <PrimaryButton sx={{ width: '100%', p: 1, mx: 'auto' }} type="submit">
+        <PrimaryButton
+          sx={{ width: '100%', p: 1, mx: 'auto' }}
+          type="submit"
+        >
           {btnText}
         </PrimaryButton>
 
-        <Typography sx={{ mt: 3, color: '#862e9c' }} variant="subtitle2">
+        <Typography
+          sx={{ mt: 3, color: '#862e9c' }}
+          variant="subtitle2"
+        >
           Already have an account ?
         </Typography>
-        <Box component={Link} to="/login" sx={isLoading ? { pointerEvents: 'none' } : {}}>
-          <Typography variant="subtitle2" sx={{ m: 0, color: '#101010' }}>
+        <Box
+          component={Link}
+          to="/login"
+          sx={isLoading ? { pointerEvents: 'none' } : {}}
+        >
+          <Typography
+            variant="subtitle2"
+            sx={{ m: 0, color: '#101010' }}
+          >
             Login
           </Typography>
         </Box>

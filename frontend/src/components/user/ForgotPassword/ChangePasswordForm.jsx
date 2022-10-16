@@ -5,32 +5,30 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 import { PrimaryButton } from '../../../MaterialUiConfig/styled';
-import { useChangeUserPasswordMutation } from '../../../redux/api/userApiSlice';
 import useSuccessHandler from '../../../hooks/useSuccessHandler';
 import { setToken } from '../../../redux/reducers/authSlice';
+import { useUserChangePasswordMutation } from '../../../redux/api/authApiSlice';
 
-function ChangePwdForm() {
-  const [isChangePwd, setIsChangePwd] = useState(false);
-  const [btnText, setBtnText] = useState('Update');
+function ChangePasswordForm({ phoneNumber }) {
+  const [btnText, setBtnText] = useState('Change Password');
   const [formError, setFormError] = useState('');
-  const [updatePassword, { isLoading }] = useChangeUserPasswordMutation();
+  const [updatePassword, { isLoading }] = useUserChangePasswordMutation();
+
+  const navigate = useNavigate();
 
   const successToast = useSuccessHandler();
   const dispatch = useDispatch();
   const schema = yup.object().shape({
-    confirmPassword: yup
-      .string()
-      .required('Please enter your old password ')
-      .min(4, 'Password must be atleast 4 characters'),
     newPassword: yup
       .string()
       .required('Please enter your new password ')
       .min(4, 'Password must be atleast 4 characters'),
     confirmNewPassword: yup
       .string()
-      .required('Please confirm your new password')
+      .required('Confirm your new Password ')
       .oneOf([yup.ref('newPassword'), null], 'Passwords must match')
       .min(4, 'Password must be atleast 4 characters')
   });
@@ -44,23 +42,19 @@ function ChangePwdForm() {
     mode: 'onChange'
   });
 
-  const toggleIsChangePwd = () => {
-    setIsChangePwd((current) => !current);
-  };
-
   const onSubmitHandler = async (updateData) => {
     if (!isLoading) {
       try {
         setBtnText('Loading...');
-        const res = await updatePassword(updateData).unwrap();
+        const res = await updatePassword({ phoneNumber, ...updateData }).unwrap();
         await dispatch(setToken(res));
 
         setFormError('');
-        setBtnText('Update Data');
-        toggleIsChangePwd();
+        setBtnText('Change Password');
         successToast(res);
+        navigate('/');
       } catch (err) {
-        setBtnText('Update Data');
+        setBtnText('Change Password');
         setFormError(err.data.message);
       }
     }
@@ -93,17 +87,13 @@ function ChangePwdForm() {
         autoComplete="off"
         onSubmit={handleSubmit(onSubmitHandler)}
       >
-        <Box sx={{ display: 'flex', gap: 2 }}>
-          <Typography sx={{ mb: '2rem', textAlign: 'left' }}>Change Password</Typography>
-
-          <Typography
-            onClick={toggleIsChangePwd}
-            sx={{ color: '#2874f0', cursor: 'pointer', textDecoration: 'underline' }}
-          >
-            Edit
-          </Typography>
-        </Box>
-
+        <Typography
+          variant="h4"
+          component="h1"
+          sx={{ mb: '2rem', textAlign: 'center' }}
+        >
+          Change Password
+        </Typography>
         <Grid
           container
           spacing={2}
@@ -114,27 +104,10 @@ function ChangePwdForm() {
           >
             <TextField
               sx={{ mb: 2 }}
-              label="Confirm Old Password"
-              fullWidth
-              required
-              type="password"
-              disabled={!isChangePwd}
-              error={!!errors.confirmPassword}
-              helperText={errors.confirmPassword ? errors.confirmPassword.message : ''}
-              {...register('confirmPassword')}
-            />
-          </Grid>
-          <Grid
-            item
-            xs={12}
-          >
-            <TextField
-              sx={{ mb: 2 }}
               label="New Password"
               fullWidth
               required
               type="password"
-              disabled={!isChangePwd}
               error={!!errors.newPassword}
               helperText={errors.newPassword ? errors.newPassword.message : ''}
               {...register('newPassword')}
@@ -150,7 +123,6 @@ function ChangePwdForm() {
               label="Confirm New Password"
               fullWidth
               required
-              disabled={!isChangePwd}
               type="password"
               error={!!errors.confirmNewPassword}
               helperText={errors.confirmNewPassword ? errors.confirmNewPassword.message : ''}
@@ -167,7 +139,6 @@ function ChangePwdForm() {
           </Alert>
         )}
         <PrimaryButton
-          disabled={!isChangePwd}
           sx={{ width: '100%', p: 1, mx: 'auto', mb: 0 }}
           type="submit"
         >
@@ -178,4 +149,4 @@ function ChangePwdForm() {
   );
 }
 
-export default ChangePwdForm;
+export default ChangePasswordForm;

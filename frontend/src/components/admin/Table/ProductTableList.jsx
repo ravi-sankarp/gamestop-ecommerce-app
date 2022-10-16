@@ -1,13 +1,7 @@
 /* eslint-disable react/jsx-one-expression-per-line */
 import { useState } from 'react';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
 import {
+  Box,
   Button,
   Dialog,
   DialogActions,
@@ -15,7 +9,7 @@ import {
   DialogContentText,
   DialogTitle,
   IconButton,
-  TablePagination
+  Typography
 } from '@mui/material';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
@@ -23,23 +17,14 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { useDeleteProductMutation } from '../../../redux/api/adminApiSlice';
 import { setToast } from '../../../redux/reducers/toastSlice';
+import ProductCollapse from './ProductCollapse';
 
 export default function UserTableList({ data }) {
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [productData, setProductData] = useState({});
   const [sendDeleteProduct, { isLoading }] = useDeleteProductMutation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
-  };
 
   // for alert window
   const handleAlertShow = () => {
@@ -67,109 +52,89 @@ export default function UserTableList({ data }) {
   };
   return (
     <>
-      <Paper sx={{ mb: 5, mt: 14 }}>
-        <TableContainer>
-          <Table aria-label="simple table">
-            <TableHead sx={{ backgroundColor: '#2987de7a' }}>
-              <TableRow>
-                <TableCell align="center">Name</TableCell>
-                <TableCell align="center">Brand</TableCell>
-                <TableCell align="center">Category</TableCell>
-                <TableCell align="center">Orginal Price</TableCell>
-                <TableCell align="center">Discounted Price</TableCell>
-                <TableCell align="center">Stock</TableCell>
-                <TableCell align="center">Rating</TableCell>
-                <TableCell align="center">Action</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((product) => (
-                <TableRow
-                  key={product.name}
-                  sx={{
-                    '& td': {
-                      p: { md: 2 }
-                    },
-                    '&:last-child td, &:last-child th': { border: 0 },
-                    '&:nth-of-type(even) ': { backgroundColor: '#f4f8fd' }
-                  }}
+      <Box sx={{ my: 4 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 14 }}>
+          {data?.map((product, index) => (
+            <Box
+              key={product.name}
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                flexWrap: 'wrap',
+                alignItems: 'center',
+                backgroundColor: '#fff',
+                p: 2,
+                pr: 2,
+                mx: 'auto',
+                width: { xs: '75vw', md: '60vw' },
+                boxShadow: 'rgba(0, 0, 0, 0.15) 0px 0px 0px 0px',
+                border: '1px solid #dbdbdb',
+                borderRadius: '2px',
+                '&:hover': {
+                  boxShadow: '0 1px 12px 2px #dbdbdb',
+                  transition: 'box-shadow 100ms linear'
+                }
+              }}
+            >
+              <Box
+                sx={{
+                  flexGrow: 1,
+                  display: 'flex',
+                  justifyContent: 'space-evenly',
+                  gap: 5,
+                  width: '100%',
+                  alignItems: 'center',
+                  p: 2
+                }}
+              >
+                <Typography
+                  data-label="Name"
+                  textAlign="center"
                 >
-                  <TableCell
-                    data-label="Name"
-                    align="center"
+                  {index + 1}
+                </Typography>
+                <Box
+                  component="img"
+                  src={product.images[0].imgUrl}
+                  width="50px"
+                />
+                <Typography
+                  data-label="Name"
+                  textAlign="center"
+                >
+                  {product.name}
+                </Typography>
+                <Typography
+                  data-label="Original Price"
+                  textAlign="center"
+                >
+                  {`₹ ${product.price.toLocaleString()}`}
+                </Typography>
+                <Typography
+                  data-label="Action"
+                  textAlign="center"
+                >
+                  <IconButton
+                    onClick={() => navigate(`/admin/editproduct/${product._id}`)}
+                    aria-label="edit"
+                    color="primary"
                   >
-                    {product.name}
-                  </TableCell>
-                  <TableCell
-                    data-label="Brand"
-                    align="center"
+                    <EditOutlinedIcon />
+                  </IconButton>
+                  <IconButton
+                    onClick={() => handleAction(product)}
+                    aria-label="delete"
+                    color="primary"
                   >
-                    {product.brand[0].name}
-                  </TableCell>
-                  <TableCell
-                    data-label="Category"
-                    align="center"
-                  >
-                    {product.category[0].name}
-                  </TableCell>
-                  <TableCell
-                    data-label="Original Price"
-                    align="center"
-                  >
-                    {`₹ ${product.price.toLocaleString()}`}
-                  </TableCell>
-                  <TableCell
-                    data-label="Discounted Price"
-                    align="center"
-                  >
-                    {`₹ ${product.discountedPrice.toLocaleString()}`}
-                  </TableCell>
-                  <TableCell
-                    data-label="Stock"
-                    align="center"
-                  >
-                    {product.stock}
-                  </TableCell>
-                  <TableCell
-                    data-label="Rating"
-                    align="center"
-                  >
-                    {product.rating}
-                  </TableCell>
-                  <TableCell
-                    data-label="Action"
-                    align="center"
-                  >
-                    <IconButton
-                      onClick={() => navigate(`/admin/editproduct/${product._id}`)}
-                      aria-label="edit"
-                      color="primary"
-                    >
-                      <EditOutlinedIcon />
-                    </IconButton>
-                    <IconButton
-                      onClick={() => handleAction(product)}
-                      aria-label="delete"
-                      color="primary"
-                    >
-                      <DeleteOutlineOutlinedIcon />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 20]}
-          component="div"
-          count={data.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </Paper>
+                    <DeleteOutlineOutlinedIcon />
+                  </IconButton>
+                </Typography>
+              </Box>
+              <ProductCollapse product={product} />
+            </Box>
+          ))}
+        </Box>
+      </Box>
       <Dialog
         open={dialogOpen}
         onClose={handleAlertShow}

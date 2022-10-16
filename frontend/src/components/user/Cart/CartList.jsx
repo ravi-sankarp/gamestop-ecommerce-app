@@ -128,25 +128,21 @@ function CartList({ data }) {
               <Box
                 sx={{
                   display: 'flex',
+                  width: { xs: '100%', md: 'max-content' },
                   flexDirection: 'column',
                   alignItems: 'center',
                   gap: 3,
                   ml: { md: 4 }
                 }}
               >
-                <Typography
-                  textAlign="left"
-                  sx={{ whiteSpace: 'nowrap' }}
-                >
-                  {item.productDetails.name}
-                </Typography>
+                <Typography sx={{ whiteSpace: 'nowrap' }}>{item.productDetails.name}</Typography>
                 <Box
                   sx={{
                     display: 'flex',
                     gap: 1,
-                    justifyContent: { xs: 'flex-end', md: 'flex-start' },
+                    justifyContent: 'flex-start',
                     alignItems: 'center',
-                    pl: { xs: 0, md: 3 },
+                    pl: { xs: 0, md: 0 },
                     pr: { xs: 2, md: 0 }
                   }}
                 >
@@ -157,25 +153,29 @@ function CartList({ data }) {
                   >
                     {`₹${item.productDetails.discountedPrice.toLocaleString()}`}
                   </Typography>
-                  <Typography
-                    gutterBottom
-                    sx={{ textDecoration: 'line-through', opacity: 0.5 }}
-                    variant="subtitle"
-                  >
-                    {`₹${item.productDetails.price.toLocaleString()}`}
-                  </Typography>
-                  <Typography
-                    gutterBottom
-                    sx={{
-                      color: 'green',
-                      opacity: 0.8,
-                      whiteSpace: 'nowrap',
-                      fontSize: { xs: 15 }
-                    }}
-                    variant="subtitle"
-                  >
-                    {`(${item.productDetails.discount}% off )`}
-                  </Typography>
+                  {item.productDetails.discountedPrice < item.productDetails.price && (
+                    <>
+                      <Typography
+                        gutterBottom
+                        sx={{ textDecoration: 'line-through', opacity: 0.5 }}
+                        variant="subtitle"
+                      >
+                        {`₹${item.productDetails.price.toLocaleString()}`}
+                      </Typography>
+                      <Typography
+                        gutterBottom
+                        sx={{
+                          color: 'green',
+                          opacity: 0.8,
+                          whiteSpace: 'nowrap',
+                          fontSize: { xs: 15 }
+                        }}
+                        variant="subtitle"
+                      >
+                        {`(${item.productDetails.discount}% off )`}
+                      </Typography>
+                    </>
+                  )}
                 </Box>
               </Box>
               <Box
@@ -301,11 +301,13 @@ function CartList({ data }) {
           <Typography>₹{data.discountedTotal.toLocaleString()}</Typography>
         </Box>
         <Divider />
-        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-          <Typography sx={{ color: 'green' }}>
-            You will save ₹{(data.total - data.discountedTotal).toLocaleString()} on this order
-          </Typography>
-        </Box>
+        {data?.discountedTotal < data?.total && (
+          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+            <Typography sx={{ color: 'green' }}>
+              You will save ₹{(data.total - data.discountedTotal).toLocaleString()} on this order
+            </Typography>
+          </Box>
+        )}
         {checkoutError && <Alert severity="error">{checkoutError}</Alert>}
         <PrimaryButton
           onClick={handleCheckout}

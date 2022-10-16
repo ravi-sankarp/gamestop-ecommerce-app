@@ -11,6 +11,7 @@ import {
   FormLabel,
   Radio,
   RadioGroup,
+  TextField,
   Typography
 } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
@@ -19,13 +20,16 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { PrimaryButton } from '../../MaterialUiConfig/styled';
 import {
+  useCheckCouponMutation,
   useCreatePaypalOrderMutation,
   useCreateRazorpayOrderMutation,
   usePurchaseWithCodMutation,
+  usePurchaseWithWalletMutation,
   useVerifyPaypalMutation
 } from '../../redux/api/userApiSlice';
 import UserAddressForm from './Forms/UserAddressForm';
 import RazorPayPayment from './Payments/RazorPayPayment';
+import useSuccessHandler from '../../hooks/useSuccessHandler';
 
 function loadScript(src) {
   return new Promise((resolve) => {
@@ -41,28 +45,35 @@ function loadScript(src) {
   });
 }
 
-function Checkout({ cartData, addressData, addressMessage }) {
+function Checkout({ cartData, addressData, addressMessage, walletBalance }) {
   const [search, setSearch] = useSearchParams();
 
   const paymentId = search.get('paymentId');
   const payerId = search.get('PayerID');
   const [open, setOpen] = useState(false);
+  const [couponDiscount, setCouponDiscount] = useState(0);
   const [btnText, setBtnText] = useState('Confirm Order');
   const [paypalLoading, setPaypalLoading] = useState(false);
   const [addressId, setAddressId] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('');
+  const [couponErr, setCouponErr] = useState('');
   const [razorpayOrderDetails, setRazorpayOrderDetails] = useState(false);
   const [paypalRedirectUrl, setPaypalRedirectUrl] = useState(false);
   const [error, setError] = useState(false);
   const [message, setMessage] = useState('');
   const [successModal, setSuccessModal] = useState(false);
 
+  const [couponCode, setCouponCode] = useState('');
+
   const navigate = useNavigate();
+  const successToast = useSuccessHandler();
 
   const [confirmOrder, { isLoading: confirmOrderIsLoading }] = usePurchaseWithCodMutation();
+  const [walletPurchase, { isLoading: walletPurchaseIsLoading }] = usePurchaseWithWalletMutation();
   const [razorpayOrder, { isLoading: razorpayOrderIsLoading }] = useCreateRazorpayOrderMutation();
   const [paypalOrder, { isLoading: paypalOrderIsLoading }] = useCreatePaypalOrderMutation();
   const [paypalVerify, { isLoading: paypalVerifyIsLoading }] = useVerifyPaypalMutation();
+  const [checkCoupon, { isLoading: checkCouponIsLoading }] = useCheckCouponMutation();
 
   useEffect(() => {
     if (paypalRedirectUrl) {
@@ -117,7 +128,7 @@ function Checkout({ cartData, addressData, addressMessage }) {
     try {
       if (!confirmOrderIsLoading) {
         setBtnText('Loading...');
-        const res = await confirmOrder({ addressId }).unwrap();
+        const res = await confirmOrder({ addressId, couponCode }).unwrap();
         setMessage(res.message);
         setSuccessModal(true);
         setError('');
@@ -129,12 +140,27 @@ function Checkout({ cartData, addressData, addressMessage }) {
       setBtnText('Confirm Order');
     }
   };
+  const handleWalletPurchase = async () => {
+    try {
+      if (!walletPurchaseIsLoading) {
+        setBtnText('Loading...');
+        const res = await walletPurchase({ addressId, couponCode }).unwrap();
+        setMessage(res.message);
+        setSuccessModal(true);
+        setError('');
+        setBtnText('Confirm Order');
+      }
+    } catch (err) {
+      setError(err.data.message || 'Something went wrong');
+      setBtnText('Confirm Order');
+    }
+  };
 
   const handleRazorpayOrder = async () => {
     try {
       if (!razorpayOrderIsLoading) {
         setBtnText('Loading...');
-        const data = await razorpayOrder({ addressId }).unwrap();
+        const data = await razorpayOrder({ addressId, couponCode }).unwrap();
         setRazorpayOrderDetails(data.data);
         setError('');
         setBtnText('Confirm Order');
@@ -150,7 +176,7 @@ function Checkout({ cartData, addressData, addressMessage }) {
     try {
       if (!paypalOrderIsLoading) {
         setBtnText('Loading...');
-        const data = await paypalOrder({ addressId }).unwrap();
+        const data = await paypalOrder({ addressId, couponCode }).unwrap();
         setPaypalRedirectUrl(data.data);
         setError('');
         setBtnText('Confirm Order');
@@ -176,6 +202,9 @@ function Checkout({ cartData, addressData, addressMessage }) {
       case 'cod':
         handleCashOnDelivery();
         break;
+      case 'wallet':
+        handleWalletPurchase();
+        break;
       case 'razorpay':
         handleRazorpayOrder();
         break;
@@ -192,6 +221,23 @@ function Checkout({ cartData, addressData, addressMessage }) {
     setSuccessModal(false);
   };
 
+  const handleCouponCheck = async () => {
+    if (!couponCode) {
+      setCouponErr('Please enter a valid coupon');
+      return;
+    }
+    setCouponErr('');
+    if (!checkCouponIsLoading) {
+      try {
+        const result = await checkCoupon({ code: couponCode }).unwrap();
+        successToast(result);
+
+        setCouponDiscount(cartData.discountedTotal * result.data.discount * 0.01);
+      } catch (err) {
+        setCouponErr(err?.data?.message);
+      }
+    }
+  };
   return (
     <Box
       sx={{
@@ -271,7 +317,37 @@ function Checkout({ cartData, addressData, addressMessage }) {
             toggleForm={toggleForm}
           />
         )}
+
+        <Box sx={{ backgroundColor: '#fff', p: 3 }}>
+          <Typography
+            textAlign="center"
+            variant="h6"
+            sx={{
+              fontSize: 18
+            }}
+          >
+            Have a coupon ? Click here to apply
+          </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <TextField
+              id="filled-basic"
+              label="Coupon Code"
+              variant="outlined"
+              color="primary"
+              value={couponCode}
+              onChange={(e) => setCouponCode(e.target.value)}
+            />
+            <PrimaryButton onClick={handleCouponCheck}>Check</PrimaryButton>
+          </Box>
+          <Typography
+            color="red"
+            textAlign="center"
+          >
+            {couponErr}
+          </Typography>
+        </Box>
       </Box>
+
       <Box
         sx={{
           flexGrow: { xs: 1, md: 0 },
@@ -310,17 +386,32 @@ function Checkout({ cartData, addressData, addressMessage }) {
           <Typography sx={{ color: 'green' }}>FREE</Typography>
         </Box>
         <Divider />
+        {!!couponDiscount && (
+          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Typography>Coupon Discount</Typography>
+            <Typography sx={{ color: 'green' }}>
+              <RemoveIcon sx={{ fontSize: 12 }} /> ₹{couponDiscount.toLocaleString()}
+            </Typography>
+          </Box>
+        )}
+        <Divider />
+
         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <Typography>Total Amount</Typography>
-          <Typography>₹{cartData.discountedTotal.toLocaleString()}</Typography>
+          <Typography>₹{(cartData.discountedTotal - couponDiscount).toLocaleString()}</Typography>
         </Box>
         <Divider />
-        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-          <Typography sx={{ color: 'green' }}>
-            You will save ₹{(cartData.total - cartData.discountedTotal).toLocaleString()} on this
-            order
-          </Typography>
-        </Box>
+
+        {cartData.total > cartData.discountedTotal - couponDiscount && (
+          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+            <Typography sx={{ color: 'green' }}>
+              You will save ₹
+              {(cartData.total - cartData.discountedTotal + couponDiscount).toLocaleString()} on
+              this order
+            </Typography>
+          </Box>
+        )}
+
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
           <Typography
             variant="h6"
@@ -340,6 +431,13 @@ function Checkout({ cartData, addressData, addressMessage }) {
                 value="cod"
                 control={<Radio />}
                 label="Cash On Delivery"
+              />
+              <FormControlLabel
+                value="wallet"
+                control={<Radio />}
+                label={`Wallet (Balance - ₹${walletBalance.toLocaleString('en-us')})`}
+                sx={{ whiteSpace: 'nowrap' }}
+                disabled={cartData.discountedTotal - couponDiscount > walletBalance}
               />
               <FormControlLabel
                 value="razorpay"

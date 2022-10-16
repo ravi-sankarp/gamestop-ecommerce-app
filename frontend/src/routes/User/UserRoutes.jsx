@@ -7,6 +7,7 @@ import CartPage from '../../pages/User/CartPage';
 import CheckoutPage from '../../pages/User/CheckoutPage';
 import HomePage from '../../pages/User/HomePage';
 import ProductPage from '../../pages/User/ProductPage';
+import UserForgotPasswordPage from '../../pages/User/UserForgotPasswordPage';
 import UserLoginPage from '../../pages/User/UserLoginPage';
 import UserOtpLoginPage from '../../pages/User/UserOtpLoginPage';
 import UserProfilePage from '../../pages/User/UserProfilePage';
@@ -52,6 +53,10 @@ function UserRoutes() {
             <Route
               path="register"
               element={<UserRegisterPage />}
+            />
+            <Route
+              path="forgotpassword"
+              element={<UserForgotPasswordPage />}
             />
             <Route
               path="products"

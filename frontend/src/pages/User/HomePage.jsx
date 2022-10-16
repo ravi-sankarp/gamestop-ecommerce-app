@@ -1,5 +1,11 @@
+import HomeBannerCarousel from '../../components/user/Home/HomeBannerCarousel';
+
 function HomePage() {
-  return <div>HomePage</div>;
+  return (
+    <div>
+      <HomeBannerCarousel />
+    </div>
+  );
 }
 
 export default HomePage;

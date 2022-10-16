@@ -1,9 +1,13 @@
 import { useEffect } from 'react';
 import { Box, CircularProgress, Typography } from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Checkout from '../../components/user/Checkout';
 import useApiErrorHandler from '../../hooks/useApiErrorHandler';
-import { useGetAddressesQuery, useGetCartTotalQuery } from '../../redux/api/userApiSlice';
+import {
+  useGetAddressesQuery,
+  useGetCartTotalQuery,
+  useGetWalletBalanceQuery
+} from '../../redux/api/userApiSlice';
 import { PrimaryButton } from '../../MaterialUiConfig/styled';
 import HelmetMeta from '../../components/HelmetMeta';
 
@@ -25,14 +29,24 @@ function CheckoutPage() {
     data: addressData,
     error: errorAddress
   } = useGetAddressesQuery();
+  const {
+    isLoading: isLoadingWallet,
+    isFetching: isFetchingWallet,
+    isSuccess: isSuccessWallet,
+    isError: isErrorWallet,
+    data: walletData,
+    error: errorWallet
+  } = useGetWalletBalanceQuery();
   const handleError = useApiErrorHandler();
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (isErrorAddress) {
       handleError(errorAddress);
     }
-  }, [isErrorAddress, errorAddress, handleError, navigate]);
+    if (isErrorWallet) {
+      handleError(errorWallet);
+    }
+  }, [isErrorAddress, errorAddress, handleError, isErrorWallet, errorWallet]);
 
   let content;
   if (
@@ -40,6 +54,8 @@ function CheckoutPage() {
     || (isFetchingCart && !isSuccessCart)
     || isLoadingAddress
     || (isFetchingAddress && !isSuccessAddress)
+    || isLoadingWallet
+    || (isFetchingWallet && !isSuccessWallet)
   ) {
     content = (
       <Box
@@ -116,9 +132,10 @@ function CheckoutPage() {
         {isSuccessAddress && isSuccessCart && (
           <Checkout
             refetch={refetch}
-            addressMessage={addressData.message}
-            addressData={addressData.data}
-            cartData={cartData.data}
+            addressMessage={addressData?.message}
+            addressData={addressData?.data}
+            cartData={cartData?.data}
+            walletBalance={walletData?.data?.balance}
           />
         )}
       </Box>

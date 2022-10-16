@@ -12,11 +12,20 @@ export const extendedViewsApiSlice = apiSlice.injectEndpoints({
     }),
     getNavlist: builder.query({
       query: () => '/getnavlist',
-      providesTags: ['productdata,categorydata']
+      providesTags: ['productdata', 'categorydata', 'branddata']
+    }),
+    getProductAndCategories: builder.query({
+      query: () => '/getproductsandcategories',
+      providesTags: ['productdata', 'categorydata']
     }),
     getSingleProduct: builder.query({
       query: ({ id }) => `/getproduct/${id}`,
       providesTags: ['productdata']
+    }),
+
+    getAllBanners: builder.query({
+      query: () => '/getallbanners',
+      providesTags: ['banners']
     })
   })
 });
@@ -24,5 +33,7 @@ export const {
   useGetHomePageQuery,
   useGetAllProductsQuery,
   useGetSingleProductQuery,
-  useGetNavlistQuery
+  useGetNavlistQuery,
+  useGetProductAndCategoriesQuery,
+  useGetAllBannersQuery
 } = extendedViewsApiSlice;
