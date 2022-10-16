@@ -21,9 +21,9 @@ function HomeBannerCarousel() {
       <Box
         sx={{
           position: 'fixed',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%,0%)',
+          top: '0',
+          width: '98vw',
+          height: '100vh',
           overflowY: 'hidden',
           display: 'flex',
           alignItems: 'center',
@@ -46,13 +46,20 @@ function HomeBannerCarousel() {
       showStatus={false}
       infiniteLoop
       autoPlay
+      showThumbs={false}
+      stopOnHover
+      dynamicHeight={50}
+      className="home-carousel"
     >
       {data?.data?.map((banner) => (
         <Box
+          key={banner._id}
           component="img"
+          loading="lazy"
+          height="400"
           src={banner?.bannerImg.imgUrl}
           alt={banner?.title}
-          sx={{ height: '300px', objectFit: 'cover', aspectRatio: '16/9' }}
+          sx={{ height: '40vh', aspectRatio: '16/9' }}
         />
       ))}
     </Carousel>

@@ -70,6 +70,7 @@ function Login({ handleAdminLogin, formError }) {
           label="Email"
           fullWidth
           required
+          autoFocus
           type="email"
           error={!!errors.email}
           helperText={errors.email ? errors.email.message : ''}

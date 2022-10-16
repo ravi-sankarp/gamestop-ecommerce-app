@@ -37,9 +37,9 @@ import {
   Tooltip
 } from '@mui/material';
 import { useDispatch } from 'react-redux';
-import { deleteToken } from '../../../redux/reducers/authSlice';
 import { setToast } from '../../../redux/reducers/toastSlice';
 import apiSlice from '../../../redux/api/apiSlice';
+import { deleteAdminToken } from '../../../redux/reducers/adminAuthSlice';
 
 const drawerWidth = 240;
 
@@ -233,7 +233,7 @@ function Sidebar() {
     }
   };
   const handleLogout = async () => {
-    await dispatch(deleteToken());
+    await dispatch(deleteAdminToken());
     await dispatch(apiSlice.util.resetApiState());
     setOpenAlert(false);
     const message = { message: 'Successfully Logged Out' };

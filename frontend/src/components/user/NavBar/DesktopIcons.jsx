@@ -26,11 +26,11 @@ import { useGetCartAndWishlistCountQuery } from '../../../redux/api/userApiSlice
 
 function DesktopIcons() {
   const [openAlert, setOpenAlert] = useState(false);
-  const data = useSelector((state) => state.auth.data);
-  const { data: result } = useGetCartAndWishlistCountQuery('Get cart count', { skip: !data });
+  const { token } = useSelector((state) => state.auth.data);
+  const { data: result } = useGetCartAndWishlistCountQuery('Get cart count', { skip: !token });
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const value = data.token ? 'Logout' : 'Login';
+  const value = token ? 'Logout' : 'Login';
 
   // for alert window
   const handleAlertShow = () => {

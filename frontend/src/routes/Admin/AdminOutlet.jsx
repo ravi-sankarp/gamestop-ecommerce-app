@@ -2,7 +2,7 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 function AdminOutlet() {
-  const data = useSelector((state) => state.auth.data);
+  const data = useSelector((state) => state.adminAuth.data);
   if (data.admin) {
     return <Outlet />;
   }

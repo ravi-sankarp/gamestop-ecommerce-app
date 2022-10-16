@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Navigate, useNavigate } from 'react-router-dom';
 import Login from '../../components/admin/Login/Login';
 import { useAdminLoginMutation } from '../../redux/api/authApiSlice';
-import { setToken } from '../../redux/reducers/authSlice';
+import { setAdminToken } from '../../redux/reducers/adminAuthSlice';
 import { setToast } from '../../redux/reducers/toastSlice';
 
 function AdminLoginPage() {
@@ -12,7 +12,7 @@ function AdminLoginPage() {
   const navigate = useNavigate();
 
   const [adminLogin, { isLoading }] = useAdminLoginMutation();
-  const stateData = useSelector((state) => state.auth.data);
+  const stateData = useSelector((state) => state.adminAuth.data);
   if (stateData.admin) {
     return <Navigate to="/admin/dashboard" />;
   }
@@ -21,7 +21,7 @@ function AdminLoginPage() {
       try {
         const res = await adminLogin(data).unwrap();
         if (res.status === 'success') {
-          await dispatch(setToken(res));
+          await dispatch(setAdminToken(res));
           dispatch(setToast({ data: res, open: true }));
           setFormError('');
           navigate('/admin/dashboard');

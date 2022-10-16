@@ -102,7 +102,6 @@ function Checkout({ cartData, addressData, addressMessage, walletBalance }) {
           }
         } catch (err) {
           setPaypalLoading(false);
-          console.error(err);
           setError(err.data.message ?? 'Something went wrong');
           search.delete('paymentId');
           search.delete('PayerId');
@@ -166,7 +165,6 @@ function Checkout({ cartData, addressData, addressMessage, walletBalance }) {
         setBtnText('Confirm Order');
       }
     } catch (err) {
-      console.error(err);
       setError(err.data.message ?? 'Something went wrong');
       setBtnText('Confirm Order');
     }
@@ -179,10 +177,9 @@ function Checkout({ cartData, addressData, addressMessage, walletBalance }) {
         const data = await paypalOrder({ addressId, couponCode }).unwrap();
         setPaypalRedirectUrl(data.data);
         setError('');
-        setBtnText('Confirm Order');
+        // setBtnText('Confirm Order');
       }
     } catch (err) {
-      console.error(err);
       setError(err.data.message ?? err?.data?.response?.message ?? 'Something went wrong');
       setBtnText('Confirm Order');
     }
@@ -234,6 +231,7 @@ function Checkout({ cartData, addressData, addressMessage, walletBalance }) {
 
         setCouponDiscount(cartData.discountedTotal * result.data.discount * 0.01);
       } catch (err) {
+        setCouponCode('');
         setCouponErr(err?.data?.message);
       }
     }

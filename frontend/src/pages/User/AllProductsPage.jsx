@@ -18,6 +18,8 @@ function AllProductsPage() {
     content = (
       <Box
         sx={{
+          position: 'absolute',
+          top: 0,
           width: '100%',
           height: '100vh',
           overflowY: 'hidden',

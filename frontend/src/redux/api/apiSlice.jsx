@@ -5,11 +5,18 @@ const baseQuery = fetchBaseQuery({
   baseUrl: 'http://localhost:8000/api',
   prepareHeaders: (headers, { getState, endpoint }) => {
     const { token, refreshToken } = getState().auth.data;
+    const { token: adminToken, refreshToken: adminRefreshToken } = getState().adminAuth.data;
     if (refreshToken && endpoint === 'refresh') {
-      headers.set('authorization', `Bearer ${refreshToken}`);
-    } else if (token) {
-      headers.set('authorization', `Bearer ${token}`);
-    }
+      if (window.location.href.includes('admin')) {
+        headers.set('authorization', `Bearer ${adminRefreshToken}`);
+      } else {
+        headers.set('authorization', `Bearer ${refreshToken}`);
+      }
+    } else if (window.location.href.includes('admin')) {
+        headers.set('authorization', `Bearer ${adminToken}`);
+      } else {
+        headers.set('authorization', `Bearer ${token}`);
+      }
     return headers;
   }
 });

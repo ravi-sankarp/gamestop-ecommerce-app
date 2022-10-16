@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Box, Button, Grid, List, ListItem, Typography } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
+import { Carousel } from 'react-responsive-carousel';
 import ReactImageMagnify from 'react-image-magnify';
 import { PrimaryButton, SecondaryButton } from '../../../MaterialUiConfig/styled';
 import { useUpdateCartMutation, useUpdateWishlistMutation } from '../../../redux/api/userApiSlice';
@@ -69,16 +70,30 @@ function SingleProduct({ product }) {
         alignItems="center"
       >
         <Box
-          component="img"
-          src={img}
           sx={{
-            width: '100%',
-            height: 300,
-            objectFit: 'contain',
             display: { xs: 'block', lg: 'none' }
           }}
-          alt=""
-        />
+        >
+          <Carousel
+            showStatus={false}
+            infiniteLoop
+            showThumbs={false}
+            stopOnHover
+            showArrows={false}
+            className="product-carousel"
+          >
+            {product.images.map((item) => (
+              <Box
+                key={item.public_id}
+                component="img"
+                loading="lazy"
+                src={item.imgUrl}
+                alt={product?.name}
+                sx={{ height: '300px', width: '100%', objectFit: 'contain', aspectRatio: '16/9' }}
+              />
+            ))}
+          </Carousel>
+        </Box>
         <Box
           sx={{
             display: { xs: 'none', lg: 'flex' },
@@ -165,7 +180,7 @@ function SingleProduct({ product }) {
             <Typography
               gutterBottom
               variant="subtitle"
-              sx={{ color: '#000', opacity: 1, fontWeight: '550', fontSize: 25 }}
+              sx={{ color: '#000', opacity: 1, fontWeight: '500', fontSize: 25 }}
             >
               {`₹${product.discountedPrice.toLocaleString()}`}
             </Typography>
@@ -213,7 +228,7 @@ function SingleProduct({ product }) {
             }
           }}
         >
-          <Typography variant="h6">Product Highlights : </Typography>
+          <Typography variant="h6">Product Highlights  </Typography>
           {product.keyFeatures.split(',').map((feature) => (
             <ListItem
               key={feature.split(':')[0]}
