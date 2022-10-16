@@ -510,9 +510,9 @@ const listBanners = asyncHandler(async (req, res) => {
 //@route  POST /api/admin/addbanner
 //@access private
 const addBanner = asyncHandler(async (req, res) => {
-  const { title, description, type, typeId } = req.body;
+  const { title, description } = req.body;
   //checking if title and desciption exists
-  if (!title || !description || !req.file || !type || !typeId) {
+  if (!title || !description || !req.file) {
     throw new AppError('Please send all the required data', 400);
   }
 
@@ -524,7 +524,7 @@ const addBanner = asyncHandler(async (req, res) => {
   };
 
   //adding data to database
-  await bannerHelpers.createNewBanner({ title, description, type, id: typeId, bannerImg });
+  await bannerHelpers.createNewBanner({ title, description, bannerImg });
   const resData = {
     status: 'success',
     message: 'Successfully added the banner'
@@ -555,17 +555,9 @@ const editBanner = asyncHandler(async (req, res) => {
     };
   }
 
-  //setting banner type if it exists
-  let typeName;
-  if (req.body.type) {
-    typeName = req.body.type.toLowerCase();
-  }
-
   const data = {
     title: req.body.title || bannerDetails.title,
     description: req.body.description || bannerDetails.description,
-    type: typeName || bannerDetails.type,
-    id: req.body.typeId || bannerDetails.id,
     bannerImg: bannerImg || bannerDetails.bannerImg
   };
 
@@ -963,16 +955,19 @@ const getAllCoupons = asyncHandler(async (req, res) => {
 //@access private
 const addNewCoupon = asyncHandler(async (req, res) => {
   const {
-    code,
+    code: stringCode,
     minPrice: stringMinPrice,
     discount: discountString,
     expiryDate: stringExpiryDate
   } = req.body;
 
   // check if all the data is present
-  if (!code || !stringMinPrice || !discountString || !stringExpiryDate) {
+  if (!stringCode || !stringMinPrice || !discountString || !stringExpiryDate) {
     throw new AppError('Please send all the necessary data', 400);
   }
+
+  // converting code to uppercase
+  const code = stringCode.toUpperCase();
 
   // check if coupon code already exists
   const coupon = await couponHelpers.findByCouponCode(code);

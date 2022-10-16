@@ -539,7 +539,6 @@ const deleteAddress = asyncHandler(async (req, res) => {
 const checkCoupon = asyncHandler(async (req, res) => {
   const { code } = req.body;
   const { userDetails: user } = req;
-  console.log(user);
   // check if code exists
   if (!code) {
     throw new AppError('Please provide a coupon code', 400);
@@ -597,11 +596,26 @@ const getWalletDetails = asyncHandler(async (req, res) => {
   const { _id, referral } = req.userDetails;
 
   // Get wallet details of the user
-  const wallet = walletHelpers.findWalletByUserId(_id);
+  const wallet = await walletHelpers.findWalletByUserId(_id);
 
   const resData = {
     status: 'success',
     data: { wallet, referral }
+  };
+  sendResponse(200, resData, res);
+});
+
+//@desc   Get balance of user wallet
+//@route  GET /api/getwalletbalance
+//@access private
+const getWalletBalance = asyncHandler(async (req, res) => {
+  const { _id } = req.userDetails;
+
+  // Get wallet details of the user
+  const wallet = await walletHelpers.findWalletByUserId(_id);
+  const resData = {
+    status: 'success',
+    data: { balance: wallet?.balance }
   };
   sendResponse(200, resData, res);
 });
@@ -611,8 +625,13 @@ const getWalletDetails = asyncHandler(async (req, res) => {
 //@access private
 const addToWallet = asyncHandler(async (req, res) => {
   const user = req.userDetails;
-  const { amount } = req.body;
+  const { amount: stringAmount } = req.body;
 
+  // if amount is not present then throw an erro
+  if (!stringAmount) {
+    throw new AppError('Please send the amount', 400);
+  }
+  const amount = Number(stringAmount);
   const options = {
     amount: amount * 100,
     currency: 'INR',
@@ -1215,6 +1234,7 @@ export default {
   deleteAddress,
   checkCoupon,
   getWalletDetails,
+  getWalletBalance,
   addToWallet,
   purchaseWithCod,
   purchaseWithWallet,

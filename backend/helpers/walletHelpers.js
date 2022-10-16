@@ -18,6 +18,7 @@ export const createNewWallet = asyncHandler(async (id) => {
 // update wallet balance
 export const updateWalletBalance = asyncHandler(async (id, transactionData) => {
   const userId = ObjectId(id);
+  transactionData.date = new Date();
   await getDb()
     .collection('wallet')
     .updateOne(

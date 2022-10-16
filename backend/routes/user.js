@@ -58,6 +58,9 @@ router.delete('/deleteaddress/:id', protect, userController.deleteAddress);
 // route for listing wallet details of the user
 router.get('/getwalletdetails', protect, userController.getWalletDetails);
 
+// route for getting wallet balance of the user
+router.get('/getwalletbalance', protect, userController.getWalletBalance);
+
 // route for adding amount to wallet
 router.post('/addtowallet', protect, userController.addToWallet);
 

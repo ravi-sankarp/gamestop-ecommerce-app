@@ -78,6 +78,16 @@ export const findAllProducts = asyncHandler(async (query) => {
   return products;
 });
 
+//find all products name and id
+export const findProductNames = asyncHandler(async () => {
+  const product = await getDb()
+    .collection('products')
+    .find({ isDeleted: false })
+    .project({ name: 1 })
+    .toArray();
+  return product;
+});
+
 //find total products count
 export const findTotalProducts = asyncHandler(async () => {
   const agg = [

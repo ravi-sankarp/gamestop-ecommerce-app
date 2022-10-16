@@ -318,10 +318,10 @@ const handleForgotPassword = asyncHandler(async (req, res) => {
 //@route  PUT /api/auth/changeuserpassword
 //@access private
 const handleChangePassword = asyncHandler(async (req, res) => {
-  const { newPassword, confirmNewPassword, email } = req.body;
+  const { newPassword, confirmNewPassword, phoneNumber } = req.body;
 
   // checking if all the data exists
-  if (!newPassword || !confirmNewPassword || !email) {
+  if (!newPassword || !confirmNewPassword || !phoneNumber) {
     throw new AppError('Please send all the required data !', 400);
   }
 
@@ -331,7 +331,7 @@ const handleChangePassword = asyncHandler(async (req, res) => {
   }
 
   // finding user details by email address
-  const user = await findUserByEmail(email.toLowerCase().trim());
+  const user = await findUserByPhoneNumber(phoneNumber.trim());
 
   // if user does not exist
   if (!user) {

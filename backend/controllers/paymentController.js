@@ -3,6 +3,7 @@ import asyncHandler from 'express-async-handler';
 import { deleteCartByUserId } from '../helpers/cartHelpers.js';
 import { changeOrderStatus } from '../helpers/orderHelpers.js';
 import * as paymentHelpers from '../helpers/paymentHelpers.js';
+import { updateWalletBalance } from '../helpers/walletHelpers.js';
 
 //@desc   Verify Razorpay Webhook
 //@route  POST /api/verifyrazorpaypayment
@@ -27,7 +28,16 @@ const verifyRazorpayPayment = asyncHandler(async (req, res) => {
 
     // updating the payment data to the database
     const result = await paymentHelpers.updatePaymentDetails(paymentId, updateData);
-    if (result.operation !== 'Add to Wallet') {
+    if (result.operation === 'Add to Wallet') {
+      const walletDataReferredUser = {
+        operation: result.operation,
+        paymentId: result.paymentId,
+        mode: 'credit',
+        amount: result.amount
+      };
+      // adding the amount to the user wallet
+      await updateWalletBalance(result.userId, walletDataReferredUser);
+    } else {
       // changing the order status to order placed
       await changeOrderStatus(result?.orderId, 'Order Placed');
 

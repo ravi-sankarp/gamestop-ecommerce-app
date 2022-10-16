@@ -3,6 +3,7 @@ import sendResponse from '../utils/sendResponse.js';
 import * as categoryHelpers from '../helpers/categoryHelpers.js';
 import * as brandHelpers from '../helpers/brandHelpers.js';
 import * as productHelpers from '../helpers/productHelpers.js';
+import { findAllBanners } from '../helpers/bannerHelpers.js';
 
 //@desc   get all products
 //@route  GET /api/getproducts
@@ -44,8 +45,36 @@ const getBrandsAndCategoryList = asyncHandler(async (req, res) => {
   };
   sendResponse(200, resData, res);
 });
+
+//@desc   Get Category and Brand List
+//@route  GET /api/getnavlist
+//@access public
+const getProductsAndCategories = asyncHandler(async (req, res) => {
+  const categories = await categoryHelpers.findAllCategories();
+  const products = await productHelpers.findProductNames();
+  const resData = {
+    status: 'success',
+    data: { categories, products }
+  };
+  sendResponse(200, resData, res);
+});
+
+//@desc   Get all banners
+//@route  GET /api/getallbanners
+//@access public
+const getAllBanners = asyncHandler(async (req, res) => {
+  const banners = await findAllBanners();
+  const resData = {
+    status: 'success',
+    data: banners
+  };
+  sendResponse(200, resData, res);
+});
+
 export default {
   getAllProducts,
   getSingleProduct,
-  getBrandsAndCategoryList
+  getBrandsAndCategoryList,
+  getProductsAndCategories,
+  getAllBanners
 };

@@ -29,6 +29,15 @@ export const findAllCategoryOffers = asyncHandler(async () => {
         path: '$categoryDetails',
         preserveNullAndEmptyArrays: false
       }
+    },
+    {
+      $project: {
+        _id: '$_id',
+        type: '$type',
+        discount: '$discount',
+        categoryId: '$categoryId',
+        categoryName: '$categoryDetails.name'
+      }
     }
   ];
 
@@ -56,6 +65,15 @@ export const findAllProductOffers = asyncHandler(async () => {
       $unwind: {
         path: '$productDetails',
         preserveNullAndEmptyArrays: false
+      }
+    },
+    {
+      $project: {
+        _id: '$_id',
+        type: '$type',
+        discount: '$discount',
+        productId: '$productId',
+        productName: '$productDetails.name'
       }
     }
   ];

@@ -16,4 +16,10 @@ router.get('/getnavlist', viewController.getBrandsAndCategoryList);
 //verify razorpay webhook payment
 router.post('/verifyrazorpaypayment', paymentController.verifyRazorpayPayment);
 
+// Get Categories and Product
+router.get('/getproductsandcategories', viewController.getProductsAndCategories);
+
+// Get Categories and Product
+router.get('/getallbanners', viewController.getAllBanners);
+
 export default router;
