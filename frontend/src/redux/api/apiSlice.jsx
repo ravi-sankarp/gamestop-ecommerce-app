@@ -1,12 +1,15 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { setAdminToken } from '../reducers/adminAuthSlice';
 import { setToken } from '../reducers/authSlice';
+
+let sentRefreshTokenRequest = false;
 
 const baseQuery = fetchBaseQuery({
   baseUrl: 'http://localhost:8000/api',
   prepareHeaders: (headers, { getState, endpoint }) => {
     const { token, refreshToken } = getState().auth.data;
     const { token: adminToken, refreshToken: adminRefreshToken } = getState().adminAuth.data;
-    if (refreshToken && endpoint === 'refresh') {
+    if (endpoint === 'refresh') {
       if (window.location.href.includes('admin')) {
         headers.set('authorization', `Bearer ${adminRefreshToken}`);
       } else {
@@ -23,8 +26,11 @@ const baseQuery = fetchBaseQuery({
 
 const baseQueryWithReAuth = async (args, api, extraOptions) => {
   let result = await baseQuery(args, api, extraOptions);
-  if (result?.error?.status === 401) {
+  if (result?.error?.status === 401 && !sentRefreshTokenRequest) {
     console.log('sending refresh token');
+
+    // setting refresh token sent to true
+    sentRefreshTokenRequest = true;
 
     // sending refresh token to get new access token
     const refreshResult = await baseQuery(
@@ -36,8 +42,13 @@ const baseQueryWithReAuth = async (args, api, extraOptions) => {
       return refreshResult;
     }
     if (refreshResult?.data) {
-      api.dispatch(setToken(refreshResult.data));
+      if (window.location.pathname.includes('admin')) {
+        api.dispatch(setAdminToken(refreshResult.data));
+      } else {
+        api.dispatch(setToken(refreshResult.data));
+      }
       result = await baseQuery(args, api, extraOptions);
+      sentRefreshTokenRequest = false;
     }
   }
   return result;
