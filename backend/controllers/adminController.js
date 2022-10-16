@@ -667,25 +667,28 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
 
   // if the order was cancelled then refund the amount and add data to payments collection
   if (status === 'Cancelled By Admin') {
-    const paymentId = (await asyncRandomBytes(6)).toString('hex');
-    const paymentData = {
-      paymentId,
-      operation: 'Refund cancelled Product',
-      mode: 'debit',
-      amount: order.totalAmountDiscounted,
-      status: 'success',
-      method: 'Wallet Transfer'
-    };
-    const walletData = {
-      operation: 'Refund cancelled product',
-      paymentId,
-      mode: 'credit',
-      amount: order.totalAmountDiscounted
-    };
-    await Promise.all([
-      createNewPayment(req.userDetails._id, order.orderId, paymentData),
-      updateWalletBalance(req.userDetails._id, walletData)
-    ]);
+    // checking if the user has already paid for the puchase
+    if (order.paymentMethod !== 'COD') {
+      const paymentId = (await asyncRandomBytes(6)).toString('hex');
+      const paymentData = {
+        paymentId,
+        operation: 'Refund cancelled Product',
+        mode: 'debit',
+        amount: order.totalAmountDiscounted,
+        status: 'success',
+        method: 'Wallet Transfer'
+      };
+      const walletData = {
+        operation: 'Refund cancelled product',
+        paymentId,
+        mode: 'credit',
+        amount: order.totalAmountDiscounted
+      };
+      await Promise.all([
+        createNewPayment(req.userDetails._id, order.orderId, paymentData),
+        updateWalletBalance(req.userDetails._id, walletData)
+      ]);
+    }
   }
 
   const resData = {

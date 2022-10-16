@@ -1041,7 +1041,7 @@ const cancelOrder = asyncHandler(async (req, res) => {
 
   // if user has already paid the amount refund the amount to the user wallet
   // add the data to payments collection
-  if (order.orderStatus !== 'COD') {
+  if (order.paymentMethod !== 'COD') {
     const paymentId = (await asyncRandomBytes(6)).toString('hex');
     const paymentData = {
       paymentId,
