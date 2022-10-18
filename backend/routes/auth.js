@@ -9,6 +9,9 @@ router.post('/login', authController.userLogin);
 //Admin login route
 router.post('/adminlogin', authController.adminLogin);
 
+//Login with google
+router.post('/googlelogin', authController.googleLogin);
+
 //User request OTP for login
 router.post('/requestotp', authController.requestOtp);
 

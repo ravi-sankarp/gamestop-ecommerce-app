@@ -2,7 +2,7 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { Alert, Box, TextField, Typography } from '@mui/material';
+import { Alert, Box, Divider, TextField, Typography } from '@mui/material';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
@@ -11,6 +11,7 @@ import { PrimaryButton, SecondaryButton } from '../../../MaterialUiConfig/styled
 import { useUserLoginMutation } from '../../../redux/api/authApiSlice';
 import { setToken } from '../../../redux/reducers/authSlice';
 import { setToast } from '../../../redux/reducers/toastSlice';
+import GoogleLoginComponent from './GoogleLoginComponent';
 
 function UserLoginForm() {
   const [formError, setFormError] = useState('');
@@ -64,7 +65,7 @@ function UserLoginForm() {
     >
       <Box
         sx={{
-          width: { xs: 'max-content', md: 'max-content' },
+          width: { xs: '70vw', sm: '40vw', md: '20vw' },
           maxWidth: { md: '30vw' },
           p: 5,
           textAlign: 'center',
@@ -90,7 +91,7 @@ function UserLoginForm() {
           component="h1"
           sx={{ mb: '2rem', textAlign: 'center', color: '#98a6ad' }}
         >
-          Enter your email and password to continue
+          Login to continue
         </Typography>
         {formError && (
           <Alert
@@ -142,14 +143,50 @@ function UserLoginForm() {
         >
           {btnText}
         </PrimaryButton>
-        <SecondaryButton
-          component={Link}
-          to="/otplogin"
-          disabled={isLoading}
-          sx={{ width: { xs: '10rem', md: '100%' }, p: 1, px: 2, mx: 'auto', whiteSpace: 'nowrap' }}
-        >
-          Login with OTP
-        </SecondaryButton>
+        <Box sx={{ position: 'relative' }}>
+          <Divider />
+          <Typography
+            sx={{
+              background: '#fff',
+              px: 1,
+              position: 'absolute',
+              left: '50%',
+              bottom: '-11px',
+              transform: 'translateX(-50%)',
+              zIndex: 100
+            }}
+          >
+            or
+          </Typography>
+        </Box>
+        <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <SecondaryButton
+            component={Link}
+            to="/otplogin"
+            disabled={isLoading}
+            sx={{
+              width: '300px',
+              p: 1,
+              px: 2,
+              mx: 'auto',
+              whiteSpace: 'nowrap',
+              height: '38px',
+              fontSize: '14px',
+              boxShadow: '0 0 0 1px #dadce0',
+              '&:hover': {
+                boxShadow: '0 0 0 1px #d2e3fc',
+                backgroundColor: 'rgba(66,133,244,.04)'
+              }
+            }}
+          >
+            Sign in with OTP
+          </SecondaryButton>
+          <GoogleLoginComponent
+            setError={setFormError}
+            text="signin_with"
+            width={300}
+          />
+        </Box>
         <Typography
           sx={{ mt: 3, color: '#862e9c' }}
           variant="subtitle2"

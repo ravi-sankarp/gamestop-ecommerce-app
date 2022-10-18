@@ -23,6 +23,7 @@
     "express-async-handler": "^1.2.0",
     "express-mongo-sanitize": "^2.2.0",
     "express-rate-limit": "^6.6.0",
+    "google-auth-library": "^8.5.2",
     "handlebars": "^4.7.7",
     "helmet": "^6.0.0",
     "http-errors": "~1.6.3",

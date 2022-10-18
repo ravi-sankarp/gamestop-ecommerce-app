@@ -18,6 +18,14 @@ export const extendedUserApiSlice = apiSlice.injectEndpoints({
       })
     }),
 
+    loginWithGoogle: builder.mutation({
+      query: (data) => ({
+        url: '/auth/googlelogin',
+        method: 'POST',
+        body: data
+      })
+    }),
+
     userRequestOtp: builder.mutation({
       query: (data) => ({
         url: '/auth/requestotp',
@@ -63,6 +71,7 @@ export const {
   useUserLoginMutation,
   useAdminLoginMutation,
   useUserRegisterMutation,
+  useLoginWithGoogleMutation,
   useUserRequestOtpMutation,
   useUserVerifyOtpMutation,
   useUserForgotPasswordMutation,

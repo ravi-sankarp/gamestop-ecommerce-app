@@ -2,15 +2,16 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { Alert, Box, Grid, TextField, Typography } from '@mui/material';
+import { Alert, Box, Divider, Grid, TextField, Typography } from '@mui/material';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import * as yup from 'yup';
-import { PrimaryButton } from '../../../MaterialUiConfig/styled';
+import { SecondaryButton } from '../../../MaterialUiConfig/styled';
 import { useUserRegisterMutation } from '../../../redux/api/authApiSlice';
 import { setToken } from '../../../redux/reducers/authSlice';
 import { setToast } from '../../../redux/reducers/toastSlice';
+import GoogleLoginComponent from './GoogleLoginComponent';
 
 function UserRegisterForm() {
   const [formError, setFormError] = useState('');
@@ -79,16 +80,17 @@ function UserRegisterForm() {
         minHeight: { xs: 'max-content', md: '100vh' },
         backgroundColor: '#1098ad',
         justifyContent: 'center',
-        alignItems: { xs: 'flex-start', md: 'center' }
+        alignItems: { xs: 'flex-start', md: 'center' },
+        py: { xs: 5, md: 0 }
       }}
     >
       <Box
         sx={{
-          width: { xs: '100', md: '50vw' },
+          width: { xs: '100', sm: '60vw', md: '50vw' },
           maxWidth: { md: '30vw' },
           p: { xs: 0, md: 5 },
-          px: { xs: 2 },
-          py: { xs: 3 },
+          px: { xs: 4 },
+          py: { xs: 4, sm: 2 },
           textAlign: 'center',
           backgroundColor: '#ffffff',
           minHeight: { xs: 'max-content', md: '50vh' },
@@ -107,13 +109,13 @@ function UserRegisterForm() {
         >
           Register
         </Typography>
-        <Typography
+        {/* <Typography
           variant="subtitle1"
           component="h1"
           sx={{ mb: '2rem', textAlign: 'center', color: '#98a6ad' }}
         >
           Enter your details to continue
-        </Typography>
+        </Typography> */}
         {formError && (
           <Alert
             sx={{ mb: 5 }}
@@ -122,7 +124,6 @@ function UserRegisterForm() {
             {formError}!
           </Alert>
         )}
-
         <Grid
           container
           spacing={2}
@@ -132,6 +133,7 @@ function UserRegisterForm() {
             xs={6}
           >
             <TextField
+              size="small"
               sx={{ mb: 2 }}
               label="First Name"
               fullWidth
@@ -147,6 +149,7 @@ function UserRegisterForm() {
             xs={6}
           >
             <TextField
+              size="small"
               sx={{ mb: 2 }}
               label="Last Name"
               fullWidth
@@ -162,6 +165,7 @@ function UserRegisterForm() {
             xs={6}
           >
             <TextField
+              size="small"
               sx={{ mb: 2 }}
               label="Email"
               fullWidth
@@ -177,6 +181,7 @@ function UserRegisterForm() {
             xs={6}
           >
             <TextField
+              size="small"
               sx={{ mb: 2 }}
               label="Phone Number"
               fullWidth
@@ -192,6 +197,7 @@ function UserRegisterForm() {
             xs={6}
           >
             <TextField
+              size="small"
               sx={{ mb: 2 }}
               label="Password"
               fullWidth
@@ -207,6 +213,7 @@ function UserRegisterForm() {
             xs={6}
           >
             <TextField
+              size="small"
               sx={{ mb: 2 }}
               label="Confirm Password"
               fullWidth
@@ -229,6 +236,7 @@ function UserRegisterForm() {
               Have a referral Code ?
             </Typography>
             <TextField
+              size="small"
               sx={{ mb: 2 }}
               label="Referral Code"
               fullWidth
@@ -240,13 +248,33 @@ function UserRegisterForm() {
             />
           </Grid>
         </Grid>
-        <PrimaryButton
-          sx={{ width: '100%', p: 1, mx: 'auto' }}
+        <SecondaryButton
+          sx={{ width: '400px', p: 1, mx: 'auto' }}
           type="submit"
         >
           {btnText}
-        </PrimaryButton>
-
+        </SecondaryButton>
+        <Box sx={{ position: 'relative', mb: 4, mt: 2 }}>
+          <Divider />
+          <Typography
+            sx={{
+              background: '#fff',
+              px: 1,
+              position: 'absolute',
+              left: '50%',
+              bottom: '-11px',
+              transform: 'translateX(-50%)',
+              zIndex: 100
+            }}
+          >
+            or
+          </Typography>
+        </Box>
+        <GoogleLoginComponent
+          text="signup_with"
+          width={400}
+          setError={setFormError}
+        />
         <Typography
           sx={{ mt: 3, color: '#862e9c' }}
           variant="subtitle2"

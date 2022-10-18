@@ -1,6 +1,7 @@
 import validator from 'validator';
 import asyncHandler from 'express-async-handler';
 import bcrypt from 'bcryptjs';
+import { OAuth2Client } from 'google-auth-library';
 
 import AppError from '../utils/appError.js';
 import sendResponse from '../utils/sendResponse.js';
@@ -22,6 +23,9 @@ import {
 import { createNewWallet, updateWalletBalance } from '../helpers/walletHelpers.js';
 import asyncRandomBytes from '../utils/asyncRandomBytes.js';
 import { createNewPayment } from '../helpers/paymentHelpers.js';
+
+// google login client
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 //function for hashing user passords
 export const hashPassword = async (pwd) => {
@@ -49,6 +53,12 @@ export const verifyUserLogin = asyncHandler(async (req) => {
   if (!user) {
     throw new AppError('Account does not exist ! Please create a new account', 400);
   }
+
+  // if user has logged in with their google account then throw an error
+  if (user.googleAuth) {
+    throw new AppError('You have signed in with your google account', 400);
+  }
+
   //checking whether password matches
   else if (await bcrypt.compare(password, user.password)) {
     //check if user is active
@@ -71,7 +81,94 @@ const userLogin = asyncHandler(async (req, res) => {
     token: generateToken(user._id),
     refreshToken: generateRefreshToken(user._id),
     message: 'Login successfull',
-    admin: user.isAdmin
+    admin: user.isAdmin,
+    googleAuth: false
+  };
+  sendResponse(200, data, res);
+});
+
+//@desc   handle login with google
+//@route  POST /api/auth/googlelogin
+//@access public
+const googleLogin = asyncHandler(async (req, res) => {
+  const { token } = req.body;
+
+  // throw error if credentials was not found
+  if (!token) {
+    throw new AppError('Please provide the credentials', 400);
+  }
+
+  // verify the token
+  const ticket = await client.verifyIdToken({
+    idToken: token,
+    audience: process.env.GOOGLE_CLIENT_ID
+  });
+  const { name, email, sub } = ticket.getPayload();
+
+  // if data was not send then throw an error
+  if (!name || !email) {
+    throw new AppError(`Please provide your ${name ? 'email' : 'full name'}`, 400);
+  }
+
+  // check if user already exists
+  const user = await findUserByEmail(email);
+
+  // to save user id
+  let userId;
+
+  // to set redirect url to profile tab if the user is new
+  let redirectUrl;
+
+  // if user exists then directly login the user
+  if (user) {
+    // check if the user has used google for signing in
+    if (!user.googleAuth) {
+      throw new AppError(
+        'You have not signed in with google ! Please use normal login method',
+        400
+      );
+    }
+
+    // check if user is currently blocked
+    if (user.isBlocked) {
+      throw new AppError('Your account is currently blocked', 403);
+    }
+    // save the user id to generate token
+    userId = user._id;
+  } else {
+    // add user data to database
+    // create a referal code for the user
+    const code = (await asyncRandomBytes(6)).toString('hex');
+    const { insertedId } = await createNewUser({
+      email,
+      firstName: name.split(' ')[0],
+      lastName: name.split(' ')[1],
+      googleId: sub,
+      referral: {
+        id: code,
+        count: 0,
+        amount: 0
+      },
+      isBlocked: false,
+      isAdmin: false,
+      googleAuth: true
+    });
+    userId = insertedId;
+    redirectUrl = '/profile?profile=info';
+
+    // create userwallet
+    // create a wallet for the user
+    await createNewWallet(insertedId);
+  }
+
+  const data = {
+    status: 'success',
+    token: generateToken(userId),
+    refreshToken: generateRefreshToken(userId),
+    message: 'Login successfull',
+    admin: false,
+    googleAuth: true,
+    redirectUrl
   };
   sendResponse(200, data, res);
 });
@@ -102,6 +199,9 @@ const registerUser = asyncHandler(async (req, res) => {
   //checking if email already exists
   const userCheckEmail = await findUserByEmail(modifiedEmail);
   if (userCheckEmail) {
+    if (userCheckEmail.googleAuth) {
+      throw new AppError('You have signed in with your google account', 409);
+    }
     throw new AppError('Email already exists', 409);
   }
 
@@ -150,7 +250,8 @@ const registerUser = asyncHandler(async (req, res) => {
     status: 'success',
     token: generateToken(result.insertedId),
     refreshToken: generateRefreshToken(result.insertedId),
-    message: 'Successfully created your account'
+    message: 'Successfully created your account',
+    googleAuth: false
   };
   sendResponse(201, data, res);
 
@@ -243,7 +344,8 @@ const verifyUserOtp = asyncHandler(async (req, res) => {
         message: 'Login Successfull',
         token: generateToken(user._id),
         refreshToken: generateRefreshToken(user._id),
-        admin: user.isAdmin
+        admin: user.isAdmin,
+        googleAuth: user.googleAuth
       };
       sendResponse(200, data, res);
     }
@@ -256,13 +358,14 @@ const verifyUserOtp = asyncHandler(async (req, res) => {
 //@route  GET /api/auth/refreshtoken
 //@access public
 const handleRefreshToken = asyncHandler(async (req, res) => {
-  const { token, refreshToken, isAdmin } = await generateTokenWithRefreshToken(req);
+  const { token, refreshToken, isAdmin,googleAuth } = await generateTokenWithRefreshToken(req);
   const data = {
     status: 'success',
     message: 'Generated Token',
     token: token,
     refreshToken: refreshToken,
-    admin: isAdmin
+    admin: isAdmin,
+    googleAuth
   };
   sendResponse(200, data, res);
 });
@@ -303,6 +406,11 @@ const handleForgotPassword = asyncHandler(async (req, res) => {
   // if no user was found
   if (!user) {
     throw new AppError('Cannot find any user with this email address', 400);
+  }
+
+  // if user has signed in with google account then throw an error
+  if (user.googleAuth) {
+    throw new AppError('You have signed in with your google account !', 400);
   }
 
   // checking if phonenumber matches the current user
@@ -369,6 +477,7 @@ export default {
   verifyUserOtp,
   handleRefreshToken,
   adminLogin,
+  googleLogin,
   handleForgotPassword,
   handleChangePassword
 };
