@@ -275,8 +275,8 @@ const moveToCart = asyncHandler(async (req, res) => {
 const listWishlistDetails = asyncHandler(async (req, res) => {
   const user = req.userDetails;
 
-  const wihslist = await wishlistHelpers.findWishlistByUserId(user._id);
-  if (!wihslist.length) {
+  const wishlist = await wishlistHelpers.findWishlistByUserId(user._id);
+  if (!wishlist.length) {
     const resData = {
       status: 'Success',
       message: 'Your wishlist is empty'
@@ -285,7 +285,7 @@ const listWishlistDetails = asyncHandler(async (req, res) => {
   } else {
     const resData = {
       status: 'Success',
-      data: { ...wihslist[0] }
+      data: { ...wishlist[0] }
     };
     sendResponse(200, resData, res);
   }
@@ -322,11 +322,23 @@ const getCartTotal = asyncHandler(async (req, res) => {
   const { _id } = req.userDetails;
   const result = await cartHelpers.findCartTotalByUserId(_id);
   let resData;
+  const [cart] = await cartHelpers.findCartByUserId(_id);
+
+  //check if any product is out of stock
+  const outOfStock = cart.items.find((item) => item.productDetails.stock < item.count);
+
   if (result) {
     resData = {
       status: 'success',
       data: { ...result }
     };
+    if (outOfStock) {
+      throw new AppError(
+        'One or Two items in your cart is out of stock ! Cannnot place order',
+        400
+      );
+      // resData.data.outOfStock = true;
+    }
   } else {
     throw new AppError('Your cart is empty ! Add some items to cart to checkout.', 400);
   }
@@ -845,7 +857,7 @@ const createPaypalOrder = asyncHandler(async (req, res) => {
       } else {
         const { length } = payment.links;
 
-        //update the returned paypal order id to the payment document
+        // update the returned paypal order id to the payment document
         const data = {
           gateway: 'Paypal',
           paymentId: payment.id,
@@ -856,15 +868,17 @@ const createPaypalOrder = asyncHandler(async (req, res) => {
         };
         await paymentHelpers.createNewPayment(user._id, orderId, data);
 
+        //sending the token as response
         for (let i = 0; i < length; i += 1) {
           if (payment.links[i].rel === 'approval_url') {
-            //getting the redirect url for the paypal order
-            const redirectUrl = payment.links[i].href;
+            //getting the token for the paypal order
 
-            //sending the redirect url as response
+            const id = `EC-${payment.links[i].href.split('EC-')[1]}`;
             const resData = {
               status: 'Success',
-              data: redirectUrl
+              data: {
+                id
+              }
             };
             sendResponse(200, resData, res);
           }
@@ -917,6 +931,19 @@ const verifyPaypal = asyncHandler(async (req, res) => {
         // changing the order status to order placed
         await changeOrderStatus(result?.orderId, 'Order Placed');
 
+        // decrease the product quantity
+        const [cart] = await cartHelpers.findCartByUserId(result.userId);
+
+        // if there are multiple items then decrease product count of each item
+        if (cart?.items?.length > 1) {
+          await Promise.all(
+            cart.items.map(
+              async (item) => await updateProductStock(item.productDetails._id, -item.count)
+            )
+          );
+        } else {
+          await updateProductStock(cart.items[0].productDetails._id, -cart.items[0].count);
+        }
         //empty cart after placing the order
         await cartHelpers.deleteCartByUserId(result.userId);
 

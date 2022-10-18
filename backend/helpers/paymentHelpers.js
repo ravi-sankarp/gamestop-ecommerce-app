@@ -42,7 +42,15 @@ export const updatePaymentDetails = asyncHandler(async (paymentId, data) => {
   return result.value;
 });
 
+// find a payment document by payment id
 export const findByPaymentId = asyncHandler(async (paymentId) => {
   const result = await getDb().collection('payments').findOne({ paymentId });
+  return result;
+});
+
+// find a payment documnent by order id
+export const findByOrderId = asyncHandler(async (odId) => {
+  const orderId = ObjectId(odId);
+  const result = await getDb().collection('payments').findOne({ orderId });
   return result;
 });

@@ -3,11 +3,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setToast } from '../../redux/reducers/toastSlice';
 
 function UserOutlet() {
-  const data = useSelector((state) => state.auth.data);
+  const { token } = useSelector((state) => state.auth.data);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  if (!data.token) {
+  if (!token) {
     const toast = {
       message: 'Please Login to continue'
     };

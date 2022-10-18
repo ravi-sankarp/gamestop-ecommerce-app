@@ -4,6 +4,7 @@ import { Alert, Box, CircularProgress, Grid, TextField, Typography } from '@mui/
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
+import { useSelector } from 'react-redux';
 import { PrimaryButton } from '../../../MaterialUiConfig/styled';
 import {
   useEditUserDetailsMutation,
@@ -15,6 +16,7 @@ import HelmetMeta from '../../HelmetMeta';
 import ChangePwdForm from '../Forms/ChangePwdForm';
 
 function ProfileTab() {
+  const { googleAuth } = useSelector((state) => state.auth.data);
   const [formError, setFormError] = useState('');
   const [isEdit, setisEdit] = useState(false);
   const [btnText, setBtnText] = useState('Update');
@@ -247,13 +249,15 @@ function ProfileTab() {
             </Box>
           </Box>
         </Grid>
-        <Grid
-          item
-          xs={12}
-          md={5}
-        >
-          <ChangePwdForm />
-        </Grid>
+        {googleAuth || (
+          <Grid
+            item
+            xs={12}
+            md={5}
+          >
+            <ChangePwdForm />
+          </Grid>
+        )}
       </Grid>
     </>
   );

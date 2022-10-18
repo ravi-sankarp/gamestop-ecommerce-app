@@ -160,7 +160,7 @@ function WalletTab() {
                   <AccountBalanceIcon />
                 </Box>
                 <Typography>
-                  {`₹ ${data?.data?.wallet?.balance.toLocaleString('en-us')}`}
+                  {`₹ ${data?.data?.wallet?.balance.toLocaleString('en-us') ?? 0}`}
                 </Typography>
                 <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                   <PrimaryButton onClick={handleAlertShow}>Add Money to Wallet</PrimaryButton>
@@ -219,7 +219,7 @@ function WalletTab() {
                 >
                   <Typography>Amount Earned :</Typography>
 
-                  <Typography>{data?.data?.referral?.amount}</Typography>
+                  <Typography>{`₹ ${data?.data?.referral?.amount?.toLocaleString('en-us')}`}</Typography>
                 </Box>
                 <Box
                   sx={{

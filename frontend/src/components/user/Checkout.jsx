@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 /* eslint-disable react/jsx-one-expression-per-line */
 import {
   Alert,
@@ -14,51 +15,33 @@ import {
   TextField,
   Typography
 } from '@mui/material';
-import LoadingButton from '@mui/lab/LoadingButton';
 import RemoveIcon from '@mui/icons-material/Remove';
-import { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { PrimaryButton } from '../../MaterialUiConfig/styled';
 import {
   useCheckCouponMutation,
   useCreatePaypalOrderMutation,
   useCreateRazorpayOrderMutation,
   usePurchaseWithCodMutation,
-  usePurchaseWithWalletMutation,
-  useVerifyPaypalMutation
+  usePurchaseWithWalletMutation
 } from '../../redux/api/userApiSlice';
 import UserAddressForm from './Forms/UserAddressForm';
 import RazorPayPayment from './Payments/RazorPayPayment';
 import useSuccessHandler from '../../hooks/useSuccessHandler';
-
-function loadScript(src) {
-  return new Promise((resolve) => {
-    const script = document.createElement('script');
-    script.src = src;
-    script.onload = () => {
-      resolve(true);
-    };
-    script.onerror = () => {
-      resolve(false);
-    };
-    document.body.appendChild(script);
-  });
-}
+import PaypalPayment from './Payments/PaypalPayment';
 
 function Checkout({ cartData, addressData, addressMessage, walletBalance }) {
-  const [search, setSearch] = useSearchParams();
-
-  const paymentId = search.get('paymentId');
-  const payerId = search.get('PayerID');
   const [open, setOpen] = useState(false);
   const [couponDiscount, setCouponDiscount] = useState(0);
+  const [cartDiscountedTotal, setCartDiscountedTotal] = useState(
+    cartData.discountedTotal - couponDiscount
+  );
   const [btnText, setBtnText] = useState('Confirm Order');
-  const [paypalLoading, setPaypalLoading] = useState(false);
   const [addressId, setAddressId] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('');
   const [couponErr, setCouponErr] = useState('');
   const [razorpayOrderDetails, setRazorpayOrderDetails] = useState(false);
-  const [paypalRedirectUrl, setPaypalRedirectUrl] = useState(false);
   const [error, setError] = useState(false);
   const [message, setMessage] = useState('');
   const [successModal, setSuccessModal] = useState(false);
@@ -72,54 +55,23 @@ function Checkout({ cartData, addressData, addressMessage, walletBalance }) {
   const [walletPurchase, { isLoading: walletPurchaseIsLoading }] = usePurchaseWithWalletMutation();
   const [razorpayOrder, { isLoading: razorpayOrderIsLoading }] = useCreateRazorpayOrderMutation();
   const [paypalOrder, { isLoading: paypalOrderIsLoading }] = useCreatePaypalOrderMutation();
-  const [paypalVerify, { isLoading: paypalVerifyIsLoading }] = useVerifyPaypalMutation();
   const [checkCoupon, { isLoading: checkCouponIsLoading }] = useCheckCouponMutation();
 
-  useEffect(() => {
-    if (paypalRedirectUrl) {
-      const paypalCreateOrder = async () => {
-        await loadScript(
-          `https://www.paypal.com/sdk/js?client-id=${process.env.REACT_APP_PAYPAL_CLIENT_ID}`
-        );
-        window.location.assign(paypalRedirectUrl);
-      };
-      paypalCreateOrder();
-    }
-  }, [paypalRedirectUrl]);
-
-  useEffect(() => {
-    if (paymentId && payerId) {
-      window.history.replaceState({ id: 1 }, '');
-      const handleVerifyPaypal = async () => {
-        try {
-          if (!paypalVerifyIsLoading) {
-            setPaypalLoading(true);
-            const res = await paypalVerify({ paymentId, payerId }).unwrap();
-            setPaypalLoading(false);
-            setMessage(res.message);
-            setSuccessModal(true);
-            setError('');
-          }
-        } catch (err) {
-          setPaypalLoading(false);
-          setError(err.data.message ?? 'Something went wrong');
-          search.delete('paymentId');
-          search.delete('PayerId');
-          setSearch(search);
-        }
-      };
-      handleVerifyPaypal();
-    }
-  }, [paymentId, payerId, paypalVerifyIsLoading, paypalVerify, search, setSearch]);
   const toggleForm = () => {
     setOpen((current) => !current);
   };
 
   const handleSelectAddress = (e) => {
     setAddressId(e.target.value);
+    setError('');
   };
 
   const handlePaymentSelection = (e) => {
+    if (!addressId) {
+      setError('Please select a delivery address first');
+      return;
+    }
+    setError('');
     setPaymentMethod(e.target.value);
   };
 
@@ -171,17 +123,16 @@ function Checkout({ cartData, addressData, addressMessage, walletBalance }) {
   };
 
   const handlePaypalPayment = async () => {
+    setError('');
     try {
       if (!paypalOrderIsLoading) {
-        setBtnText('Loading...');
         const data = await paypalOrder({ addressId, couponCode }).unwrap();
-        setPaypalRedirectUrl(data.data);
         setError('');
-        // setBtnText('Confirm Order');
+        return data;
       }
     } catch (err) {
       setError(err.data.message ?? err?.data?.response?.message ?? 'Something went wrong');
-      setBtnText('Confirm Order');
+      throw new Error('');
     }
   };
 
@@ -230,6 +181,9 @@ function Checkout({ cartData, addressData, addressMessage, walletBalance }) {
         successToast(result);
 
         setCouponDiscount(cartData.discountedTotal * result.data.discount * 0.01);
+        setCartDiscountedTotal(
+          cartData.discountedTotal - cartData.discountedTotal * result.data.discount * 0.01
+        );
       } catch (err) {
         setCouponCode('');
         setCouponErr(err?.data?.message);
@@ -259,7 +213,52 @@ function Checkout({ cartData, addressData, addressMessage, walletBalance }) {
           }
         }}
       >
+        <Box sx={{ backgroundColor: '#fff', p: 3 }}>
+          <Typography
+            textAlign="center"
+            variant="h6"
+            sx={{
+              fontSize: 18
+            }}
+          >
+            Have a coupon ? Click here to apply
+          </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <TextField
+              id="filled-basic"
+              label="Coupon Code"
+              variant="outlined"
+              color="primary"
+              value={couponCode}
+              autoComplete="off"
+              onChange={(e) => setCouponCode(e.target.value)}
+            />
+            <PrimaryButton onClick={handleCouponCheck}>Check</PrimaryButton>
+          </Box>
+          <Typography
+            color="red"
+            textAlign="center"
+          >
+            {couponErr}
+          </Typography>
+        </Box>
+
         <FormControl sx={{ backgroundColor: '#fff', p: 4 }}>
+          {addressMessage && (
+            <Typography
+              variant="h6"
+              textAlign="center"
+            >
+              {addressMessage}
+            </Typography>
+          )}
+
+          <PrimaryButton
+            onClick={toggleForm}
+            sx={{ mx: 'auto' }}
+          >
+            Add new Address
+          </PrimaryButton>
           {addressData && (
             <>
               <FormLabel
@@ -294,20 +293,6 @@ function Checkout({ cartData, addressData, addressMessage, walletBalance }) {
               </RadioGroup>
             </>
           )}
-          {addressMessage && (
-            <Typography
-              variant="h6"
-              textAlign="center"
-            >
-              {addressMessage}
-            </Typography>
-          )}
-          <PrimaryButton
-            onClick={toggleForm}
-            sx={{ mx: 'auto' }}
-          >
-            Add new Address
-          </PrimaryButton>
         </FormControl>
         {open && (
           <UserAddressForm
@@ -315,35 +300,6 @@ function Checkout({ cartData, addressData, addressMessage, walletBalance }) {
             toggleForm={toggleForm}
           />
         )}
-
-        <Box sx={{ backgroundColor: '#fff', p: 3 }}>
-          <Typography
-            textAlign="center"
-            variant="h6"
-            sx={{
-              fontSize: 18
-            }}
-          >
-            Have a coupon ? Click here to apply
-          </Typography>
-          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            <TextField
-              id="filled-basic"
-              label="Coupon Code"
-              variant="outlined"
-              color="primary"
-              value={couponCode}
-              onChange={(e) => setCouponCode(e.target.value)}
-            />
-            <PrimaryButton onClick={handleCouponCheck}>Check</PrimaryButton>
-          </Box>
-          <Typography
-            color="red"
-            textAlign="center"
-          >
-            {couponErr}
-          </Typography>
-        </Box>
       </Box>
 
       <Box
@@ -383,20 +339,22 @@ function Checkout({ cartData, addressData, addressMessage, walletBalance }) {
           <Typography>Delivery Charges</Typography>
           <Typography sx={{ color: 'green' }}>FREE</Typography>
         </Box>
-        <Divider />
         {!!couponDiscount && (
-          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <Typography>Coupon Discount</Typography>
-            <Typography sx={{ color: 'green' }}>
-              <RemoveIcon sx={{ fontSize: 12 }} /> ₹{couponDiscount.toLocaleString()}
-            </Typography>
-          </Box>
+          <>
+            <Divider />
+            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Typography>Coupon Discount</Typography>
+              <Typography sx={{ color: 'green' }}>
+                <RemoveIcon sx={{ fontSize: 12 }} /> ₹{couponDiscount.toLocaleString()}
+              </Typography>
+            </Box>
+          </>
         )}
         <Divider />
 
         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <Typography>Total Amount</Typography>
-          <Typography>₹{(cartData.discountedTotal - couponDiscount).toLocaleString()}</Typography>
+          <Typography>₹{cartDiscountedTotal.toLocaleString()}</Typography>
         </Box>
         <Divider />
 
@@ -433,7 +391,7 @@ function Checkout({ cartData, addressData, addressMessage, walletBalance }) {
               <FormControlLabel
                 value="wallet"
                 control={<Radio />}
-                label={`Wallet (Balance - ₹${walletBalance.toLocaleString('en-us')})`}
+                label={`Wallet (Balance - ₹${walletBalance?.toLocaleString('en-us')})`}
                 sx={{ whiteSpace: 'nowrap' }}
                 disabled={cartData.discountedTotal - couponDiscount > walletBalance}
               />
@@ -463,12 +421,26 @@ function Checkout({ cartData, addressData, addressMessage, walletBalance }) {
           </Alert>
         )}
 
-        <PrimaryButton
-          onClick={handleConfirmOrder}
-          sx={{ mx: { xs: 2, md: 4 } }}
-        >
-          {btnText}
-        </PrimaryButton>
+        {paymentMethod !== 'paypal' && (
+          <PrimaryButton
+            onClick={handleConfirmOrder}
+            sx={{ mx: { xs: 2, md: 4 } }}
+          >
+            {btnText}
+          </PrimaryButton>
+        )}
+        {paymentMethod === 'paypal' && (
+          <Box
+            id="paypal-div"
+            sx={{ display: 'flex', justifyContent: 'center', mr: { xs: 0, md: 3 } }}
+          >
+            <PaypalPayment
+              setSuccessModal={setSuccessModal}
+              handlePayment={handlePaypalPayment}
+              totalAmount={cartDiscountedTotal}
+            />
+          </Box>
+        )}
       </Box>
       {razorpayOrderDetails && (
         <RazorPayPayment
@@ -479,7 +451,6 @@ function Checkout({ cartData, addressData, addressMessage, walletBalance }) {
       )}
       <Dialog
         open={successModal}
-        onClose={setSuccessModal}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
@@ -500,7 +471,7 @@ function Checkout({ cartData, addressData, addressMessage, walletBalance }) {
               onClick={handleGotoOrders}
               sx={{ textDecoration: 'underline', color: 'blue', cursor: 'pointer' }}
             >
-              Click here
+              Click here{' '}
             </Typography>
             <Typography
               variant="h6"
@@ -508,31 +479,6 @@ function Checkout({ cartData, addressData, addressMessage, walletBalance }) {
               component="span"
             >
               to go to orders page
-            </Typography>
-          </Box>
-        </DialogContent>
-      </Dialog>
-      <Dialog
-        open={paypalLoading}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        sx={{ minWidth: '30vw', minHeight: '40vh' }}
-      >
-        <DialogTitle>Payment Verification </DialogTitle>
-        <DialogContent sx={{ textAlign: 'center' }}>
-          <Typography variant="h5">{message}</Typography>
-          <Box sx={{ mt: 4 }}>
-            <Typography
-              component="span"
-              variant="h5"
-              textAlign="center"
-              sx={{ textDecoration: 'underline', color: 'blue', cursor: 'pointer' }}
-            >
-              Payment is currently being verified
-              <LoadingButton
-                loading
-                variant="text"
-              />
             </Typography>
           </Box>
         </DialogContent>

@@ -15,7 +15,7 @@ export default function FilterDrawer() {
   const { categories, brands } = useSelector((state) => state.brandAndCategory);
 
   useEffect(() => {
-    if (categories.length > 1) {
+    if (categories.length > 1 && brands.length > 1) {
       setIsSuccess(true);
     }
   }, [categories]);
@@ -71,20 +71,12 @@ export default function FilterDrawer() {
       <Divider />
 
       <Box>
-        <DrawerAccordian title="category" checkbox>
-          {categories.map((category) => (
-            <Typography key={category.name}>{category.name}</Typography>
-          ))}
-        </DrawerAccordian>
+        <DrawerAccordian />
       </Box>
       <Divider />
 
       <Box>
-        <DrawerAccordian title="brand" checkbox>
-          {brands.map((brand) => (
-            <Typography key={brand.name}>{brand.name}</Typography>
-          ))}
-        </DrawerAccordian>
+        <DrawerAccordian />
       </Box>
       <Divider />
     </Box>
@@ -97,10 +89,18 @@ export default function FilterDrawer() {
         alignItems: 'center'
       }}
     >
-      <SecondaryButton sx={{ lineHeight: 2 }} endIcon={<TuneOutlinedIcon />} onClick={toggleDrawer}>
+      <SecondaryButton
+        sx={{ lineHeight: 2 }}
+        endIcon={<TuneOutlinedIcon />}
+        onClick={toggleDrawer}
+      >
         Filter
       </SecondaryButton>
-      <Drawer variant="temporary" open={isOpen} onClose={toggleDrawer}>
+      <Drawer
+        variant="temporary"
+        open={isOpen}
+        onClose={toggleDrawer}
+      >
         {drawer}
       </Drawer>
     </Box>

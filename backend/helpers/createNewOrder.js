@@ -119,11 +119,13 @@ const createAnOrder = asyncHandler(
       };
       orderId = await createNewOrder(user._id, data);
       //decrease product stock after placing the order
-      await Promise.all(
-        cart.items.map(
-          async (item) => await updateProductStock(item.productDetails._id, -item.count)
-        )
-      );
+      if (!paymentMethod) {
+        await Promise.all(
+          cart.items.map(
+            async (item) => await updateProductStock(item.productDetails._id, -item.count)
+          )
+        );
+      }
     } else {
       const data = {
         orderedOn: new Date(),
@@ -154,7 +156,9 @@ const createAnOrder = asyncHandler(
         }
       };
       orderId = await createNewOrder(user._id, data);
-      await updateProductStock(cart.items[0].productDetails._id, -cart.items[0].count);
+      if (!paymentMethod) {
+        await updateProductStock(cart.items[0].productDetails._id, -cart.items[0].count);
+      }
     }
 
     // if a coupon was applied then add the user to the list of users who have applied the coupon

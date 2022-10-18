@@ -173,7 +173,15 @@ function DesktopIcons() {
   };
   return (
     <>
-      <Box sx={{ display: { xs: 'none', sm: 'flex' }, gap: 2, pr: 3 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          ml: { xs: 'auto', sm: 0 },
+          gap: 2,
+          pr: 3
+        }}
+      >
         {navItems.map((item) => displayItem(item))}
       </Box>
       <Dialog

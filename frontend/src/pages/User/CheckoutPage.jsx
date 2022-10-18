@@ -60,10 +60,8 @@ function CheckoutPage() {
     content = (
       <Box
         sx={{
-          position: 'fixed',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%,0%)',
+          width: '100%',
+          height: '100vh',
           overflowY: 'hidden',
           display: 'flex',
           alignItems: 'center',
@@ -102,18 +100,34 @@ function CheckoutPage() {
         >
           <img
             src="
-            https://rukminim1.flixcart.com/www/800/800/promos/16/05/2019/d438a32e-765a-4d8b-b4a6-520b560971e8.png?q=90"
+            /imgs/cartisempty.webp"
             alt="YOUR CART IS EMPTY"
           />
           <Typography variant="h6">{error.data.message}</Typography>
-          <Typography sx={{ color: '#333333' }}>Add items to it now.</Typography>
-          <PrimaryButton
-            component={Link}
-            to="/products?sort=recommended"
-            sx={{ mt: 0 }}
-          >
-            Shop Now
-          </PrimaryButton>
+          {error.data.message.includes('stock') || (
+            <>
+              <Typography sx={{ color: '#333333' }}>Add items to it now.</Typography>
+              <PrimaryButton
+                component={Link}
+                to="/products?sort=recommended"
+                sx={{ mt: 0 }}
+              >
+                Shop Now
+              </PrimaryButton>
+            </>
+          )}
+          {error.data.message.includes('stock') && (
+            <>
+              <Typography sx={{ color: '#333333' }}>Remove the items to checkout</Typography>
+              <PrimaryButton
+                component={Link}
+                to="/cart"
+                sx={{ mt: 0 }}
+              >
+                Go to cart
+              </PrimaryButton>
+            </>
+          )}
         </Box>
       </>
     );

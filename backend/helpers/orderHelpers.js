@@ -19,7 +19,10 @@ export const findOrdersByUserId = asyncHandler(async (id) => {
   const agg = [
     {
       $match: {
-        userId
+        userId,
+        'order.orderStatus':{
+          $ne:'Order Pending'
+        }
       }
     },
     {
