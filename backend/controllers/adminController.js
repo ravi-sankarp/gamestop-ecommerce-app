@@ -13,7 +13,7 @@ import * as offerHelpers from '../helpers/offerHelpers.js';
 import * as couponHelpers from '../helpers/couponHelpers.js';
 import cloudinarySingleUpload from '../utils/uploadToCloudinary.js';
 import asyncRandomBytes from '../utils/asyncRandomBytes.js';
-import { createNewPayment } from '../helpers/paymentHelpers.js';
+import { createNewPayment, findAllPayments } from '../helpers/paymentHelpers.js';
 import { updateWalletBalance } from '../helpers/walletHelpers.js';
 
 //@desc   get all user data
@@ -587,10 +587,22 @@ const deleteBanner = asyncHandler(async (req, res) => {
 //@route  GET /api/getallorders
 //@access private
 const listAllOrders = asyncHandler(async (req, res) => {
-  const orders = await orderHelpers.findAllOrders();
+  const orders = await orderHelpers.findAllOrders(req.query);
   const resData = {
     status: 'success',
     data: orders
+  };
+  sendResponse(200, resData, res);
+});
+
+//@desc   List all Orders
+//@route  GET /api/getallorders
+//@access private
+const listAllPayments = asyncHandler(async (req, res) => {
+  const payments = await findAllPayments(req.query);
+  const resData = {
+    status: 'success',
+    data: payments
   };
   sendResponse(200, resData, res);
 });
@@ -1156,6 +1168,7 @@ export default {
   editBanner,
   deleteBanner,
   listAllOrders,
+  listAllPayments,
   updateOrderStatus,
   getDashboardCardData,
   getDashboardGraphData,

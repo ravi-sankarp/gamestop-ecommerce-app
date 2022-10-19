@@ -20,8 +20,8 @@ export const findOrdersByUserId = asyncHandler(async (id) => {
     {
       $match: {
         userId,
-        'order.orderStatus':{
-          $ne:'Order Pending'
+        'order.orderStatus': {
+          $ne: 'Order Pending'
         }
       }
     },
@@ -46,7 +46,7 @@ export const findOrdersByUserId = asyncHandler(async (id) => {
 });
 
 //find all orders
-export const findAllOrders = asyncHandler(async () => {
+export const findAllOrders = asyncHandler(async (query) => {
   const agg = [
     {
       $match: {
@@ -69,9 +69,15 @@ export const findAllOrders = asyncHandler(async () => {
       }
     }
   ];
-
+  // if a query exists then filter according to it
+  if (query?.status) {
+    const { status } = query;
+    if (status !== 'All') {
+      agg.unshift({ $match: { 'order.orderStatus': status } });
+    }
+  }
   const result = await getDb().collection('orders').aggregate(agg).toArray();
-  return result[0].orders;
+  return result[0]?.orders;
 });
 
 //find order by Order id

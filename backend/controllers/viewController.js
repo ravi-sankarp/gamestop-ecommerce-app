@@ -4,6 +4,7 @@ import * as categoryHelpers from '../helpers/categoryHelpers.js';
 import * as brandHelpers from '../helpers/brandHelpers.js';
 import * as productHelpers from '../helpers/productHelpers.js';
 import { findAllBanners } from '../helpers/bannerHelpers.js';
+import AppError from '../utils/appError.js';
 
 //@desc   get all products
 //@route  GET /api/getproducts
@@ -71,10 +72,40 @@ const getAllBanners = asyncHandler(async (req, res) => {
   sendResponse(200, resData, res);
 });
 
+//@desc   Search for a product
+//@route  GET /api/searchproduct
+//@access public
+const handleSearch = asyncHandler(async (req, res) => {
+  const products = await productHelpers.productSearch(req?.query?.search);
+  const resData = {
+    status: 'success',
+    data: products
+  };
+  sendResponse(200, resData, res);
+});
+
+//@desc   Search for a product
+//@route  GET /api/findsimilarproducts
+//@access public
+const findSimilarProducts = asyncHandler(async (req, res) => {
+  // throw error if it does not exists
+  if (!req?.query?.id) {
+    throw new AppError('Please pass the Id of the product');
+  }
+  const products = await productHelpers.findSimilarProducts(req?.query?.id);
+  const resData = {
+    status: 'success',
+    data: products
+  };
+  sendResponse(200, resData, res);
+});
+
 export default {
   getAllProducts,
   getSingleProduct,
   getBrandsAndCategoryList,
   getProductsAndCategories,
-  getAllBanners
+  getAllBanners,
+  handleSearch,
+  findSimilarProducts
 };

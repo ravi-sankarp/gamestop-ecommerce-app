@@ -108,7 +108,7 @@ router.delete('/deletebanner/:id', protect, checkAdmin, adminController.deleteBa
 router.get('/getallorders', protect, checkAdmin, adminController.listAllOrders);
 
 //GET All payment details
-router.get('/getallpayments', protect, checkAdmin, adminController.listAllOrders);
+router.get('/getallpayments', protect, checkAdmin, adminController.listAllPayments);
 
 //PUT Update order status
 router.patch('/changeorderstatus', protect, checkAdmin, adminController.updateOrderStatus);

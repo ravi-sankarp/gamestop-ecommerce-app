@@ -28,23 +28,6 @@ export const findAllProducts = asyncHandler(async (query) => {
     }
   ];
   if (query) {
-    if (query.sort) {
-      if (query.sort.includes('price')) {
-        if (query.sort === 'priceAsc') {
-          agg.push({ $sort: { discountedPrice: 1 } });
-        } else {
-          agg.push({ $sort: { discountedPrice: -1 } });
-        }
-      } else if (query.sort.includes('recommended')) {
-        agg.push({ $sort: { name: 1 } });
-      } else if (query.sort.includes('newest')) {
-        agg.push({ $sort: { createdOn: 1 } });
-      } else {
-        const { sort } = query;
-
-        agg.push({ $sort: { [sort]: 1 } });
-      }
-    }
     if (query.category) {
       if (query.category.includes(',')) {
         const categories = query.category.split(',');
@@ -71,10 +54,35 @@ export const findAllProducts = asyncHandler(async (query) => {
         }
       });
     }
+    if (query.search) {
+      agg.push({
+        $match: {
+          name: {
+            $regex: `.*${query.search}.*`,
+            $options: 'i'
+          }
+        }
+      });
+    }
+    if (query.sort) {
+      if (query.sort.includes('price')) {
+        if (query.sort === 'priceAsc') {
+          agg.push({ $sort: { discountedPrice: 1 } });
+        } else {
+          agg.push({ $sort: { discountedPrice: -1 } });
+        }
+      } else if (query.sort.includes('recommended')) {
+        agg.push({ $sort: { name: 1 } });
+      } else if (query.sort.includes('newest')) {
+        agg.push({ $sort: { createdOn: 1 } });
+      } else {
+        const { sort } = query;
+
+        agg.push({ $sort: { [sort]: 1 } });
+      }
+    }
   }
   const products = await getDb().collection('products').aggregate(agg).toArray();
-  // const sortedProducts = await products.sort({ discountedPrice: 1 }).toArray();
-  // console.log(sortedProducts);
   return products;
 });
 
@@ -126,6 +134,27 @@ export const findProductById = asyncHandler(async (id) => {
 
   const product = await getDb().collection('products').findOne({ _id, isDeleted: false });
   return product;
+});
+
+//Find a products by category Id
+export const findProductByCategoryId = asyncHandler(async (id) => {
+  const categoryId = ObjectId(id);
+
+  const products = await getDb()
+    .collection('products')
+    .find({ categoryId, isDeleted: false })
+    .toArray();
+  return products;
+});
+//Find a product by brand id
+export const findProductByBrandId = asyncHandler(async (id) => {
+  const brandId = ObjectId(id);
+
+  const products = await getDb()
+    .collection('products')
+    .find({ brandId, isDeleted: false })
+    .toArray();
+  return products;
 });
 
 //Find Product by Id with category and brand data
@@ -254,4 +283,55 @@ export const updateDiscountedPrice = asyncHandler(async (id, type, discount) => 
     matchquery._id = ObjectId(id);
   }
   await getDb().collection('products').updateMany(matchquery, updatequery);
+});
+
+// search for a product
+export const productSearch = asyncHandler(async (query) => {
+  const agg = [
+    {
+      $match: {
+        isDeleted: false
+      }
+    },
+    {
+      $project: {
+        name: 1,
+        image: {
+          $arrayElemAt: ['$images', 0]
+        }
+      }
+    },
+    {
+      $project: {
+        name: 1,
+        image: '$image.imgUrl'
+      }
+    },
+    {
+      $limit: 4
+    }
+  ];
+  if (query) {
+    agg.unshift({
+      $match: {
+        name: {
+          $regex: `.*${query}.*`,
+          $options: 'i'
+        }
+      }
+    });
+  }
+
+  const product = await getDb().collection('products').aggregate(agg).toArray();
+  return product;
+});
+
+// find the similar products
+export const findSimilarProducts = asyncHandler(async (id) => {
+  const { brandId, categoryId } = await findProductById(id);
+  const [productsByBrandId, productsByCategoryId] = await Promise.all([
+    findProductByBrandId(brandId),
+    findProductByCategoryId(categoryId)
+  ]);
+  return [...productsByBrandId, ...productsByCategoryId];
 });

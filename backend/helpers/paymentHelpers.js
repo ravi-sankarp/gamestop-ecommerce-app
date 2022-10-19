@@ -3,8 +3,33 @@ import { ObjectId } from 'mongodb';
 import { getDb } from '../config/db.js';
 
 //Find all payments
-export const findAllPayments = asyncHandler(async () => {
-  const payments = await getDb().collection('payments').find().sort({ createdOn: -1 }).toArray();
+export const findAllPayments = asyncHandler(async (query) => {
+  const agg = [
+    {
+      $match: {
+        status: {
+          $ne: 'Pending'
+        }
+      }
+    },
+    {
+      $sort: {
+        createdOn: -1
+      }
+    }
+  ];
+
+  if (query?.mode) {
+    const { mode } = query;
+    if (mode === 'Credit') {
+      agg.unshift({ $match: { mode: 'credit' } });
+    } else if (mode === 'Debit') {
+      agg.unshift({ $match: { mode: 'debit' } });
+    }
+  }
+
+  const payments = await getDb().collection('payments').aggregate(agg).toArray();
+  console.log(payments);
   return payments;
 });
 

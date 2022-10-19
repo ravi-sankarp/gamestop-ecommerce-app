@@ -1,7 +1,6 @@
 import validator from 'validator';
 import asyncHandler from 'express-async-handler';
 import bcrypt from 'bcryptjs';
-import { OAuth2Client } from 'google-auth-library';
 
 import AppError from '../utils/appError.js';
 import sendResponse from '../utils/sendResponse.js';
@@ -23,9 +22,8 @@ import {
 import { createNewWallet, updateWalletBalance } from '../helpers/walletHelpers.js';
 import asyncRandomBytes from '../utils/asyncRandomBytes.js';
 import { createNewPayment } from '../helpers/paymentHelpers.js';
+import client from '../config/googleAuth.js';
 
-// google login client
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 //function for hashing user passords
 export const hashPassword = async (pwd) => {

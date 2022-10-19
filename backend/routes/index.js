@@ -22,4 +22,10 @@ router.get('/getproductsandcategories', viewController.getProductsAndCategories)
 // Get Categories and Product
 router.get('/getallbanners', viewController.getAllBanners);
 
+// Search for a product
+router.get('/searchproduct', viewController.handleSearch);
+
+// Get similar products
+router.get('/findsimilarproducts', viewController.findSimilarProducts);
+
 export default router;
