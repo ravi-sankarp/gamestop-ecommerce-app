@@ -55,21 +55,22 @@ function AdminProductsPage() {
       {content}
       {isSuccess && (
         <>
-          <Button
-            startIcon={<AddBoxIcon />}
-            component={Link}
-            to="/admin/addnewproduct"
-            sx={{
-              mt: 5,
-              position: 'absolute',
-              right: 16,
-              display: 'flex',
-              backgroundColor: '#343a40'
-            }}
-            variant="contained"
-          >
-            Add Product
-          </Button>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Button
+              startIcon={<AddBoxIcon />}
+              component={Link}
+              to="/admin/addnewproduct"
+              sx={{
+                mr: { xs: 3, md: 30 },
+                mt: 5,
+                maxWidth: 200,
+                backgroundColor: '#343a40'
+              }}
+              variant="contained"
+            >
+              Add Product
+            </Button>
+          </Box>
           <ProductTableList
             data={data.data.products}
             categories={data.data.categories}

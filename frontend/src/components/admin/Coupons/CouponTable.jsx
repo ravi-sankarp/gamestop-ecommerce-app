@@ -63,7 +63,7 @@ export default function CouponTable({ coupons }) {
   };
   return (
     <>
-      <Paper sx={{ mb: 5, mt: 4 }}>
+      <Paper sx={{ mb: 5, mt: 14, mx: { md: 20 } }}>
         <TableContainer>
           <Table aria-label="simple table">
             <TableHead sx={{ backgroundColor: '#2987de7a' }}>

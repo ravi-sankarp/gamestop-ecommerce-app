@@ -1,5 +1,6 @@
 /* eslint-disable operator-linebreak */
 import { useState, useEffect } from 'react';
+import AddBoxIcon from '@mui/icons-material/AddBox';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import {
   Box,
@@ -121,9 +122,10 @@ function AdminOffersPage() {
                   Category Offers
                 </Typography>
                 <Button
+                  startIcon={<AddBoxIcon />}
                   variant="outlined"
                   onClick={() => handleSetOperation('Category Offer')}
-                  sx={{ mt: 4 }}
+                  sx={{ mt: 4, py: 1, backgroundColor: '#fff' }}
                 >
                   Add Category Offer
                 </Button>
@@ -148,7 +150,8 @@ function AdminOffersPage() {
                   Product Offers
                 </Typography>
                 <Button
-                  sx={{ mt: 4 }}
+                  startIcon={<AddBoxIcon />}
+                  sx={{ mt: 4, py: 1, backgroundColor: '#fff' }}
                   variant="outlined"
                   onClick={() => handleSetOperation('Product Offer')}
                 >

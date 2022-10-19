@@ -62,14 +62,16 @@ function AdminBannerPage() {
       {content}
       {isSuccess && (
         <>
-          <Button
-            variant="outlined"
-            startIcon={<AddBoxIcon />}
-            onClick={handlePopupView}
-            sx={{ mt: 5, position: 'absolute', right: 16, display: 'flex' }}
-          >
-            Add Banner
-          </Button>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Button
+              variant="outlined"
+              startIcon={<AddBoxIcon />}
+              onClick={handlePopupView}
+              sx={{ mr: { xs: 3, md: 25 }, maxWidth: 200, backgroundColor: '#fff' }}
+            >
+              Add Banner
+            </Button>
+          </Box>
           {!!data?.data?.length && <BannerTable data={data.data} />}
           {!!data?.data?.length || (
             <Box

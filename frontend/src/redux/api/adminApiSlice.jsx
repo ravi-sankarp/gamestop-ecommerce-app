@@ -148,7 +148,7 @@ export const extendedAdminApiSlice = apiSlice.injectEndpoints({
     }),
 
     getAllOrders: builder.query({
-      query: () => '/admin/getallorders',
+      query: (params) => `/admin/getallorders${params}`,
       providesTags: ['orders']
     }),
 
@@ -162,7 +162,7 @@ export const extendedAdminApiSlice = apiSlice.injectEndpoints({
     }),
 
     getAllPayments: builder.query({
-      query: () => '/admin/getallpayments',
+      query: (params) => `/admin/getallpayments${params}`,
       providesTags: ['orders', 'payments']
     }),
 

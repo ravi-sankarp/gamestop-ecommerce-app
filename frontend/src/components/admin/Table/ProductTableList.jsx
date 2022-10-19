@@ -53,7 +53,7 @@ export default function UserTableList({ data }) {
   return (
     <>
       <Box sx={{ my: 4 }}>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 14 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 5 }}>
           {data?.map((product, index) => (
             <Box
               key={product.name}

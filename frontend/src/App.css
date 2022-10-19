@@ -1,4 +1,13 @@
-@import url('http://fonts.cdnfonts.com/css/whitney-2');
+/* @import url('http://fonts.cdnfonts.com/css/whitney-2'); */
+
+@font-face {
+    font-family: whitney;
+    font-style: normal;
+    font-weight: 500;
+    src: local('Whitney'), url('../public/fonts/whitneymedium.woff') format('woff')
+}
+
+
 
 body {
     padding: 0;
@@ -15,11 +24,8 @@ body {
         sans-serif;
     line-height: 1.25;
 }
-iframe{
-    margin: 0 auto;
-    width: 100%;
-    display: block;
-}
+
+
 .text-link {
     color: inherit;
     text-decoration: inherit;

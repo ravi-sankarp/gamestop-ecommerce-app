@@ -36,7 +36,7 @@ function ProductCollapse({ product }) {
         timeout="auto"
         unmountOnExit
       >
-        <Box sx={{ margin: 1 }}>
+        <Box sx={{ margin: 1, pr: 3 }}>
           <Typography
             variant="h6"
             gutterBottom
@@ -56,6 +56,7 @@ function ProductCollapse({ product }) {
                 <TableCell align="center">Discounted Price</TableCell>
                 <TableCell align="center">Brand</TableCell>
                 <TableCell align="center">Category</TableCell>
+                <TableCell align="center">Stock</TableCell>
                 <TableCell align="center">Rating</TableCell>
               </TableRow>
             </TableHead>
@@ -103,7 +104,13 @@ function ProductCollapse({ product }) {
                     {product.category[0]?.name}
                   </TableCell>
                   <TableCell
-                    data-label="Ratinh"
+                    data-label="Stock"
+                    align="center"
+                  >
+                    {product.stock}
+                  </TableCell>
+                  <TableCell
+                    data-label="Rating"
                     align="center"
                   >
                     {product.rating}

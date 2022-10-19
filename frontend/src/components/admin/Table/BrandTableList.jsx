@@ -72,7 +72,7 @@ export default function CategoryTableList({ data }) {
   };
   return (
     <>
-      <Paper sx={{ mb: 5, mt: 14 }}>
+      <Paper sx={{ mb: 5, mt: 5, mx: { md: 25 } }}>
         <TableContainer>
           <Table aria-label="simple table">
             <TableHead sx={{ backgroundColor: '#2987de7a' }}>
@@ -96,16 +96,28 @@ export default function CategoryTableList({ data }) {
                     '&:nth-of-type(even) ': { backgroundColor: '#f4f8fd' }
                   }}
                 >
-                  <TableCell data-label="Name" align="center">
+                  <TableCell
+                    data-label="Name"
+                    align="center"
+                  >
                     {brand.name}
                   </TableCell>
-                  <TableCell data-label="Description" align="center">
+                  <TableCell
+                    data-label="Description"
+                    align="center"
+                  >
                     {brand.description}
                   </TableCell>
-                  <TableCell data-label="Total Products" align="center">
+                  <TableCell
+                    data-label="Total Products"
+                    align="center"
+                  >
                     {brand.totalProducts}
                   </TableCell>
-                  <TableCell data-label="Action" align="center">
+                  <TableCell
+                    data-label="Action"
+                    align="center"
+                  >
                     <IconButton
                       onClick={() => handleAction(brand, 'edit')}
                       aria-label="edit"
@@ -193,16 +205,27 @@ export default function CategoryTableList({ data }) {
           <>
             <DialogTitle>
               <div style={{ display: 'flex' }}>
-                <Typography variant="h6" component="div" style={{ flexGrow: 1 }}>
+                <Typography
+                  variant="h6"
+                  component="div"
+                  style={{ flexGrow: 1 }}
+                >
                   Edit Brand
                 </Typography>
-                <Button color="primary" variant="outlined" onClick={handleAlertShow}>
+                <Button
+                  color="primary"
+                  variant="outlined"
+                  onClick={handleAlertShow}
+                >
                   <CloseOutlinedIcon />
                 </Button>
               </div>
             </DialogTitle>
             <DialogContent dividers>
-              <BrandEditForm brandData={brandData} close={handleAlertShow} />
+              <BrandEditForm
+                brandData={brandData}
+                close={handleAlertShow}
+              />
             </DialogContent>
           </>
         )}

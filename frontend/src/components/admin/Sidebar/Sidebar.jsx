@@ -16,6 +16,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
 import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
+import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined';
 import AppShortcutOutlinedIcon from '@mui/icons-material/AppShortcutOutlined';
 import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined';
 import InventoryOutlinedIcon from '@mui/icons-material/InventoryOutlined';
@@ -228,6 +229,15 @@ function Sidebar() {
             <PaymentOutlinedIcon />
           </Tooltip>
         );
+      case 'Sales':
+        return (
+          <Tooltip
+            title="Sales"
+            placement="right-end"
+          >
+            <AssessmentOutlinedIcon />
+          </Tooltip>
+        );
       default:
         return null;
     }
@@ -300,7 +310,8 @@ function Sidebar() {
               'Offers',
               'Coupons',
               'Orders',
-              'Payments'
+              'Payments',
+              'Sales'
             ].map((text) => (
               <ListItem
                 component={Link}

@@ -1,6 +1,7 @@
 /* eslint-disable operator-linebreak */
 import { useState, useEffect } from 'react';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
+import AddBoxIcon from '@mui/icons-material/AddBox';
 import {
   Box,
   Button,
@@ -71,21 +72,21 @@ function AdminCouponsPage() {
             <Typography>You have not added any coupons till now</Typography>
           </Box>
         )}
-
-        <Box>
-          {!!data?.data?.length && (
-            <>
-              <Button
-                variant="outlined"
-                onClick={() => handleAlertShow()}
-                sx={{ mt: 4 }}
-              >
-                Add Coupon
-              </Button>
-              <CouponTable coupons={data?.data} />
-            </>
-          )}
-        </Box>
+        <Button
+          startIcon={<AddBoxIcon />}
+          variant="outlined"
+          onClick={() => handleAlertShow()}
+          sx={{
+            position: 'absolute',
+            right: { xs: 16, md: 175 },
+            mt: 4,
+            py: 1,
+            backgroundColor: '#fff'
+          }}
+        >
+          Add Coupon
+        </Button>
+        <Box>{!!data?.data?.length && <CouponTable coupons={data?.data} />}</Box>
       </Box>
       <Dialog
         open={open}

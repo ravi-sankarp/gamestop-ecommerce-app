@@ -15,7 +15,7 @@ function NoResultsFound() {
       }}
     >
       <img
-        src="https://static-assets-web.flixcart.com/fk-p-linchpin-web/fk-cp-zion/img/error-no-search-results_2353c5.png"
+        src="/imgs/noresultsfound.png"
         alt="Sorry No Results Where Found"
       />
       <Typography variant="h4">Sorry, no results found!</Typography>

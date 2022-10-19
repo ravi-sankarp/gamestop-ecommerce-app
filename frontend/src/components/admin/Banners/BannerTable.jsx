@@ -71,7 +71,7 @@ export default function BannerTable({ data }) {
   };
   return (
     <>
-      <Paper sx={{ mb: 5, mt: 14 }}>
+      <Paper sx={{ mb: 5, mt: 5, mx: { md: 20 } }}>
         <TableContainer>
           <Table aria-label="simple table">
             <TableHead sx={{ backgroundColor: '#2987de7a' }}>

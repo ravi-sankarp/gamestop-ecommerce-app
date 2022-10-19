@@ -50,34 +50,55 @@ function AdminBrandsPage() {
   };
   return (
     <Box sx={{ overflowX: 'hidden', pt: 4 }}>
-      <Typography variant="h5" sx={{ mb: '1rem', textAlign: 'center', fontWeight: '450' }}>
+      <Typography
+        variant="h5"
+        sx={{ mb: '1rem', textAlign: 'center', fontWeight: '450' }}
+      >
         BRANDS
       </Typography>
       {content}
       {isSuccess && (
         <>
-          <Button
-            variant="outlined"
-            startIcon={<AddBoxIcon />}
-            onClick={handlePopupView}
-            sx={{ mt: 5, position: 'absolute', right: 16, display: 'flex' }}
-          >
-            Add Brand
-          </Button>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Button
+              variant="outlined"
+              startIcon={<AddBoxIcon />}
+              onClick={handlePopupView}
+              sx={{ mr: { xs: 3, md: 25 }, maxWidth: 200, backgroundColor: '#fff' }}
+            >
+              Add Brand
+            </Button>
+          </Box>
           <BrandTableList data={data.data} />
-          <Dialog sx={{ height: '100vh' }} onClose={handlePopupView} open={openPopup} maxWidth="md">
+          <Dialog
+            sx={{ height: '100vh' }}
+            onClose={handlePopupView}
+            open={openPopup}
+            maxWidth="md"
+          >
             <DialogTitle>
               <div style={{ display: 'flex' }}>
-                <Typography variant="h6" component="div" style={{ flexGrow: 1 }}>
+                <Typography
+                  variant="h6"
+                  component="div"
+                  style={{ flexGrow: 1 }}
+                >
                   Add Brand
                 </Typography>
-                <Button color="primary" variant="outlined" onClick={handlePopupView}>
+                <Button
+                  color="primary"
+                  variant="outlined"
+                  onClick={handlePopupView}
+                >
                   <CloseOutlinedIcon />
                 </Button>
               </div>
             </DialogTitle>
             <DialogContent dividers>
-              <BrandForm data={data.data} close={handlePopupView} />
+              <BrandForm
+                data={data.data}
+                close={handlePopupView}
+              />
             </DialogContent>
           </Dialog>
         </>

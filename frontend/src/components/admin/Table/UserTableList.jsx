@@ -32,7 +32,7 @@ export default function UserTableList({ data }) {
   };
   return (
     <>
-      <Paper sx={{ mb: 5 }}>
+      <Paper sx={{ mb: 5, mt: 6, mx: { md: 25 } }}>
         <TableContainer>
           <Table aria-label="simple table">
             <TableHead sx={{ backgroundColor: '#2987de7a' }}>
@@ -58,22 +58,40 @@ export default function UserTableList({ data }) {
                     '&:nth-of-type(even) ': { backgroundColor: '#f4f8fd' }
                   }}
                 >
-                  <TableCell data-label="Name" align="center">
+                  <TableCell
+                    data-label="Name"
+                    align="center"
+                  >
                     {`${user.firstName} ${user.lastName}`}
                   </TableCell>
-                  <TableCell data-label="Email" align="center">
+                  <TableCell
+                    data-label="Email"
+                    align="center"
+                  >
                     {user.email}
                   </TableCell>
-                  <TableCell data-label="Phone Number" align="center">
+                  <TableCell
+                    data-label="Phone Number"
+                    align="center"
+                  >
                     {user.phoneNumber}
                   </TableCell>
-                  <TableCell data-label="Blocked" align="center">
+                  <TableCell
+                    data-label="Blocked"
+                    align="center"
+                  >
                     {`${user.isBlocked.toString().toUpperCase()}`}
                   </TableCell>
-                  <TableCell data-label="Admin" align="center">
+                  <TableCell
+                    data-label="Admin"
+                    align="center"
+                  >
                     {`${user.isAdmin.toString().toUpperCase()}`}
                   </TableCell>
-                  <TableCell data-label="Action" align="center">
+                  <TableCell
+                    data-label="Action"
+                    align="center"
+                  >
                     <SecondaryButton
                       onClick={() => handleBlock(user)}
                       endIcon={!user.isBlocked ? <BlockIcon /> : ''}
@@ -96,7 +114,13 @@ export default function UserTableList({ data }) {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Paper>
-      {dialogOpen && <ConfirmDialog data={userData} open={dialogOpen} setOpen={setDialogOpen} />}
+      {dialogOpen && (
+        <ConfirmDialog
+          data={userData}
+          open={dialogOpen}
+          setOpen={setDialogOpen}
+        />
+      )}
     </>
   );
 }
