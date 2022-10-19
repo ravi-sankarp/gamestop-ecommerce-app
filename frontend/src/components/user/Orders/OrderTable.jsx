@@ -29,7 +29,7 @@ import {
 } from '../../../redux/api/userApiSlice';
 import OrderPriceDetails from './OrderPriceDetails';
 
-function OrderTable({ items, order }) {
+function OrderTable({ items, order, admin }) {
   const [open, setOpen] = useState(false);
   const [orderDetails, setOrderDetails] = useState();
   const [skip, setSkip] = useState(true);
@@ -127,19 +127,16 @@ function OrderTable({ items, order }) {
       errorToast(err);
     }
   };
-  const calcDayDifference = useCallback(
-    (orderedDate) => {
-      const orderedTimeStamp = new Date(orderedDate).getTime();
-      const todayTimeStamp = new Date().getTime();
-      const differenceInTime = todayTimeStamp - orderedTimeStamp;
-      const dayDifference = differenceInTime / (1000 * 3600 * 24);
-      if (dayDifference > 7) {
-        return false;
-      }
-      return true;
-    },
-    []
-  );
+  const calcDayDifference = useCallback((orderedDate) => {
+    const orderedTimeStamp = new Date(orderedDate).getTime();
+    const todayTimeStamp = new Date().getTime();
+    const differenceInTime = todayTimeStamp - orderedTimeStamp;
+    const dayDifference = differenceInTime / (1000 * 3600 * 24);
+    if (dayDifference > 7) {
+      return false;
+    }
+    return true;
+  }, []);
   console.log(order);
   return (
     <>
@@ -179,7 +176,7 @@ function OrderTable({ items, order }) {
                 <TableCell align="center">Quantity</TableCell>
                 <TableCell align="center">Subtotal</TableCell>
                 <TableCell align="center">Order Status</TableCell>
-                <TableCell align="center">Actions</TableCell>
+               {admin || <TableCell align="center">Actions</TableCell>}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -260,10 +257,11 @@ function OrderTable({ items, order }) {
                         ? 'Item Cancelled'
                         : order.orderStatus}
                     </TableCell>
-                    <TableCell
+                    {admin || (
+<TableCell
                       data-label="Actions"
                       align="center"
-                    >
+>
                       <Box
                         sx={{
                           display: 'flex',
@@ -313,7 +311,8 @@ function OrderTable({ items, order }) {
                           </>
                         )}
                       </Box>
-                    </TableCell>
+</TableCell>
+)}
                   </TableRow>
                 ))}
               {!!items.length || (
@@ -386,10 +385,11 @@ function OrderTable({ items, order }) {
                     )}
                     {order.orderStatus}
                   </TableCell>
-                  <TableCell
+                  {admin || (
+<TableCell
                     data-label="Actions"
                     align="center"
-                  >
+>
                     <Box
                       sx={{
                         display: 'flex',
@@ -437,7 +437,8 @@ function OrderTable({ items, order }) {
                         </>
                       )}
                     </Box>
-                  </TableCell>
+</TableCell>
+)}
                 </TableRow>
               )}
             </TableBody>

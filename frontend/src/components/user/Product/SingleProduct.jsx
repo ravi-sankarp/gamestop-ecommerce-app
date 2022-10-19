@@ -1,9 +1,10 @@
-/* eslint-disable no-unused-vars */
 import { useState, useEffect } from 'react';
 import { Box, Button, Grid, List, ListItem, Typography } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
 import { Carousel } from 'react-responsive-carousel';
 import ReactImageMagnify from 'react-image-magnify';
+import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
+import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
 import { PrimaryButton, SecondaryButton } from '../../../MaterialUiConfig/styled';
 import { useUpdateCartMutation, useUpdateWishlistMutation } from '../../../redux/api/userApiSlice';
 import useApiErrorHandler from '../../../hooks/useApiErrorHandler';
@@ -228,7 +229,7 @@ function SingleProduct({ product }) {
             }
           }}
         >
-          <Typography variant="h6">Product Highlights  </Typography>
+          <Typography variant="h6">Product Highlights </Typography>
           {product.keyFeatures.split(',').map((feature) => (
             <ListItem
               key={feature.split(':')[0]}
@@ -244,18 +245,20 @@ function SingleProduct({ product }) {
             </ListItem>
           ))}
         </List>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', flex: '1' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-evenly', px: 3 }}>
           <PrimaryButton
             onClick={() => handleAddToCart(product._id)}
-            sx={{ flex: '1' }}
+            sx={{ flex: '1', minWidth: 'auto', whiteSpace: 'nowrap', px: 2 }}
+            endIcon={<ShoppingCartOutlinedIcon />}
           >
             {cartText}
           </PrimaryButton>
           <SecondaryButton
             onClick={() => handleAddToWishlist(product._id)}
-            sx={{ flex: '1', height: '50px' }}
+            sx={{ flex: '1', height: '50px', whiteSpace: 'nowrap', px: 2, minWidth: 'auto' }}
           >
             {wishlistText}
+            <FavoriteBorderOutlinedIcon />
           </SecondaryButton>
         </Box>
       </Grid>

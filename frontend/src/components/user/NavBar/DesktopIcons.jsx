@@ -14,7 +14,6 @@ import {
   Badge
 } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
-import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
@@ -23,6 +22,7 @@ import { deleteToken } from '../../../redux/reducers/authSlice';
 import { setToast } from '../../../redux/reducers/toastSlice';
 import apiSlice from '../../../redux/api/apiSlice';
 import { useGetCartAndWishlistCountQuery } from '../../../redux/api/userApiSlice';
+import SearchBar from './Searchbar';
 
 function DesktopIcons() {
   const [openAlert, setOpenAlert] = useState(false);
@@ -45,14 +45,11 @@ function DesktopIcons() {
     setOpenAlert(false);
     navigate('/');
   };
+
   const navItems = [
     {
       path: 'search',
-      icon: (
-        <Tooltip title="Search">
-          <SearchOutlinedIcon />
-        </Tooltip>
-      )
+      icon: <SearchBar />
     },
     {
       path: 'profile',
@@ -151,6 +148,24 @@ function DesktopIcons() {
         </ListItem>
       );
     }
+    if (item.path === 'search') {
+      return (
+        <ListItem
+          sx={{
+            '&:hover': {
+              backgroundColor: 'inherit'
+            },
+            cursor: 'pointer',
+            width: '20px',
+            height: '15px'
+          }}
+          key={item.path}
+          disablePadding
+        >
+          <ListItemIcon sx={{ color: '#000' }}>{item.icon}</ListItemIcon>
+        </ListItem>
+      );
+    }
     return (
       <ListItem
         component={Link}
@@ -176,6 +191,7 @@ function DesktopIcons() {
       <Box
         sx={{
           display: 'flex',
+          alignItems: 'center',
           justifyContent: 'flex-end',
           ml: { xs: 'auto', sm: 0 },
           gap: 2,

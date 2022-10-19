@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-expressions */
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Box, Slider, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import MuiInput from '@mui/material/Input';
@@ -9,6 +9,14 @@ const Input = styled(MuiInput)`
   width: 80px;
 `;
 
+const debounce = (func, delay) => {
+  let setTimoutInstance;
+  return (...args) => {
+    if (setTimoutInstance) clearTimeout(setTimoutInstance);
+    setTimoutInstance = setTimeout(() => func.apply('', args), delay);
+  };
+};
+
 function PriceSlider() {
   const [search, setSearch] = useSearchParams();
   const [value, setValue] = useState([
@@ -16,12 +24,17 @@ function PriceSlider() {
     search.get('maxPrice') ?? 50000
   ]);
 
-  const handleSliderChange = (event, newValue) => {
-    search.set('minPrice', newValue[0]);
-    search.set('maxPrice', newValue[1]);
+  const handleUpdateParams = (minPrice, maxPrice) => {
+    search.set('minPrice', minPrice);
+    search.set('maxPrice', maxPrice);
     setSearch(search);
+  };
 
+  const handleOptimizedChange = useCallback(debounce(handleUpdateParams, 300), []);
+
+  const handleSliderChange = (event, newValue) => {
     setValue(newValue);
+    handleOptimizedChange(newValue[0], newValue[1]);
   };
 
   const handleInput1Change = (event) => {

@@ -23,6 +23,7 @@ export default function MenuDrawer() {
   const handleClear = () => {
     search.delete('category');
     search.delete('brand');
+    search.delete('search');
     search.delete('maxPrice');
     search.delete('minPrice');
     setSearch(search);

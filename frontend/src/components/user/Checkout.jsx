@@ -38,6 +38,7 @@ function Checkout({ cartData, addressData, addressMessage, walletBalance }) {
     cartData.discountedTotal - couponDiscount
   );
   const [btnText, setBtnText] = useState('Confirm Order');
+  const [couponBtnTxt, setCouponBtnText] = useState('Check');
   const [addressId, setAddressId] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('');
   const [couponErr, setCouponErr] = useState('');
@@ -177,6 +178,7 @@ function Checkout({ cartData, addressData, addressMessage, walletBalance }) {
     setCouponErr('');
     if (!checkCouponIsLoading) {
       try {
+        setCouponBtnText('Loading...');
         const result = await checkCoupon({ code: couponCode }).unwrap();
         successToast(result);
 
@@ -184,7 +186,9 @@ function Checkout({ cartData, addressData, addressMessage, walletBalance }) {
         setCartDiscountedTotal(
           cartData.discountedTotal - cartData.discountedTotal * result.data.discount * 0.01
         );
+        setCouponBtnText('Check');
       } catch (err) {
+        setCouponBtnText('Check');
         setCouponCode('');
         setCouponErr(err?.data?.message);
       }
@@ -231,9 +235,10 @@ function Checkout({ cartData, addressData, addressMessage, walletBalance }) {
               color="primary"
               value={couponCode}
               autoComplete="off"
+              onKeyDown={(e) => e.key === 'Enter' && handleCouponCheck()}
               onChange={(e) => setCouponCode(e.target.value)}
             />
-            <PrimaryButton onClick={handleCouponCheck}>Check</PrimaryButton>
+            <PrimaryButton onClick={handleCouponCheck}>{couponBtnTxt}</PrimaryButton>
           </Box>
           <Typography
             color="red"

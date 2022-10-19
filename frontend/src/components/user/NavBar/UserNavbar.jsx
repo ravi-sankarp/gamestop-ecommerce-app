@@ -80,7 +80,10 @@ function UserNavBar() {
           }}
           sx={{
             display: { xs: 'block', md: 'none' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: 240 }
+            '& .MuiDrawer-paper': {
+              boxSizing: 'border-box',
+              width: 240
+            }
           }}
         >
           {drawer}

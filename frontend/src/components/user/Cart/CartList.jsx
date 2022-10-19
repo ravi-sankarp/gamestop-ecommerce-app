@@ -228,13 +228,24 @@ function CartList({ data }) {
                   <IconButton
                     onClick={() => handleProductUpdate(item.productDetails._id, -1)}
                     disabled={item.count < 2}
-                    sx={{ color: '#000' }}
+                    sx={{ color: '#000', border: '2px solid #999', p: 0.1 }}
                   >
                     <RemoveIcon />
                   </IconButton>
-                  {item.count}
+                  <Box
+                    sx={{
+                      color: '#000',
+                      border: '2px solid #999',
+                      px: 1,
+                      height: 25,
+                      display: 'flex',
+                      alignItems: 'center'
+                    }}
+                  >
+                    {item.count}
+                  </Box>
                   <IconButton
-                    sx={{ color: '#000' }}
+                    sx={{ color: '#000', border: '2px solid #999', p: 0.1 }}
                     onClick={() => handleProductUpdate(item.productDetails._id, 1)}
                   >
                     <AddIcon />

@@ -2,6 +2,7 @@ import { Box, CircularProgress } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import HelmetMeta from '../../components/HelmetMeta';
+import ProductDescriptionTab from '../../components/user/Product/ProductDesctiptionTab';
 import SingleProduct from '../../components/user/Product/SingleProduct';
 import { useGetSingleProductQuery } from '../../redux/api/viewsApiSlice';
 import { setToast } from '../../redux/reducers/toastSlice';
@@ -45,7 +46,12 @@ function ProductPage() {
       <HelmetMeta title={`${data?.data?.name ?? 'Product'} | Gamestop`} />
       <Box sx={{ overflowX: 'hidden', minHeight: '100vh', p: { xs: 1, md: 3, lg: 4 } }}>
         {content}
-        {isSuccess && <SingleProduct product={data.data} />}
+        {isSuccess && (
+          <>
+            <SingleProduct product={data.data} />
+            <ProductDescriptionTab description={data.data.description} />
+          </>
+        )}
       </Box>
     </>
   );
