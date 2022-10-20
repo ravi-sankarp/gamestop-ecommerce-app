@@ -300,3 +300,20 @@ export const getLastWeekOrders = asyncHandler(async () => {
   const count = await getDb().collection('orders').aggregate(agg).toArray();
   return count;
 });
+
+// get total orders of every status
+export const getOrderStatusCount = asyncHandler(async () => {
+  const agg = [
+    {
+      $group: {
+        _id: '$order.orderStatus',
+        totalOrders: {
+          $sum: 1
+        }
+      }
+    }
+  ];
+
+  const result = await getDb().collection('orders').aggregate(agg).toArray();
+  return result;
+});

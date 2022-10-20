@@ -108,7 +108,6 @@ function OrderTable({ items, order, admin }) {
         successToast(res);
       }
     } catch (err) {
-      console.error(err);
       errorToast(err);
     }
   };
@@ -123,7 +122,6 @@ function OrderTable({ items, order, admin }) {
         successToast(res);
       }
     } catch (err) {
-      console.error(err);
       errorToast(err);
     }
   };
@@ -137,7 +135,6 @@ function OrderTable({ items, order, admin }) {
     }
     return true;
   }, []);
-  console.log(order);
   return (
     <>
       <Box sx={{ display: 'flex', alignItems: 'center', ml: 'auto' }}>

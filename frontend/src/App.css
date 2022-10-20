@@ -188,8 +188,8 @@ table th {
     transition: opacity 200ms ease-in-out, transform 150ms ease-in-out;
 }
 
-.navbar-list:hover>.navbar-dropdown,
-.navbar-list .navbar-dropdown:hover {
+.navbar-list:not(:focus):hover>.navbar-dropdown,
+.navbar-list .navbar-dropdown:not(:focus):hover {
     opacity: 1;
     pointer-events: auto;
     z-index: 121;

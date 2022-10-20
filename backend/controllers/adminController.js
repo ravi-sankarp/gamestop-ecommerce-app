@@ -587,10 +587,14 @@ const deleteBanner = asyncHandler(async (req, res) => {
 //@route  GET /api/getallorders
 //@access private
 const listAllOrders = asyncHandler(async (req, res) => {
-  const orders = await orderHelpers.findAllOrders(req.query);
+  const [orders, count] = await Promise.all([
+    orderHelpers.findAllOrders(req.query),
+    orderHelpers.getOrderStatusCount()
+  ]);
+  
   const resData = {
     status: 'success',
-    data: orders
+    data: { orders, count }
   };
   sendResponse(200, resData, res);
 });

@@ -69,7 +69,7 @@ function AdminDashboardPage() {
             textAlign="center"
             variant="h5"
           >
-            Dashboard
+            DASHBOARD
           </Typography>
           <Box sx={{ display: 'flex', mt: 3, mb: 3, justifyContent: 'space-between' }}>
             <DashboardCard

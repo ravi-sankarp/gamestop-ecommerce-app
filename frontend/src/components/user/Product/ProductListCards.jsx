@@ -48,7 +48,7 @@ export default function ProductListCards({ products }) {
                 <CardMedia
                   component="img"
                   height="130"
-                  sx={{ height: { xs: 150, lg: 150 } }}
+                  sx={{ height: { xs: 150, lg: 150 }, objectFit: 'contain' }}
                   image={`${product.images[0].imgUrl}`}
                   alt={product.name}
                 />

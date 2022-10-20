@@ -1,6 +1,19 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Alert, Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, MenuItem, TextField, Typography } from '@mui/material';
+import {
+  Alert,
+  Box,
+  Button,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  MenuItem,
+  TextField,
+  Typography
+} from '@mui/material';
 import { useChangeOrderStatusMutation, useGetAllOrdersQuery } from '../../redux/api/adminApiSlice';
 import useApiErrorHandler from '../../hooks/useApiErrorHandler';
 import HelmetMeta from '../../components/HelmetMeta';
@@ -9,14 +22,15 @@ import NoResultsFound from '../../components/NoResultsFound';
 import OrderTable from '../../components/user/Orders/OrderTable';
 import useSuccessHandler from '../../hooks/useSuccessHandler';
 import { SecondaryButton } from '../../MaterialUiConfig/styled';
+import DashboardCard from '../../components/admin/DashboardCard';
 
 function AdminOrdersPage() {
   const { search } = useLocation();
   const { data, isLoading, isFetching, isSuccess, isError, error } = useGetAllOrdersQuery(search);
   const [changeOrderStatus,
-     { isLoading: isLoadingChangeOrderStatus }] = useChangeOrderStatusMutation();
+    { isLoading: isLoadingChangeOrderStatus }] = useChangeOrderStatusMutation();
   const [status, setStatus] = useState();
-    const [selectError, setSelectError] = useState();
+  const [selectError, setSelectError] = useState();
 
   const [changeOrderDetails, setChangeOrderDetails] = useState();
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -88,7 +102,7 @@ function AdminOrdersPage() {
   return (
     <>
       <HelmetMeta title="Admin All Orders | Gamestop" />
-      <Box sx={{ overflowX: 'hidden', pt: 4 }}>
+      <Box sx={{ overflowX: 'hidden', pt: 4, p: 1 }}>
         <Typography
           variant="h5"
           sx={{ mb: '1rem', textAlign: 'center', fontWeight: '450' }}
@@ -96,8 +110,37 @@ function AdminOrdersPage() {
           ORDERS
         </Typography>
         {content}
+        {isSuccess && (
+          <Box sx={{ display: 'flex', mt: 3, mb: 3, justifyContent: 'space-between' }}>
+            <DashboardCard
+              title="Total Orders"
+              value={data?.data?.count?.reduce((acc, item) => acc + item.totalOrders, 0)}
+            />
+            <DashboardCard
+              title="Placed Orders"
+              value={data?.data?.count?.reduce(
+                (acc, item) => (item._id === 'Order Placed' ? acc + item.totalOrders : acc + 0),
+                0
+              )}
+            />
+            <DashboardCard
+              title="Delivered Orders"
+              value={data?.data?.count?.reduce(
+                (acc, item) => (item._id === 'Delivered' ? acc + item.totalOrders : acc + 0),
+                0
+              )}
+            />
+            <DashboardCard
+              title="Cancelled Orders"
+              value={data?.data?.count?.reduce(
+                (acc, item) => (item._id.includes('Cancelled') ? acc + item.totalOrders : acc + 0),
+                0
+              )}
+            />
+          </Box>
+        )}
         {isSuccess && <OrderFilter />}
-        {!!(isSuccess && data?.data?.length) || <NoResultsFound />}
+        {!!(isSuccess && data?.data?.orders?.length) || <NoResultsFound />}
         <Box
           sx={{
             display: 'flex',
@@ -109,8 +152,8 @@ function AdminOrdersPage() {
           }}
         >
           {isSuccess
-            && data?.data?.length > 0
-            && data?.data?.map((order, index) => (
+            && data?.data?.orders?.length > 0
+            && data?.data?.orders?.map((order, index) => (
               <Box
                 key={order.orderedOn}
                 sx={{
@@ -210,7 +253,6 @@ function AdminOrdersPage() {
                   <Box>
                     <Typography sx={{ color: '#868e96', fontSize: 12, whiteSpace: 'nowrap' }}>
                       Total Amount
-{' '}
                     </Typography>
                     <Typography sx={{ whiteSpace: 'nowrap' }}>
                       {`₹ ${order?.totalAmountDiscountedOriginal.toLocaleString()}`}

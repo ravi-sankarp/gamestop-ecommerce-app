@@ -32,7 +32,7 @@ const reviewEligibilityCheck = asyncHandler(async (_id, productId) => {
   // if the user has not purchased the product then throw an error
   if (!found) {
     throw new AppError(
-      'Purchase the product to write a review !',
+      'Purchase the product to post a review !',
       400
     );
   }
