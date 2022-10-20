@@ -75,8 +75,8 @@ export default function PaymentTableList({ data }) {
                   align="center"
                   sx={
                     payment.mode === 'debit'
-                      ? { color: 'green', textTransform: 'uppercase' }
-                      : { color: 'red', textTransform: 'uppercase' }
+                      ? { color: 'red', textTransform: 'uppercase' }
+                      : { color: 'green', textTransform: 'uppercase' }
                   }
                 >
                   {payment.mode}

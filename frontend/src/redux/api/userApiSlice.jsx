@@ -228,6 +228,20 @@ export const extendedUserApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: ['orders', 'wallet']
     }),
 
+    checkReviewEligibility: builder.query({
+      query: (id) => `/user/checkrevieweligibility/${id}`,
+      providesTags: ['reviews', 'productdata']
+    }),
+
+    addNewReview: builder.mutation({
+      query: (data) => ({
+        url: '/user/addnewreview',
+        method: 'POST',
+        body: data
+      }),
+      invalidatesTags: ['reviews', 'productdata']
+    }),
+
     getInvoice: builder.query({
       query: ({ id }) => ({
         url: `/user/getinvoice/${id}`,
@@ -280,5 +294,7 @@ export const {
   useGetUseWalletDetailsQuery,
   useGetWalletBalanceQuery,
   useAddToWalletMutation,
-  usePurchaseWithWalletMutation
+  usePurchaseWithWalletMutation,
+  useAddNewReviewMutation,
+  useCheckReviewEligibilityQuery
 } = extendedUserApiSlice;

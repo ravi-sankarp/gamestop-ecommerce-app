@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { Box, Button, Grid, List, ListItem, Typography } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
 import { Carousel } from 'react-responsive-carousel';
@@ -11,6 +12,7 @@ import useApiErrorHandler from '../../../hooks/useApiErrorHandler';
 import useSuccessHandler from '../../../hooks/useSuccessHandler';
 
 function SingleProduct({ product }) {
+  const { id: productId } = useParams();
   const [img, setImg] = useState(product.images[0].imgUrl);
   const [cartText, setCartText] = useState('Add to Cart');
   const [wishlistText, setWishlistText] = useState('Add to Wishlist');
@@ -18,12 +20,14 @@ function SingleProduct({ product }) {
   const [addToWishlist, { isLoading: addToWishlistIsLoading }] = useUpdateWishlistMutation();
   const successToast = useSuccessHandler();
   const errorToast = useApiErrorHandler();
+
   useEffect(() => {
+    setImg(product.images[0].imgUrl);
     window.scrollTo({
       top: 0,
       behavior: 'smooth'
     });
-  }, []);
+  }, [productId]);
 
   const handleImgHover = (e) => {
     if (e.target.tagName === 'IMG') {
@@ -177,7 +181,15 @@ function SingleProduct({ product }) {
           >
             {product.rating}
           </Button>
-          <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-start', alignItems: 'center' }}>
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 1,
+              justifyContent: 'flex-start',
+              alignItems: 'center',
+              mt: 1
+            }}
+          >
             <Typography
               gutterBottom
               variant="subtitle"
@@ -185,20 +197,24 @@ function SingleProduct({ product }) {
             >
               {`₹${product.discountedPrice.toLocaleString()}`}
             </Typography>
-            <Typography
-              gutterBottom
-              sx={{ textDecoration: 'line-through', opacity: 0.5 }}
-              variant="subtitle"
-            >
-              {`₹${product.price.toLocaleString()}`}
-            </Typography>
-            <Typography
-              gutterBottom
-              sx={{ color: 'green', opacity: 0.8 }}
-              variant="subtitle"
-            >
-              {`(${product.discount}% off )`}
-            </Typography>
+            {product.discountedPrice !== product.price && (
+              <>
+                <Typography
+                  gutterBottom
+                  sx={{ textDecoration: 'line-through', opacity: 0.5 }}
+                  variant="subtitle"
+                >
+                  {`₹${product.price.toLocaleString()}`}
+                </Typography>
+                <Typography
+                  gutterBottom
+                  sx={{ color: 'green', opacity: 0.8 }}
+                  variant="subtitle"
+                >
+                  {`(${product.discount}% off )`}
+                </Typography>
+              </>
+            )}
           </Box>
           {product.stock > 1 && product.stock < 10 && (
             <Typography

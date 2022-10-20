@@ -3,6 +3,8 @@ import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import HelmetMeta from '../../components/HelmetMeta';
 import ProductDescriptionTab from '../../components/user/Product/ProductDesctiptionTab';
+import ProductReview from '../../components/user/Product/ProductReview';
+import SimilarProducts from '../../components/user/Product/SimilarProducts';
 import SingleProduct from '../../components/user/Product/SingleProduct';
 import { useGetSingleProductQuery } from '../../redux/api/viewsApiSlice';
 import { setToast } from '../../redux/reducers/toastSlice';
@@ -13,6 +15,7 @@ function ProductPage() {
   const { data, isLoading, isFetching, isError, isSuccess, error } = useGetSingleProductQuery({
     id
   });
+
   let content;
   if (isLoading || isFetching) {
     content = (
@@ -37,7 +40,6 @@ function ProductPage() {
     );
   }
   if (isError) {
-    console.log(error);
     content = error.message;
     dispatch(setToast({ open: true, data: error }));
   }
@@ -50,6 +52,8 @@ function ProductPage() {
           <>
             <SingleProduct product={data.data} />
             <ProductDescriptionTab description={data.data.description} />
+            <SimilarProducts />
+            <ProductReview />
           </>
         )}
       </Box>

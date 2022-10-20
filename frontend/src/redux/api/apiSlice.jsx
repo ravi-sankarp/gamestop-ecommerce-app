@@ -67,7 +67,8 @@ const apiSlice = createApi({
     'offers',
     'wallet',
     'coupons',
-    'banners'
+    'banners',
+    'reviews'
   ],
   endpoints: (builder) => ({})
 });

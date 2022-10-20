@@ -35,6 +35,16 @@ export const extendedViewsApiSlice = apiSlice.injectEndpoints({
     searchProduct: builder.query({
       query: (params) => `/searchproduct?search=${params.query}`,
       providesTags: ['productdata']
+    }),
+
+    getSimilarProducts: builder.query({
+      query: (params) => `/findsimilarproducts?id=${params}`,
+      providesTags: ['productdata']
+    }),
+
+    getProductReviews: builder.query({
+      query: (params) => `/getproductreviews?id=${params}`,
+      providesTags: ['reviews', 'productdata']
     })
   })
 });
@@ -45,5 +55,7 @@ export const {
   useGetNavlistQuery,
   useGetProductAndCategoriesQuery,
   useGetAllBannersQuery,
-  useSearchProductQuery
+  useSearchProductQuery,
+  useGetSimilarProductsQuery,
+  useGetProductReviewsQuery
 } = extendedViewsApiSlice;

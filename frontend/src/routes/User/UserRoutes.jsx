@@ -1,9 +1,12 @@
 import { Box } from '@mui/material';
 import { Route, Routes } from 'react-router-dom';
 import UserNavbar from '../../components/user/NavBar/UserNavbar';
+import PageNotFound from '../../components/user/PageNotFound';
 import UserFooter from '../../components/user/UserFooter';
 import AllProductsPage from '../../pages/User/AllProductsPage';
+import BrandPage from '../../pages/User/BrandPage';
 import CartPage from '../../pages/User/CartPage';
+import CategoryPage from '../../pages/User/CategoryPage';
 import CheckoutPage from '../../pages/User/CheckoutPage';
 import HomePage from '../../pages/User/HomePage';
 import ProductPage from '../../pages/User/ProductPage';
@@ -66,11 +69,24 @@ function UserRoutes() {
               path="product/:id"
               element={<ProductPage />}
             />
+            <Route
+              path="brand/:id"
+              element={<BrandPage />}
+            />
+            <Route
+              path="category/:id"
+              element={<CategoryPage />}
+            />
 
             {/* All Private routes */}
 
             <Route
               path="*"
+              element={<PageNotFound />}
+            />
+
+            <Route
+              path="/*"
               element={<UserOutlet />}
             >
               <Route

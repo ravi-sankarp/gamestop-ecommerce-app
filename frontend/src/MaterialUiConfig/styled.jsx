@@ -23,9 +23,10 @@ export const PrimaryButton = styled(Button)({
     boxShadow: '0.2 0.2 0.2 0.2rem #000'
   },
   '&:disabled': {
-    backgroundColor: '#ddd',
-    color: '#000',
-    cursor: 'not-allowed'
+    backgroundColor: 'rgba(0,0,0,0.2) ',
+     color: '#000 ',
+    pointerEvents: 'auto ',
+    cursor: 'not-allowed '
   }
 });
 export const SecondaryButton = styled(Button)({

@@ -37,7 +37,7 @@ export default function ProductDescriptionTab({ description }) {
         pt: 4,
         // padding: { xs: '15px 10px', md: '30px 100px' },
         alignItems: 'center',
-        minHeight: 400
+        minHeight: 340
       }}
     >
       <TabContext value={value}>

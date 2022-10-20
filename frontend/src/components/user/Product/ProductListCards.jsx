@@ -19,10 +19,11 @@ export default function ProductListCards({ products }) {
           key={product._id}
           item
           xs={6}
-          sm={4}
-          md={4}
+          sm={6}
+          md={6}
           lg={3}
           xl={3}
+          align="center"
         >
           <Link
             to={`/product/${product._id}`}
@@ -31,8 +32,8 @@ export default function ProductListCards({ products }) {
             <Card
               elevation={0}
               sx={{
-                maxWidth: { xs: '100%', md: 300 },
-                minHeight: 240
+                maxWidth: { xs: 300, lg: 300 },
+                minHeight: { xs: 150, lg: 240 }
               }}
             >
               <CardActionArea
@@ -47,7 +48,7 @@ export default function ProductListCards({ products }) {
                 <CardMedia
                   component="img"
                   height="130"
-                  sx={{ height: { xs: 130, lg: 150 } }}
+                  sx={{ height: { xs: 150, lg: 150 } }}
                   image={`${product.images[0].imgUrl}`}
                   alt={product.name}
                 />
