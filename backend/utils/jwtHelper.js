@@ -71,6 +71,7 @@ export const generateTokenWithRefreshToken = asyncHandler(async (req) => {
   return {
     token,
     refreshToken,
-    isAdmin: user.isAdmin
+    isAdmin: user.isAdmin,
+    googleAuth:user.googleAuth
   };
 });
