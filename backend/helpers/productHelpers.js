@@ -137,22 +137,25 @@ export const findProductById = asyncHandler(async (id) => {
 });
 
 //Find a products by category Id
-export const findProductByCategoryId = asyncHandler(async (id) => {
+export const findProductByCategoryId = asyncHandler(async (id, brId, proId) => {
   const categoryId = ObjectId(id);
+  const brandId = ObjectId(brId);
+  const _id = ObjectId(proId);
 
   const products = await getDb()
     .collection('products')
-    .find({ categoryId, isDeleted: false })
+    .find({ categoryId, isDeleted: false, brandId: { $ne: brandId }, _id: { $ne: _id } })
     .toArray();
   return products;
 });
 //Find a product by brand id
-export const findProductByBrandId = asyncHandler(async (id) => {
+export const findProductByBrandId = asyncHandler(async (id, proId) => {
   const brandId = ObjectId(id);
+  const productId = ObjectId(proId);
 
   const products = await getDb()
     .collection('products')
-    .find({ brandId, isDeleted: false })
+    .find({ brandId, isDeleted: false, _id: { $ne: productId } })
     .toArray();
   return products;
 });
@@ -330,8 +333,21 @@ export const productSearch = asyncHandler(async (query) => {
 export const findSimilarProducts = asyncHandler(async (id) => {
   const { brandId, categoryId } = await findProductById(id);
   const [productsByBrandId, productsByCategoryId] = await Promise.all([
-    findProductByBrandId(brandId),
-    findProductByCategoryId(categoryId)
+    findProductByBrandId(brandId, id),
+    findProductByCategoryId(categoryId, brandId, id)
   ]);
   return [...productsByBrandId, ...productsByCategoryId];
+});
+
+// update product rating
+export const updateProductRating = asyncHandler(async (id, rating) => {
+  const _id = ObjectId(id);
+  await getDb().collection('products').updateOne(
+    { _id },
+    {
+      $set: {
+        rating
+      }
+    }
+  );
 });

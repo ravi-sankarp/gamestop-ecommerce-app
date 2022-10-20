@@ -4,11 +4,17 @@ import validator from 'validator';
 import bcrypt from 'bcryptjs';
 import AppError from '../utils/appError.js';
 import sendResponse from '../utils/sendResponse.js';
+import badWordsFilter from '../config/badWordsFilter.js';
 import * as cartHelpers from '../helpers/cartHelpers.js';
 import * as wishlistHelpers from '../helpers/wishlistHelpers.js';
 import * as paymentHelpers from '../helpers/paymentHelpers.js';
 import * as walletHelpers from '../helpers/walletHelpers.js';
-import { findProductById, updateProductStock } from '../helpers/productHelpers.js';
+import * as reviewHelpers from '../helpers/reviewHelpers.js';
+import {
+  findProductById,
+  updateProductRating,
+  updateProductStock
+} from '../helpers/productHelpers.js';
 import {
   checkEmailAlreadyExists,
   checkPhoneNumberAlreadyExists,
@@ -34,6 +40,7 @@ import { generateRefreshToken, generateToken } from '../utils/jwtHelper.js';
 import { paypal, razorpayInstance } from '../config/payment.js';
 import { findByCouponCode } from '../helpers/couponHelpers.js';
 import asyncRandomBytes from '../utils/asyncRandomBytes.js';
+import reviewEligibilityCheck from '../helpers/checkUserCanReview.js';
 
 //@desc   Add items to cart or increase/decrease product quantity
 //@route  GET /api/user/updatecart
@@ -1241,6 +1248,73 @@ const generateInvoice = asyncHandler(async (req, res) => {
   await rm(filePath);
 });
 
+//@desc   To check whether a user is eligible for review
+//@route  GET /api/checkrevieweligibility
+//@access private
+const checkEligibleForReview = asyncHandler(async (req, res, next) => {
+  const { _id } = req.userDetails;
+  const { id } = req.params;
+
+  // if id is not present then throw an error
+  if (!id) {
+    throw new AppError('Please send the product Id', 400);
+  }
+  await reviewEligibilityCheck(_id, id, next);
+
+  const resData = {
+    status: 'success',
+    message: 'Eligible for review'
+  };
+  sendResponse(200, resData, res);
+});
+
+//@desc   Add a new product review
+//@route  POST /api/addnewreview
+//@access private
+const addNewProductReview = asyncHandler(async (req, res, next) => {
+  const { _id, firstName, lastName } = req.userDetails;
+
+  const { productId, rating: stringRating, description } = req.body;
+  // check if data is present
+  if (!productId || !stringRating || !description) {
+    throw new AppError('Please send all the required data', 400);
+  }
+  const rating = Number(stringRating);
+
+  // check if its valid number
+  if (!rating) {
+    throw new AppError('Please enter a valid number', 400);
+  }
+  // check if rating is valid
+  if (rating < 1 || rating > 5) {
+    throw new AppError('Rating must be value between 1 and 5', 400);
+  }
+  await reviewEligibilityCheck(_id, productId, next);
+
+  const updateData = {
+    userId: _id,
+    userName: `${firstName} ${lastName}`,
+    rating,
+    description: badWordsFilter.clean(description),
+    createdOn: new Date()
+  };
+
+  // update the review
+  await reviewHelpers.addProductReview(productId, updateData);
+
+  // send response
+  const resData = {
+    status: 'success',
+    message: 'Successfully added the review'
+  };
+  sendResponse(200, resData, res);
+
+  // getting the new product average
+  const { average } = await reviewHelpers.findProductRatingAverage(productId);
+
+  // updating the product rating
+  await updateProductRating(productId, Math.round(average * 10) / 10);
+});
 export default {
   updateCart,
   removeProductFromCart,
@@ -1272,5 +1346,7 @@ export default {
   listUserOrders,
   cancelOrder,
   returnOrder,
-  generateInvoice
+  generateInvoice,
+  checkEligibleForReview,
+  addNewProductReview
 };

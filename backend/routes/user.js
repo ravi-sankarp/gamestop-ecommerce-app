@@ -97,4 +97,10 @@ router.patch('/returnproduct', protect, userController.returnOrder);
 // route for getting invoice of a delivered product
 router.get('/getinvoice/:id', protect, userController.generateInvoice);
 
+// check if user is eligible for reviewing a product
+router.get('/checkrevieweligibility/:id', protect, userController.checkEligibleForReview);
+
+// route for adding new review
+router.post('/addnewreview', protect, userController.addNewProductReview);
+
 export default router;

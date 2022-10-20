@@ -26,6 +26,9 @@ router.get('/getallbanners', viewController.getAllBanners);
 router.get('/searchproduct', viewController.handleSearch);
 
 // Get similar products
-router.get('/findsimilarproducts', viewController.findSimilarProducts);
+router.get('/findsimilarproducts', viewController.getSimilarProducts);
+
+// Get product reviews
+router.get('/getproductreviews', viewController.getProductReviews);
 
 export default router;

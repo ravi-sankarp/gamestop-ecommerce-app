@@ -5,6 +5,7 @@ import * as brandHelpers from '../helpers/brandHelpers.js';
 import * as productHelpers from '../helpers/productHelpers.js';
 import { findAllBanners } from '../helpers/bannerHelpers.js';
 import AppError from '../utils/appError.js';
+import { findReviewsByProductId } from '../helpers/reviewHelpers.js';
 
 //@desc   get all products
 //@route  GET /api/getproducts
@@ -84,10 +85,10 @@ const handleSearch = asyncHandler(async (req, res) => {
   sendResponse(200, resData, res);
 });
 
-//@desc   Search for a product
+//@desc   Find similar products
 //@route  GET /api/findsimilarproducts
 //@access public
-const findSimilarProducts = asyncHandler(async (req, res) => {
+const getSimilarProducts = asyncHandler(async (req, res) => {
   // throw error if it does not exists
   if (!req?.query?.id) {
     throw new AppError('Please pass the Id of the product');
@@ -100,6 +101,22 @@ const findSimilarProducts = asyncHandler(async (req, res) => {
   sendResponse(200, resData, res);
 });
 
+//@desc   Find the reviews for the product
+//@route  GET /api/findproductreviews
+//@access public
+const getProductReviews = asyncHandler(async (req, res) => {
+  // throw error if it does not exists
+  if (!req?.query?.id) {
+    throw new AppError('Please pass the Id of the product');
+  }
+  const [reviews] = await findReviewsByProductId(req?.query?.id);
+  const resData = {
+    status: 'success',
+    data: reviews
+  };
+  sendResponse(200, resData, res);
+});
+
 export default {
   getAllProducts,
   getSingleProduct,
@@ -107,5 +124,6 @@ export default {
   getProductsAndCategories,
   getAllBanners,
   handleSearch,
-  findSimilarProducts
+  getSimilarProducts,
+  getProductReviews
 };
