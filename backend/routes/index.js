@@ -10,6 +10,12 @@ router.get('/getallproducts', viewController.getAllProducts);
 //Get single Product details
 router.get('/getproduct/:id', viewController.getSingleProduct);
 
+// Get brand data for a particular brand
+router.get('/getbrand/:id', viewController.getBrandData);
+
+// Get the category data for a particular category
+router.get('/getcategory/:id', viewController.getCategoryData);
+
 //Get single Category and Product List
 router.get('/getnavlist', viewController.getBrandsAndCategoryList);
 

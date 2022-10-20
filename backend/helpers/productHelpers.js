@@ -139,24 +139,33 @@ export const findProductById = asyncHandler(async (id) => {
 //Find a products by category Id
 export const findProductByCategoryId = asyncHandler(async (id, brId, proId) => {
   const categoryId = ObjectId(id);
-  const brandId = ObjectId(brId);
-  const _id = ObjectId(proId);
+  const query = {
+    categoryId,
+    isDeleted: false
+  };
+  if (brId) {
+    query.brandId = { $ne: ObjectId(brId) };
+  }
+  if (proId) {
+    query._id = { $ne: ObjectId(proId) };
+  }
 
-  const products = await getDb()
-    .collection('products')
-    .find({ categoryId, isDeleted: false, brandId: { $ne: brandId }, _id: { $ne: _id } })
-    .toArray();
+  const products = await getDb().collection('products').find(query).toArray();
   return products;
 });
+
 //Find a product by brand id
 export const findProductByBrandId = asyncHandler(async (id, proId) => {
   const brandId = ObjectId(id);
-  const productId = ObjectId(proId);
+  const query = {
+    isDeleted: false,
+    brandId
+  };
+  if (proId) {
+    query._id = { $ne: ObjectId(proId) };
+  }
 
-  const products = await getDb()
-    .collection('products')
-    .find({ brandId, isDeleted: false, _id: { $ne: productId } })
-    .toArray();
+  const products = await getDb().collection('products').find(query).toArray();
   return products;
 });
 

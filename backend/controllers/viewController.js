@@ -20,11 +20,66 @@ const getAllProducts = asyncHandler(async (req, res) => {
   sendResponse(200, resData, res);
 });
 
+//@desc   get single brand data
+//@route  GET /api/getbrand/:id
+//@access public
+const getBrandData = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  // throwing error if id is not present
+  if (!id) {
+    throw new AppError('Please send the id of the product', 400);
+  }
+
+  // Getting the brand details and the details of the products with that brandId
+  const [products, brandDetails] = await Promise.all([
+    productHelpers.findProductByBrandId(id),
+    brandHelpers.findBrandByID(id)
+  ]);
+
+  // sending response data
+  const resData = {
+    status: 'success',
+    data: { products, brandDetails }
+  };
+  sendResponse(200, resData, res);
+});
+
+//@desc   get single category data
+//@route  GET /api/getcategory/:id
+//@access public
+const getCategoryData = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  // throwing error if id is not present
+  if (!id) {
+    throw new AppError('Please send the id of the product', 400);
+  }
+
+  // Getting the category details and the details of the products with that categoryId
+  const [products, categoryDetails] = await Promise.all([
+    productHelpers.findProductByCategoryId(id),
+    categoryHelpers.findCategoryById(id)
+  ]);
+
+  // sending response
+  const resData = {
+    status: 'success',
+    data: { products,categoryDetails }
+  };
+  sendResponse(200, resData, res);
+});
+
 //@desc   get single product data
 //@route  GET /api/getproduct/:id
 //@access public
 const getSingleProduct = asyncHandler(async (req, res) => {
   const { id } = req.params;
+
+  // throwing error if id is not present
+  if (!id) {
+    throw new AppError('Please send the id of the product', 400);
+  }
 
   const product = await productHelpers.findProductByIdAggregation(id);
   const resData = {
@@ -125,5 +180,7 @@ export default {
   getAllBanners,
   handleSearch,
   getSimilarProducts,
-  getProductReviews
+  getProductReviews,
+  getBrandData,
+  getCategoryData
 };
