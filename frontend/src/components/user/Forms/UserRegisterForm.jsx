@@ -64,7 +64,7 @@ function UserRegisterForm() {
         dispatch(setToast({ data: res, open: true }));
         setFormError('');
         await dispatch(setToken(res));
-        navigate('/');
+        navigate(-2);
       } catch (err) {
         setBtnText('Register');
         setFormError(err.data.message);

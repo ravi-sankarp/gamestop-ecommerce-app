@@ -43,7 +43,7 @@ function UserLoginForm() {
           await dispatch(setToken(res));
           dispatch(setToast({ data: res, open: true }));
           setFormError('');
-          navigate('/');
+          navigate(-1);
         }
       } catch (err) {
         setBtnText('Login');

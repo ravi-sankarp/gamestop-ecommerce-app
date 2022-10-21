@@ -55,6 +55,11 @@ export const extendedViewsApiSlice = apiSlice.injectEndpoints({
     getSingleCategoryData: builder.query({
       query: ({ id }) => `/getcategory/${id}`,
       providesTags: ['productdata', 'categorydata']
+    }),
+
+    getFeaturedProducts: builder.query({
+      query: () => '/getfeaturedproducts',
+      providesTags: ['productdata']
     })
   })
 });
@@ -69,5 +74,6 @@ export const {
   useGetSimilarProductsQuery,
   useGetProductReviewsQuery,
   useGetSingleBrandDataQuery,
-  useGetSingleCategoryDataQuery
+  useGetSingleCategoryDataQuery,
+  useGetFeaturedProductsQuery
 } = extendedViewsApiSlice;

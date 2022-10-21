@@ -15,6 +15,7 @@ import AdminAddNewProductPage from '../../pages/Admin/AdminAddNewProductPage';
 import AdminEditProductPage from '../../pages/Admin/AdminEditProductPage';
 import AdminCouponsPage from '../../pages/Admin/AdminCouponsPage';
 import AdminOffersPage from '../../pages/Admin/AdminOffersPage';
+import AdminSalesReportPage from '../../pages/Admin/AdminSalesReportPage';
 
 function AdminRoutes() {
   return (
@@ -52,6 +53,7 @@ function AdminRoutes() {
             <Route path="coupons" element={<AdminCouponsPage />} />
             <Route path="orders" element={<AdminOrdersPage />} />
             <Route path="payments" element={<AdminPaymentsPage />} />
+            <Route path="salesreport" element={<AdminSalesReportPage />} />
           </Route>
         </Routes>
       </Box>

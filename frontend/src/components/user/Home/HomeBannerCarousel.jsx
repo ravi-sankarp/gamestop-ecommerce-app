@@ -20,10 +20,8 @@ function HomeBannerCarousel() {
     return (
       <Box
         sx={{
-          position: 'fixed',
-          top: '0',
-          width: '98vw',
-          height: '100vh',
+          width: '100%',
+          height: '30vh',
           overflowY: 'hidden',
           display: 'flex',
           alignItems: 'center',
@@ -56,10 +54,9 @@ function HomeBannerCarousel() {
           key={banner._id}
           component="img"
           loading="lazy"
-          height="400"
           src={banner?.bannerImg.imgUrl}
           alt={banner?.title}
-          sx={{ height: '40vh', aspectRatio: '16/9' }}
+          sx={{ height: '50vh', aspectRatio: '16/9', objectFit: 'cover' }}
         />
       ))}
     </Carousel>

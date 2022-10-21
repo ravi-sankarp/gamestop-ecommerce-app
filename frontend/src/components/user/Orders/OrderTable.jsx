@@ -173,7 +173,7 @@ function OrderTable({ items, order, admin }) {
                 <TableCell align="center">Quantity</TableCell>
                 <TableCell align="center">Subtotal</TableCell>
                 <TableCell align="center">Order Status</TableCell>
-               {admin || <TableCell align="center">Actions</TableCell>}
+                {admin || <TableCell align="center">Actions</TableCell>}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -200,7 +200,9 @@ function OrderTable({ items, order, admin }) {
                       data-label="Price"
                       align="center"
                     >
-                      {`₹ ${item?.originalPrice?.toLocaleString()}`}
+                      {`₹ ${
+                        item?.price?.toLocaleString() ?? item?.discountedPrice?.toLocaleString()
+                      }`}
                     </TableCell>
                     <TableCell
                       data-label="Quantity"
@@ -255,61 +257,61 @@ function OrderTable({ items, order, admin }) {
                         : order.orderStatus}
                     </TableCell>
                     {admin || (
-<TableCell
-                      data-label="Actions"
-                      align="center"
->
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          gap: 1,
-                          justifyContent: { xs: 'flex-end', md: 'center' },
-                          '& p': {
-                            fontSize: 15,
-                            cursor: 'pointer',
-                            textDecoration: 'underline'
-                          },
-                          '& p:hover': {
-                            color: '#1a6aed'
-                          }
-                        }}
+                      <TableCell
+                        data-label="Actions"
+                        align="center"
                       >
-                        {order.orderStatus === 'Delivered' ||
-                          order.orderStatus.includes('Cancelled') ||
-                          order.orderStatus === 'Returned' ||
-                          item.returned ||
-                          item.cancelled || (
-                            <Typography
-                              onClick={() => handleCancelRequest({
-                                  orderId: order.orderId,
-                                  productId: item.productId,
-                                  productName: item.productName
-                                })}
-                            >
-                              Cancel Order
-                            </Typography>
-                          )}
-                        {order.orderStatus === 'Delivered' && (
-                          <>
-                            <Typography onClick={() => handleGetInvoice(order)}>
-                              Get Invoice
-                            </Typography>
-                            {calcDayDifference(order.orderStatusUpdatedOn) && (
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            gap: 1,
+                            justifyContent: { xs: 'flex-end', md: 'center' },
+                            '& p': {
+                              fontSize: 15,
+                              cursor: 'pointer',
+                              textDecoration: 'underline'
+                            },
+                            '& p:hover': {
+                              color: '#1a6aed'
+                            }
+                          }}
+                        >
+                          {order.orderStatus === 'Delivered' ||
+                            order.orderStatus.includes('Cancelled') ||
+                            order.orderStatus === 'Returned' ||
+                            item.returned ||
+                            item.cancelled || (
                               <Typography
-                                onClick={() => handleReturnRequest({
+                                onClick={() => handleCancelRequest({
                                     orderId: order.orderId,
                                     productId: item.productId,
                                     productName: item.productName
                                   })}
                               >
-                                Return Product
+                                Cancel Order
                               </Typography>
                             )}
-                          </>
-                        )}
-                      </Box>
-</TableCell>
-)}
+                          {order.orderStatus === 'Delivered' && (
+                            <>
+                              <Typography onClick={() => handleGetInvoice(order)}>
+                                Get Invoice
+                              </Typography>
+                              {calcDayDifference(order.orderStatusUpdatedOn) && (
+                                <Typography
+                                  onClick={() => handleReturnRequest({
+                                      orderId: order.orderId,
+                                      productId: item.productId,
+                                      productName: item.productName
+                                    })}
+                                >
+                                  Return Product
+                                </Typography>
+                              )}
+                            </>
+                          )}
+                        </Box>
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))}
               {!!items.length || (
@@ -334,7 +336,9 @@ function OrderTable({ items, order, admin }) {
                     data-label="Price"
                     align="center"
                   >
-                    {`₹ ${items?.originalPrice?.toLocaleString()}`}
+                    {`₹ ${
+                      items?.price?.toLocaleString() ?? items?.discountedPrice?.toLocaleString()
+                    }`}
                   </TableCell>
                   <TableCell
                     data-label="Quantity"
@@ -383,59 +387,59 @@ function OrderTable({ items, order, admin }) {
                     {order.orderStatus}
                   </TableCell>
                   {admin || (
-<TableCell
-                    data-label="Actions"
-                    align="center"
->
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        gap: 1,
-                        justifyContent: { xs: 'flex-end', md: 'center' },
-                        '& p': {
-                          fontSize: 15,
-                          cursor: 'pointer',
-                          textDecoration: 'underline'
-                        },
-                        '& p:hover': {
-                          color: '#1a6aed'
-                        }
-                      }}
+                    <TableCell
+                      data-label="Actions"
+                      align="center"
                     >
-                      {order.orderStatus === 'Delivered' ||
-                        order.orderStatus.includes('Cancelled') ||
-                        order.orderStatus === 'Returned' || (
-                          <Typography
-                            onClick={() => handleCancelRequest({
-                                orderId: order.orderId,
-                                productId: order.item.productId,
-                                productName: order.item.productName
-                              })}
-                          >
-                            Cancel Order
-                          </Typography>
-                        )}
-                      {order.orderStatus === 'Delivered' && (
-                        <>
-                          <Typography onClick={() => handleGetInvoice(order)}>
-                            Get Invoice
-                          </Typography>
-                          {calcDayDifference(order.orderStatusUpdatedOn) && (
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          gap: 1,
+                          justifyContent: { xs: 'flex-end', md: 'center' },
+                          '& p': {
+                            fontSize: 15,
+                            cursor: 'pointer',
+                            textDecoration: 'underline'
+                          },
+                          '& p:hover': {
+                            color: '#1a6aed'
+                          }
+                        }}
+                      >
+                        {order.orderStatus === 'Delivered' ||
+                          order.orderStatus.includes('Cancelled') ||
+                          order.orderStatus === 'Returned' || (
                             <Typography
-                              onClick={() => handleReturnRequest({
+                              onClick={() => handleCancelRequest({
                                   orderId: order.orderId,
                                   productId: order.item.productId,
                                   productName: order.item.productName
                                 })}
                             >
-                              Return Product
+                              Cancel Order
                             </Typography>
                           )}
-                        </>
-                      )}
-                    </Box>
-</TableCell>
-)}
+                        {order.orderStatus === 'Delivered' && (
+                          <>
+                            <Typography onClick={() => handleGetInvoice(order)}>
+                              Get Invoice
+                            </Typography>
+                            {calcDayDifference(order.orderStatusUpdatedOn) && (
+                              <Typography
+                                onClick={() => handleReturnRequest({
+                                    orderId: order.orderId,
+                                    productId: order.item.productId,
+                                    productName: order.item.productName
+                                  })}
+                              >
+                                Return Product
+                              </Typography>
+                            )}
+                          </>
+                        )}
+                      </Box>
+                    </TableCell>
+                  )}
                 </TableRow>
               )}
             </TableBody>

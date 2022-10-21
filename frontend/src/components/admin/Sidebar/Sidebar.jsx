@@ -229,10 +229,10 @@ function Sidebar() {
             <PaymentOutlinedIcon />
           </Tooltip>
         );
-      case 'Sales':
+      case 'Sales Report':
         return (
           <Tooltip
-            title="Sales"
+            title="Sales Report"
             placement="right-end"
           >
             <AssessmentOutlinedIcon />
@@ -311,11 +311,11 @@ function Sidebar() {
               'Coupons',
               'Orders',
               'Payments',
-              'Sales'
+              'Sales Report'
             ].map((text) => (
               <ListItem
                 component={Link}
-                to={`/admin/${text[0].toLowerCase()}${text.slice(1)}`}
+                to={`/admin/${text.split(' ').join('').toLowerCase()}`}
                 key={text}
                 disablePadding
                 className="text-link"

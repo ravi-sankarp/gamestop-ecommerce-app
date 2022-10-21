@@ -1,5 +1,6 @@
+import { useSelector } from 'react-redux';
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Box, Button, Grid, List, ListItem, Typography } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
 import { Carousel } from 'react-responsive-carousel';
@@ -13,6 +14,8 @@ import useSuccessHandler from '../../../hooks/useSuccessHandler';
 
 function SingleProduct({ product }) {
   const { id: productId } = useParams();
+  const { token } = useSelector((state) => state.auth.data);
+  const navigate = useNavigate();
   const [img, setImg] = useState(product.images[0].imgUrl);
   const [cartText, setCartText] = useState('Add to Cart');
   const [wishlistText, setWishlistText] = useState('Add to Wishlist');
@@ -23,10 +26,6 @@ function SingleProduct({ product }) {
 
   useEffect(() => {
     setImg(product.images[0].imgUrl);
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
   }, [productId]);
 
   const handleImgHover = (e) => {
@@ -35,6 +34,15 @@ function SingleProduct({ product }) {
     }
   };
   const handleAddToCart = async (id) => {
+    if (!token) {
+      const res = {
+        status: 'success',
+        message: 'Please Login first'
+      };
+      await successToast(res);
+      navigate('/login');
+      return;
+    }
     try {
       if (!isLoading) {
         setCartText('Adding...');
@@ -48,6 +56,15 @@ function SingleProduct({ product }) {
     }
   };
   const handleAddToWishlist = async (id) => {
+    if (!token) {
+      const res = {
+        status: 'success',
+        message: 'Please Login first'
+      };
+     await successToast(res);
+      navigate('/login');
+      return;
+    }
     try {
       if (!addToWishlistIsLoading) {
         setWishlistText('Adding...');

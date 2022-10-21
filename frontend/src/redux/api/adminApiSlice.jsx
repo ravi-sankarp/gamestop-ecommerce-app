@@ -226,6 +226,11 @@ export const extendedAdminApiSlice = apiSlice.injectEndpoints({
         method: 'DELETE'
       }),
       invalidatesTags: ['coupons']
+    }),
+
+    getSalesReport: builder.query({
+      query: () => '/admin/getsalesreport',
+      providesTags: ['orders']
     })
   })
 });
@@ -261,5 +266,6 @@ export const {
   useGetBannerDataQuery,
   useAddNewBannerrMutation,
   useEditBannerMutation,
-  useDeleteBannerMutation
+  useDeleteBannerMutation,
+  useGetSalesReportQuery
 } = extendedAdminApiSlice;

@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Tab from '@mui/material/Tab';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
@@ -32,11 +32,18 @@ const StyledTab = styled((props) => (
 
 export default function IconTabs() {
   const [search, setSearch] = useSearchParams();
-  if (!search.get('profile')) {
-    search.set('profile', 'info');
-    setSearch(search);
-  }
+
   const [value, setValue] = useState(search.get('profile') ?? 'info');
+
+  useEffect(() => {
+    if (!search.get('profile')) {
+      search.set('profile', 'info');
+      setSearch(search);
+    }
+    if (value !== search.get('profile')) {
+      setValue(search.get('profile'));
+    }
+  }, [search, setSearch, value]);
 
   const handleChange = (event, newValue) => {
     search.set('profile', newValue);

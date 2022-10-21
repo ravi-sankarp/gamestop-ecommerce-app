@@ -6,7 +6,7 @@ import Typography from '@mui/material/Typography';
 import { Box, Button, CardActionArea, Grid } from '@mui/material';
 import { Link } from 'react-router-dom';
 
-export default function ProductListCards({ products }) {
+export default function ProductListCards({ products, width = 3 }) {
   return (
     <Grid
       container
@@ -21,8 +21,8 @@ export default function ProductListCards({ products }) {
           xs={6}
           sm={6}
           md={6}
-          lg={3}
-          xl={3}
+          lg={width}
+          xl={width}
           align="center"
         >
           <Link
