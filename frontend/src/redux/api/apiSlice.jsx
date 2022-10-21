@@ -2,8 +2,11 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { setAdminToken } from '../reducers/adminAuthSlice';
 import { setToken } from '../reducers/authSlice';
 
+const url = process.env.NODE_ENV === 'production'
+    ? 'https://gamestop.website/api'
+    : 'http://localhost:8000/api';
 const baseQuery = fetchBaseQuery({
-  baseUrl: 'http://localhost:8000/api',
+  baseUrl: url,
   prepareHeaders: (headers, { getState, endpoint }) => {
     const { token, refreshToken } = getState().auth.data;
     const { token: adminToken, refreshToken: adminRefreshToken } = getState().adminAuth.data;

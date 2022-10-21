@@ -38,6 +38,6 @@ router.get('/findsimilarproducts', viewController.getSimilarProducts);
 router.get('/getproductreviews', viewController.getProductReviews);
 
 // Find Product with offers
-router.get('/getfeaturedproducts', viewController.getFeaturedProducts);
+router.get('/wwww', viewController.getFeaturedProducts);
 
 export default router;
