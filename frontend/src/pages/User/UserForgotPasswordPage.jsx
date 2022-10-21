@@ -9,6 +9,7 @@ import StepLabel from '@mui/material/StepLabel';
 import GetOtpForm from '../../components/user/ForgotPassword/GetOtpForm';
 import VerifyOtpForm from '../../components/user/ForgotPassword/VerifyOtpForm';
 import ChangePasswordForm from '../../components/user/ForgotPassword/ChangePasswordForm';
+import HelmetMeta from '../../components/HelmetMeta';
 
 export default function UserForgotPasswordPage() {
   const stateData = useSelector((state) => state.auth.data);
@@ -51,45 +52,48 @@ export default function UserForgotPasswordPage() {
   };
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        minWidth: '100vw',
-        backgroundColor: '#1098ad',
-        justifyContent: 'center',
-        py: 5
-      }}
-    >
+    <>
+      <HelmetMeta title="Forgot Password | Gamestop" />
       <Box
         sx={{
-          width: '80vw',
-          maxWidth: { md: '70vw' },
-          textAlign: 'center',
-          backgroundColor: '#ffffff',
-          minHeight: '50vh',
-          padding: { xs: '20px 10px' },
-          p: { md: 5 },
           display: 'flex',
-          flexDirection: 'column'
+          minWidth: '100vw',
+          backgroundColor: '#1098ad',
+          justifyContent: 'center',
+          py: 5
         }}
       >
-        <Stepper activeStep={activeStep}>
-          {steps.map((label) => {
-            const stepProps = {};
-            const labelProps = {};
+        <Box
+          sx={{
+            width: '80vw',
+            maxWidth: { md: '70vw' },
+            textAlign: 'center',
+            backgroundColor: '#ffffff',
+            minHeight: '50vh',
+            padding: { xs: '20px 10px' },
+            p: { md: 5 },
+            display: 'flex',
+            flexDirection: 'column'
+          }}
+        >
+          <Stepper activeStep={activeStep}>
+            {steps.map((label) => {
+              const stepProps = {};
+              const labelProps = {};
 
-            return (
-              <Step
-                key={label}
-                {...stepProps}
-              >
-                <StepLabel {...labelProps}>{label}</StepLabel>
-              </Step>
-            );
-          })}
-        </Stepper>
-        {checkWhichPage()}
+              return (
+                <Step
+                  key={label}
+                  {...stepProps}
+                >
+                  <StepLabel {...labelProps}>{label}</StepLabel>
+                </Step>
+              );
+            })}
+          </Stepper>
+          {checkWhichPage()}
+        </Box>
       </Box>
-    </Box>
+    </>
   );
 }

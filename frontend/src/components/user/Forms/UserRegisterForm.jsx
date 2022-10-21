@@ -264,7 +264,7 @@ function UserRegisterForm() {
               left: '50%',
               bottom: '-11px',
               transform: 'translateX(-50%)',
-              zIndex: 100
+              zIndex: 2
             }}
           >
             or

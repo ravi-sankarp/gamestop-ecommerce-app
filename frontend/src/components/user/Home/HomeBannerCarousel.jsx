@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import 'react-responsive-carousel/lib/styles/carousel.min.css'; // requires a loader
 import { Carousel } from 'react-responsive-carousel';
-import { Box, CircularProgress } from '@mui/material';
+import { Box, Skeleton } from '@mui/material';
 import { useEffect } from 'react';
 import useApiErrorHandler from '../../../hooks/useApiErrorHandler';
 import { useGetAllBannersQuery } from '../../../redux/api/viewsApiSlice';
@@ -16,7 +16,7 @@ function HomeBannerCarousel() {
     }
   }, [isError, error, handleError]);
 
-  if (isLoading || (isFetching && !isSuccess)) {
+  if (isLoading || isFetching) {
     return (
       <Box
         sx={{
@@ -31,35 +31,38 @@ function HomeBannerCarousel() {
           }
         }}
       >
-        <CircularProgress
-          sx={{ overflow: 'hidden' }}
-          color="primary"
+        <Skeleton
+          variant="rectangular"
+          animation="wave"
+          sx={{ width: '100%', height: '40vh' }}
         />
       </Box>
     );
   }
 
   return (
-    <Carousel
-      showStatus={false}
-      infiniteLoop
-      autoPlay
-      showThumbs={false}
-      stopOnHover
-      dynamicHeight={50}
-      className="home-carousel"
-    >
-      {data?.data?.map((banner) => (
-        <Box
-          key={banner._id}
-          component="img"
-          loading="lazy"
-          src={banner?.bannerImg.imgUrl}
-          alt={banner?.title}
-          sx={{ height: '50vh', aspectRatio: '16/9', objectFit: 'cover' }}
-        />
-      ))}
-    </Carousel>
+    isSuccess && (
+      <Carousel
+        showStatus={false}
+        infiniteLoop
+        autoPlay
+        showThumbs={false}
+        stopOnHover
+        dynamicHeight={50}
+        className="home-carousel"
+      >
+        {data?.data?.map((banner) => (
+          <Box
+            key={banner._id}
+            component="img"
+            loading="lazy"
+            src={banner?.bannerImg.imgUrl}
+            alt={banner?.title}
+            sx={{ height: '50vh', aspectRatio: '16/9', objectFit: 'cover' }}
+          />
+        ))}
+      </Carousel>
+    )
   );
 }
 

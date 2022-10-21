@@ -82,7 +82,8 @@ function GoogleLoginComponent({ text, width, setError }) {
             justifyContent: 'center',
             '&::-webkit-scrollbar': {
               display: 'none'
-            }
+            },
+            zIndex: 10
           }}
         >
           <CircularProgress

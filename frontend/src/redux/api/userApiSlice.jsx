@@ -15,7 +15,7 @@ export const extendedUserApiSlice = apiSlice.injectEndpoints({
 
     getCartTotal: builder.query({
       query: () => '/user/getcarttotal',
-      providesTags: ['']
+      providesTags: ['cart']
     }),
 
     updateCart: builder.mutation({

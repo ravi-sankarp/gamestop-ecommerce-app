@@ -57,7 +57,7 @@ const handleRazorpayPayment = async (data, setPaymentOrderId, handleError) => {
   });
 };
 
-function RazorPayPayment({ setSuccessModal, setMessage, data }) {
+function RazorPayPayment({ setSuccessModal, setMessage, data, addToWallet = false, refetch }) {
   const [paymentOrderId, setPaymentOrderId] = useState(false);
   const {
     data: paymentStatus,
@@ -119,13 +119,18 @@ function RazorPayPayment({ setSuccessModal, setMessage, data }) {
   useEffect(() => {
     if (isSuccessPaymentStatus) {
       if (paymentStatus?.status === 'success') {
-        setSuccessModal(true);
-        setMessage(paymentStatus?.message);
+        if (!addToWallet) {
+          setSuccessModal(true);
+          setMessage(paymentStatus?.message);
+        } else {
+          refetch();
+          handleError(paymentStatus);
+        }
       } else {
         handleError(paymentStatus);
       }
     }
-  }, [handleError, isSuccessPaymentStatus, paymentStatus, setMessage, setSuccessModal]);
+  }, [isSuccessPaymentStatus, paymentStatus]);
   return content;
 }
 

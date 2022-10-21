@@ -153,13 +153,20 @@ function UserLoginForm() {
               left: '50%',
               bottom: '-11px',
               transform: 'translateX(-50%)',
-              zIndex: 100
+              zIndex: 1
             }}
           >
             or
           </Typography>
         </Box>
-        <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}
+        >
           <SecondaryButton
             component={Link}
             to="/otplogin"
@@ -168,7 +175,7 @@ function UserLoginForm() {
               width: '300px',
               p: 1,
               px: 2,
-              mx: 'auto',
+              mx: 0,
               whiteSpace: 'nowrap',
               height: '38px',
               fontSize: '14px',

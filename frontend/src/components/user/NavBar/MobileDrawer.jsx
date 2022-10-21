@@ -11,7 +11,7 @@ import {
   Typography
 } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import MobileDrawerAccordian from './MobileDrawerAccordian';
 import { deleteToken } from '../../../redux/reducers/authSlice';
@@ -20,6 +20,7 @@ import apiSlice from '../../../redux/api/apiSlice';
 
 function MobileDrawer({ handleDrawerToggle }) {
   const [openAlert, setOpenAlert] = useState(false);
+  const { token } = useSelector((state) => state.auth.data);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -65,21 +66,41 @@ function MobileDrawer({ handleDrawerToggle }) {
           <MobileDrawerAccordian handleDrawerToggle={handleDrawerToggle} />
         </Box>
         <Divider />
-        <Button
-          onClick={handleAlertShow}
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1,
-            position: 'absolute',
-            bottom: '10px',
-            left: '50%',
-            transform: 'translateX(-50%)'
-          }}
-        >
-          Logout
-          <LogoutOutlinedIcon />
-        </Button>
+        {token && (
+          <Button
+            onClick={handleAlertShow}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              position: 'absolute',
+              bottom: '10px',
+              left: '50%',
+              transform: 'translateX(-50%)'
+            }}
+          >
+            Logout
+            <LogoutOutlinedIcon />
+          </Button>
+        )}
+        {!token && (
+          <Button
+            component={Link}
+            to="/login"
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              position: 'absolute',
+              bottom: '10px',
+              left: '50%',
+              transform: 'translateX(-50%)'
+            }}
+          >
+            Login
+            <LogoutOutlinedIcon />
+          </Button>
+        )}
       </Box>
       <Dialog
         open={openAlert}

@@ -56,7 +56,7 @@ function ProductSort() {
         alignItems: 'center',
         justifyContent: 'center',
         gap: 1,
-        minWidth: '200px',
+        minWidth: { md: '200px' },
         borderRadius: '2px',
         boxShadow: '0 0 0 1px #999999',
         margin: '20px',
@@ -85,7 +85,10 @@ function ProductSort() {
       </Typography>
       <ExpandMoreOutlinedIcon className="dropdown-icon" />
 
-      <div onClick={handleSort} className="navbar-dropdown sort-dropdown">
+      <div
+        onClick={handleSort}
+        className="navbar-dropdown sort-dropdown"
+      >
         <Typography variant="subtitle">Recommended</Typography>
         <Typography variant="subtitle">Price(Low - High)</Typography>
         <Typography variant="subtitle">Price(High-Low)</Typography>

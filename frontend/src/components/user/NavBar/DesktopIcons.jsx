@@ -195,7 +195,7 @@ function DesktopIcons() {
           justifyContent: 'flex-end',
           ml: { xs: 'auto', sm: 0 },
           gap: 2,
-          pr: 3
+          pr: { md: 3 }
         }}
       >
         {navItems.map((item) => displayItem(item))}

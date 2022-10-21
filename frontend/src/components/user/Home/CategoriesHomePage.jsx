@@ -1,6 +1,7 @@
-import { Box, CircularProgress, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import React from 'react';
 import { useSelector } from 'react-redux';
+import CardLoadingHome from './CardLoadingHome';
 import HomeListCards from './HomeCards';
 
 function CategoriesHomePage() {
@@ -21,10 +22,7 @@ function CategoriesHomePage() {
           }
         }}
       >
-        <CircularProgress
-          sx={{ overflow: 'hidden' }}
-          color="primary"
-        />
+        <CardLoadingHome />
       </Box>
     );
   }

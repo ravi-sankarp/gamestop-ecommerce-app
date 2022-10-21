@@ -50,7 +50,11 @@ function Login({ handleAdminLogin, formError }) {
         autoComplete="off"
         onSubmit={handleSubmit(onSubmitHandler)}
       >
-        <Typography variant="h4" component="h1" sx={{ mb: '2rem', textAlign: 'center' }}>
+        <Typography
+          variant="h4"
+          component="h1"
+          sx={{ mb: '2rem', textAlign: 'center' }}
+        >
           Login
         </Typography>
         <Typography
@@ -61,7 +65,10 @@ function Login({ handleAdminLogin, formError }) {
           Enter your email and password to continue
         </Typography>
         {formError && (
-          <Alert sx={{ mb: 5 }} severity="error">
+          <Alert
+            sx={{ mb: 5 }}
+            severity="error"
+          >
             {formError}!
           </Alert>
         )}
@@ -86,7 +93,10 @@ function Login({ handleAdminLogin, formError }) {
           helperText={errors.password ? errors.password.message : ''}
           {...register('password')}
         />
-        <PrimaryButton sx={{ width: '200px', p: 1 }} type="submit">
+        <PrimaryButton
+          sx={{ width: '200px', p: 1, mx: 'auto' }}
+          type="submit"
+        >
           Login
         </PrimaryButton>
       </Box>

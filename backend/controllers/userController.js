@@ -973,9 +973,10 @@ const checkPaymentStatus = asyncHandler(async (req, res) => {
   if (result?.status === 'success') {
     res.json({
       status: 'success',
-      message: 'Order Placed'
+      message: result.operation === 'Add to Wallet' ? 'Added money to wallet' : 'Order Placed'
     });
   } else {
+    res.status(400);
     res.json({
       status: 'failed',
       message: 'order failed'

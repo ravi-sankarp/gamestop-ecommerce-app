@@ -42,7 +42,7 @@ function CategoryPage() {
   }
   return (
     <>
-      <HelmetMeta title={`${data?.data?.name ?? 'Brand Page'} | Gamestop`} />
+      <HelmetMeta title={`${data?.data?.name ?? 'Category Page'} | Gamestop`} />
       <Box sx={{ overflowX: 'hidden', minHeight: '100vh', p: { xs: 1, md: 3, lg: 4 } }}>
         {content}
         {isSuccess && (

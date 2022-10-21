@@ -10,13 +10,16 @@ import {
   FormControl,
   FormControlLabel,
   FormLabel,
+  IconButton,
   Radio,
   RadioGroup,
   TextField,
   Typography
 } from '@mui/material';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import RemoveIcon from '@mui/icons-material/Remove';
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { PrimaryButton } from '../../MaterialUiConfig/styled';
 import {
@@ -30,6 +33,7 @@ import UserAddressForm from './Forms/UserAddressForm';
 import RazorPayPayment from './Payments/RazorPayPayment';
 import useSuccessHandler from '../../hooks/useSuccessHandler';
 import PaypalPayment from './Payments/PaypalPayment';
+import apiSlice from '../../redux/api/apiSlice';
 
 function Checkout({ cartData, addressData, addressMessage, walletBalance }) {
   const [open, setOpen] = useState(false);
@@ -48,6 +52,7 @@ function Checkout({ cartData, addressData, addressMessage, walletBalance }) {
   const [successModal, setSuccessModal] = useState(false);
 
   const [couponCode, setCouponCode] = useState('');
+  const dispatch = useDispatch();
 
   const navigate = useNavigate();
   const successToast = useSuccessHandler();
@@ -165,8 +170,10 @@ function Checkout({ cartData, addressData, addressMessage, walletBalance }) {
     }
   };
 
-  const handleGotoOrders = () => {
+  const handleGotoOrders = async () => {
     navigate('/profile?profile=orders', { replace: true });
+    await dispatch(apiSlice.util.resetApiState());
+
     setSuccessModal(false);
   };
 
@@ -239,6 +246,16 @@ function Checkout({ cartData, addressData, addressMessage, walletBalance }) {
               onChange={(e) => setCouponCode(e.target.value)}
             />
             <PrimaryButton onClick={handleCouponCheck}>{couponBtnTxt}</PrimaryButton>
+            {!!couponDiscount && (
+              <IconButton
+                onClick={() => {
+                  setCouponCode('');
+                  setCouponDiscount(0);
+                }}
+              >
+                <DeleteForeverIcon sx={{ color: '#000' }} />
+              </IconButton>
+            )}
           </Box>
           <Typography
             color="red"

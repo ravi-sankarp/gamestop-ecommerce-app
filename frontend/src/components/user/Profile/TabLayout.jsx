@@ -43,6 +43,19 @@ export default function IconTabs() {
     if (value !== search.get('profile')) {
       setValue(search.get('profile'));
     }
+    if (search.get('profile')) {
+      const profile = search.get('profile');
+      if (
+        profile !== 'info'
+        && profile !== 'address'
+        && profile !== 'wallet'
+        && profile !== 'orders'
+      ) {
+        search.set('profile', 'info');
+        setSearch(search);
+        setValue('info');
+      }
+    }
   }, [search, setSearch, value]);
 
   const handleChange = (event, newValue) => {

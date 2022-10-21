@@ -16,6 +16,7 @@ import AdminEditProductPage from '../../pages/Admin/AdminEditProductPage';
 import AdminCouponsPage from '../../pages/Admin/AdminCouponsPage';
 import AdminOffersPage from '../../pages/Admin/AdminOffersPage';
 import AdminSalesReportPage from '../../pages/Admin/AdminSalesReportPage';
+import PageNotFound from '../../components/user/PageNotFound';
 
 function AdminRoutes() {
   return (
@@ -30,7 +31,10 @@ function AdminRoutes() {
     >
       <Sidebar />
       <Routes>
-        <Route path="/login" element={<AdminLoginPage />} />
+        <Route
+          path="/login"
+          element={<AdminLoginPage />}
+        />
       </Routes>
       <Box
         sx={{
@@ -40,20 +44,66 @@ function AdminRoutes() {
         }}
       >
         <Routes>
-          <Route path="/" element={<AdminOutlet />}>
-            <Route path="dashboard" element={<AdminDashboardPage />} />
-            <Route path="users" element={<AdminUsersPage />} />
-            <Route path="products" element={<AdminProductsPage />} />
-            <Route path="addnewproduct" element={<AdminAddNewProductPage />} />
-            <Route path="editproduct/:id" element={<AdminEditProductPage />} />
-            <Route path="categories" element={<AdminCategoryPage />} />
-            <Route path="brands" element={<AdminBrandsPage />} />
-            <Route path="banners" element={<AdminBannersPage />} />
-            <Route path="offers" element={<AdminOffersPage />} />
-            <Route path="coupons" element={<AdminCouponsPage />} />
-            <Route path="orders" element={<AdminOrdersPage />} />
-            <Route path="payments" element={<AdminPaymentsPage />} />
-            <Route path="salesreport" element={<AdminSalesReportPage />} />
+          <Route
+            path="*"
+            element={<PageNotFound />}
+          />
+          <Route
+            path="/"
+            element={<AdminOutlet />}
+          >
+            <Route
+              path="dashboard"
+              element={<AdminDashboardPage />}
+            />
+            <Route
+              path="users"
+              element={<AdminUsersPage />}
+            />
+            <Route
+              path="products"
+              element={<AdminProductsPage />}
+            />
+            <Route
+              path="addnewproduct"
+              element={<AdminAddNewProductPage />}
+            />
+            <Route
+              path="editproduct/:id"
+              element={<AdminEditProductPage />}
+            />
+            <Route
+              path="categories"
+              element={<AdminCategoryPage />}
+            />
+            <Route
+              path="brands"
+              element={<AdminBrandsPage />}
+            />
+            <Route
+              path="banners"
+              element={<AdminBannersPage />}
+            />
+            <Route
+              path="offers"
+              element={<AdminOffersPage />}
+            />
+            <Route
+              path="coupons"
+              element={<AdminCouponsPage />}
+            />
+            <Route
+              path="orders"
+              element={<AdminOrdersPage />}
+            />
+            <Route
+              path="payments"
+              element={<AdminPaymentsPage />}
+            />
+            <Route
+              path="salesreport"
+              element={<AdminSalesReportPage />}
+            />
           </Route>
         </Routes>
       </Box>

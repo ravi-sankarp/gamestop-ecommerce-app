@@ -39,7 +39,6 @@ function AllProductsPage() {
     );
   }
   if (isError) {
-    console.log({ error });
     content = error.message;
     dispatch(setToast({ open: true, data: error }));
   }
@@ -63,7 +62,7 @@ function AllProductsPage() {
         <Box
           sx={{
             display: 'flex',
-            justifyContent: { xs: 'space-between' },
+            justifyContent: 'space-between',
             height: '5rem',
             alignItems: 'center',
             mb: 3
