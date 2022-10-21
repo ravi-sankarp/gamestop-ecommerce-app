@@ -591,7 +591,7 @@ const listAllOrders = asyncHandler(async (req, res) => {
     orderHelpers.findAllOrders(req.query),
     orderHelpers.getOrderStatusCount()
   ]);
-  
+
   const resData = {
     status: 'success',
     data: { orders, count }
@@ -1151,6 +1151,18 @@ const deleteCoupon = asyncHandler(async (req, res) => {
   sendResponse(200, resData, res);
 });
 
+//@desc   Get the sales data of all the products
+//@route  GET /api/getsalesdata
+//@access private
+const getSalesReport = asyncHandler(async (req, res) => {
+  const orders = await orderHelpers.findAllSales(req.query);
+  const resData = {
+    status: 'success',
+    data: orders
+  };
+  sendResponse(200, resData, res);
+});
+
 export default {
   listUsers,
   editUser,
@@ -1183,5 +1195,6 @@ export default {
   getAllCoupons,
   addNewCoupon,
   editCoupon,
-  deleteCoupon
+  deleteCoupon,
+  getSalesReport
 };

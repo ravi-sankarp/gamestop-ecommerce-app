@@ -317,3 +317,81 @@ export const getOrderStatusCount = asyncHandler(async () => {
   const result = await getDb().collection('orders').aggregate(agg).toArray();
   return result;
 });
+
+//find all status
+export const findAllSales = asyncHandler(async (query) => {
+  const agg = [
+    {
+      $match: {
+        'order.orderStatus': 'Delivered'
+      }
+    },
+    {
+      $sort: {
+        'order.orderedOn': -1
+      }
+    },
+    {
+      $group: {
+        _id: null,
+        orders: {
+          $push: '$order'
+        }
+      }
+    }
+  ];
+  // if a query exists then filter according to it
+  if (query?.filter) {
+    const { filter } = query;
+    if (filter === 'yesterday') {
+      agg.unshift({
+        $match: {
+          'order.orderedOn': {
+            $gt: new Date(new Date() - 60 * 60 * 24 * 1000)
+          }
+        }
+      });
+    }
+    if (filter === 'last month') {
+      agg.unshift({
+        $match: {
+          'order.orderedOn': {
+            $gt: new Date(new Date() - 60 * 60 * 24 * 1000 * 29)
+          }
+        }
+      });
+    }
+    if (filter === 'last week') {
+      agg.unshift({
+        $match: {
+          'order.orderedOn': {
+            $gt: new Date(new Date() - 60 * 60 * 24 * 1000 * 6)
+          }
+        }
+      });
+    }
+    if (filter === 'last week') {
+      agg.unshift({
+        $match: {
+          'order.orderedOn': {
+            $gt: new Date(new Date() - 60 * 60 * 24 * 1000 * 6)
+          }
+        }
+      });
+    }
+  }
+  if (query?.minDate && query?.maxDate) {
+    const { minDate, maxDate } = query;
+
+    agg.unshift({
+      $match: {
+        'order.orderedOn': {
+          $gte: new Date(minDate),
+          lte: new Date(maxDate)
+        }
+      }
+    });
+  }
+  const result = await getDb().collection('orders').aggregate(agg).toArray();
+  return result[0]?.orders;
+});

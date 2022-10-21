@@ -37,4 +37,7 @@ router.get('/findsimilarproducts', viewController.getSimilarProducts);
 // Get product reviews
 router.get('/getproductreviews', viewController.getProductReviews);
 
+// Find Product with offers
+router.get('/getfeaturedproducts', viewController.getFeaturedProducts);
+
 export default router;

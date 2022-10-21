@@ -65,7 +65,7 @@ const getCategoryData = asyncHandler(async (req, res) => {
   // sending response
   const resData = {
     status: 'success',
-    data: { products,categoryDetails }
+    data: { products, categoryDetails }
   };
   sendResponse(200, resData, res);
 });
@@ -172,6 +172,18 @@ const getProductReviews = asyncHandler(async (req, res) => {
   sendResponse(200, resData, res);
 });
 
+//@desc   Find the products with good offers
+//@route  GET /api/getfeaturedproducts
+//@access public
+const getFeaturedProducts = asyncHandler(async (req, res) => {
+  const products = await productHelpers.findFeaturedProducts();
+  const resData = {
+    status: 'success',
+    data: products
+  };
+  sendResponse(200, resData, res);
+});
+
 export default {
   getAllProducts,
   getSingleProduct,
@@ -182,5 +194,6 @@ export default {
   getSimilarProducts,
   getProductReviews,
   getBrandData,
-  getCategoryData
+  getCategoryData,
+  getFeaturedProducts
 };

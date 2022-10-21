@@ -143,4 +143,7 @@ router.put('/editcoupon/:id', protect, checkAdmin, adminController.editCoupon);
 // Delete an existing coupon
 router.delete('/deletecoupon/:id', protect, checkAdmin, adminController.deleteCoupon);
 
+// Get Sales Data
+router.get('/getsalesreport', protect, checkAdmin, adminController.getSalesReport);
+
 export default router;

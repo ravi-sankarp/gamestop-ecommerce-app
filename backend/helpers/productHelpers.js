@@ -360,3 +360,12 @@ export const updateProductRating = asyncHandler(async (id, rating) => {
     }
   );
 });
+
+// Find featured Product
+export const findFeaturedProducts = asyncHandler(async () => {
+  const products = await getDb()
+    .collection('products')
+    .find({ $expr: { $lt: ['$discountedPrice', '$price'] } }).limit(4)
+    .toArray();
+  return products;
+});
