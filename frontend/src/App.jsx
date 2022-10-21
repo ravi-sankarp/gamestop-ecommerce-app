@@ -7,6 +7,7 @@ import theme from './MaterialUiConfig/themes';
 import DisplayMessage from './components/DisplayMessage';
 import './App.css';
 import ScrollToTop from './components/ScrollToTop';
+import PageNotFound from './components/user/PageNotFound';
 
 function App() {
   return (
@@ -21,6 +22,11 @@ function App() {
           <Route
             path="/*"
             element={<UserRoutes />}
+          />
+
+          <Route
+            path="*"
+            element={<PageNotFound />}
           />
         </Routes>
         <DisplayMessage />
