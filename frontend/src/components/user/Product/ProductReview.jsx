@@ -13,7 +13,8 @@ function ProductReview() {
   const { token } = useSelector((state) => state.auth.data);
   const [open, setOpen] = useState(false);
   const { id } = useParams();
-  const { data, isLoading, isFetching, isSuccess, isError, error } = useGetProductReviewsQuery(id);
+  const { data, isLoading, isFetching, isSuccess, isError,
+     error, refetch } = useGetProductReviewsQuery(id);
   const {
     isLoading: isLoadingEligibility,
     isFetching: isFetchingEligibility,
@@ -105,7 +106,7 @@ function ProductReview() {
       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <PrimaryButton
           onClick={toggleForm}
-          sx={checkEligible ? { display: 'none' } : { display: 'block' }}
+          sx={checkEligible() ? { display: 'none' } : { display: 'block' }}
         >
           Post a review
         </PrimaryButton>
@@ -168,6 +169,7 @@ function ProductReview() {
       <AddReviewForm
         open={open}
         toggleForm={toggleForm}
+        refetch={refetch}
       />
     </Box>
   );

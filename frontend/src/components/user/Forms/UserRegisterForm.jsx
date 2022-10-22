@@ -86,7 +86,7 @@ function UserRegisterForm() {
     >
       <Box
         sx={{
-          width: { xs: '100', sm: '60vw', md: '50vw' },
+          width: { xs: '70vw', sm: '60vw', md: '50vw' },
           maxWidth: { md: '30vw' },
           p: { xs: 0, md: 5 },
           px: { xs: 4 },
@@ -107,8 +107,30 @@ function UserRegisterForm() {
           component="h1"
           sx={{ mb: '2rem', textAlign: 'center' }}
         >
-          Register
+          Sign Up
         </Typography>
+        <GoogleLoginComponent
+          text="signup_with"
+          width={250}
+          setError={setFormError}
+        />
+        <Box sx={{ position: 'relative', my: 4, mb: 5 }}>
+          <Divider />
+          <Typography
+            sx={{
+              background: '#fff',
+              px: 1,
+              position: 'absolute',
+              left: '50%',
+              bottom: '-11px',
+              transform: 'translateX(-50%)',
+              zIndex: 2
+            }}
+          >
+            or
+          </Typography>
+        </Box>
+
         {/* <Typography
           variant="subtitle1"
           component="h1"
@@ -130,7 +152,8 @@ function UserRegisterForm() {
         >
           <Grid
             item
-            xs={6}
+            xs={12}
+            sm={6}
           >
             <TextField
               size="small"
@@ -146,7 +169,8 @@ function UserRegisterForm() {
           </Grid>
           <Grid
             item
-            xs={6}
+            xs={12}
+            sm={6}
           >
             <TextField
               size="small"
@@ -162,7 +186,8 @@ function UserRegisterForm() {
           </Grid>
           <Grid
             item
-            xs={6}
+            xs={12}
+            sm={6}
           >
             <TextField
               size="small"
@@ -178,7 +203,8 @@ function UserRegisterForm() {
           </Grid>
           <Grid
             item
-            xs={6}
+            xs={12}
+            sm={6}
           >
             <TextField
               size="small"
@@ -194,7 +220,8 @@ function UserRegisterForm() {
           </Grid>
           <Grid
             item
-            xs={6}
+            xs={12}
+            sm={6}
           >
             <TextField
               size="small"
@@ -210,7 +237,8 @@ function UserRegisterForm() {
           </Grid>
           <Grid
             item
-            xs={6}
+            xs={12}
+            sm={6}
           >
             <TextField
               size="small"
@@ -249,32 +277,11 @@ function UserRegisterForm() {
           </Grid>
         </Grid>
         <SecondaryButton
-          sx={{ width: '400px', p: 1, mx: 'auto' }}
+          sx={{ width: '250px', p: 1, mx: 'auto' }}
           type="submit"
         >
           {btnText}
         </SecondaryButton>
-        <Box sx={{ position: 'relative', mb: 4, mt: 2 }}>
-          <Divider />
-          <Typography
-            sx={{
-              background: '#fff',
-              px: 1,
-              position: 'absolute',
-              left: '50%',
-              bottom: '-11px',
-              transform: 'translateX(-50%)',
-              zIndex: 2
-            }}
-          >
-            or
-          </Typography>
-        </Box>
-        <GoogleLoginComponent
-          text="signup_with"
-          width={400}
-          setError={setFormError}
-        />
         <Typography
           sx={{ mt: 3, color: '#862e9c' }}
           variant="subtitle2"

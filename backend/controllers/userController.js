@@ -331,6 +331,11 @@ const getCartTotal = asyncHandler(async (req, res) => {
   let resData;
   const [cart] = await cartHelpers.findCartByUserId(_id);
 
+// if cart is empty
+if(!cart){
+   throw new AppError('Your cart is empty ! Cannnot place order', 400);
+}
+
   //check if any product is out of stock
   const outOfStock = cart.items.find((item) => item.productDetails.stock < item.count);
 
@@ -1196,6 +1201,11 @@ const returnOrder = asyncHandler(async (req, res) => {
 const generateInvoice = asyncHandler(async (req, res) => {
   const orderId = req.params.id;
 
+  //throw error if it does not exist
+  if (!orderId) {
+    throw new AppError('Please provide the order ID', 400);
+  }
+
   //find corresponding order details
   const { order } = await findOrderByOrderId(orderId);
 
@@ -1230,7 +1240,7 @@ const generateInvoice = asyncHandler(async (req, res) => {
   });
   order.totalAmountDiscounted = order.totalAmountDiscounted.toLocaleString();
   if (order?.item) {
-    order.item.discountedPrice = order.item.discountedPrice.toLocaleString();
+    order.item.price = order.item.price.toLocaleString();
   }
   if (order?.items) {
     order.items = order.items.filter((item) => {

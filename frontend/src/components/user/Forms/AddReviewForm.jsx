@@ -1,7 +1,6 @@
 /* eslint-disable react/jsx-one-expression-per-line */
 /* eslint-disable react/jsx-props-no-spreading */
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import {
   Alert,
@@ -19,17 +18,16 @@ import { useForm } from 'react-hook-form';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import * as yup from 'yup';
 import { PrimaryButton } from '../../../MaterialUiConfig/styled';
-import { setToast } from '../../../redux/reducers/toastSlice';
 import { useAddNewReviewMutation } from '../../../redux/api/userApiSlice';
+import useSuccessHandler from '../../../hooks/useSuccessHandler';
 
-function AddReviewForm({ open, toggleForm }) {
+function AddReviewForm({ open, toggleForm, refetch }) {
   const [rating, setRating] = useState();
   const [ratingError, setRatingError] = useState();
   const [formError, setFormError] = useState('');
   const [btnText, setBtnText] = useState('Add Review');
-  const dispatch = useDispatch();
   const { id } = useParams();
-
+  const successHandler = useSuccessHandler();
   const [addReview, { isLoading }] = useAddNewReviewMutation();
   const schema = yup.object().shape({
     description: yup
@@ -60,7 +58,8 @@ function AddReviewForm({ open, toggleForm }) {
           rating,
           description: data.description
         }).unwrap();
-        dispatch(setToast({ data: res, open: true }));
+        successHandler(res);
+        refetch();
         setFormError('');
         toggleForm();
         setBtnText('Add Review');

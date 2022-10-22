@@ -80,7 +80,7 @@ function CheckoutPage() {
   }
 
   if (isErrorCart) {
-    content = (
+   return (
       <>
         <HelmetMeta title="Gamestop Checkout" />
 

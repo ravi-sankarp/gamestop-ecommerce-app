@@ -15,7 +15,7 @@ export const extendedUserApiSlice = apiSlice.injectEndpoints({
 
     getCartTotal: builder.query({
       query: () => '/user/getcarttotal',
-      providesTags: ['cart']
+      providesTags: ['orders']
     }),
 
     updateCart: builder.mutation({
@@ -159,7 +159,7 @@ export const extendedUserApiSlice = apiSlice.injectEndpoints({
         method: 'POST',
         body: data
       }),
-      invalidatesTags: ['orders', 'cart', 'productdata']
+      invalidatesTags: ['cart', 'productdata']
     }),
 
     purchaseWithWallet: builder.mutation({
@@ -168,7 +168,7 @@ export const extendedUserApiSlice = apiSlice.injectEndpoints({
         method: 'POST',
         body: data
       }),
-      invalidatesTags: ['orders', 'cart', 'productdata']
+      invalidatesTags: ['cart', 'productdata']
     }),
 
     createRazorpayOrder: builder.mutation({

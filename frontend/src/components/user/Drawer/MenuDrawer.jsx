@@ -51,19 +51,26 @@ export default function MenuDrawer() {
         }}
         PaperProps={{
           style: {
-            minWidth: 'max-content'
+            minWidth: 'max-content',
+            overFlowY: 'auto'
           }
         }}
-        sx={{ width: '30vw' }}
+        sx={{ minWidth: '30vw', overflowY: 'auto' }}
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
       >
         <Box sx={{ display: 'flex', maxHeight: '2.5rem', p: 0, justifyContent: 'space-around' }}>
-          <PrimaryButton sx={{ p: '1rem', mt: 0 }} onClick={handleClear}>
+          <PrimaryButton
+            sx={{ p: '1rem', mt: 0 }}
+            onClick={handleClear}
+          >
             Clear All
           </PrimaryButton>
-          <PrimaryButton sx={{ p: '1rem', mt: 0 }} onClick={handleClose}>
+          <PrimaryButton
+            sx={{ p: '1rem', mt: 0 }}
+            onClick={handleClose}
+          >
             Apply
           </PrimaryButton>
         </Box>

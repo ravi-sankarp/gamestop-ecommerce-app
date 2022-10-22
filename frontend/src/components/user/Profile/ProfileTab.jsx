@@ -198,22 +198,24 @@ function ProfileTab() {
                     {...register('lastName')}
                   />
                 </Grid>
-                <Grid
-                  item
-                  xs={6}
-                >
-                  <TextField
-                    sx={{ mb: 2 }}
-                    label="Email"
-                    fullWidth
-                    required
-                    type="email"
-                    disabled={!isEdit}
-                    error={!!errors.email}
-                    helperText={errors.email ? errors.email.message : ''}
-                    {...register('email')}
-                  />
-                </Grid>
+                {googleAuth || (
+                  <Grid
+                    item
+                    xs={6}
+                  >
+                    <TextField
+                      sx={{ mb: 2 }}
+                      label="Email"
+                      fullWidth
+                      required
+                      type="email"
+                      disabled={!isEdit}
+                      error={!!errors.email}
+                      helperText={errors.email ? errors.email.message : ''}
+                      {...register('email')}
+                    />
+                  </Grid>
+                )}
                 <Grid
                   item
                   xs={6}

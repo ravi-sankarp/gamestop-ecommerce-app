@@ -92,7 +92,6 @@ function Checkout({ cartData, addressData, addressMessage, walletBalance }) {
         setBtnText('Confirm Order');
       }
     } catch (err) {
-      console.error(err);
       setError(err.data.message || 'Something went wrong');
       setBtnText('Confirm Order');
     }
