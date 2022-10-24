@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
+import apiSlice from '../redux/api/apiSlice';
+import { deleteAdminToken } from '../redux/reducers/adminAuthSlice';
 import { deleteToken } from '../redux/reducers/authSlice';
 import { setToast } from '../redux/reducers/toastSlice';
 
@@ -9,60 +11,41 @@ function useApiErrorHandler() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const handleTokenDelete = async () => {
+    if (pathname.split('/').includes('admin')) {
+      await dispatch(deleteAdminToken());
+      navigate('/admin/login');
+    } else {
+      await dispatch(deleteToken());
+      navigate('/login');
+    }
+    await dispatch(apiSlice.util.resetApiState());
+  };
   useEffect(() => {
     if (error) {
       dispatch(setToast({ open: true, data: error.data || error }));
       if (error?.data?.statusCode === 403) {
-        dispatch(deleteToken());
-        if (pathname.split('/').includes('admin')) {
-          navigate('/admin/login');
-        } else {
-          navigate('/login');
-        }
+        handleTokenDelete();
       }
       if (error?.data?.name === 'TokenExpiredError') {
-        dispatch(deleteToken());
-        if (pathname.split('/').includes('admin')) {
-          navigate('/admin/login');
-        } else {
-          navigate('/login');
-        }
+        handleTokenDelete();
       }
       if (error?.data?.message === 'User recently changed password! Login again') {
-        dispatch(deleteToken());
-        if (pathname.split('/').includes('admin')) {
-          navigate('/admin/login');
-        } else {
-          navigate('/login');
-        }
+        handleTokenDelete();
+        dispatch(apiSlice.util.resetApiState());
       }
       if (error?.data?.message === 'Your session has expired! Please log in again.') {
-        dispatch(deleteToken());
-        if (pathname.split('/').includes('admin')) {
-          navigate('/admin/login');
-        } else {
-          navigate('/login');
-         }
-       }
+        handleTokenDelete();
+      }
       if (error?.data?.message === 'The user no longer exists') {
-        dispatch(deleteToken());
-        if (pathname.split('/').includes('admin')) {
-          navigate('/admin/login');
-        } else {
-          navigate('/login');
-        }
+        handleTokenDelete();
       }
       if (error?.data?.message === 'Invalid token. Please log in again!') {
-        dispatch(deleteToken());
-        if (pathname.split('/').includes('admin')) {
-          navigate('/admin/login');
-        } else {
-          navigate('/login');
-        }
+        handleTokenDelete();
       }
       setError(null);
     }
-  }, [error, dispatch, navigate, pathname]);
+  }, [error, dispatch, navigate, pathname, handleTokenDelete]);
   return setError;
 }
 
