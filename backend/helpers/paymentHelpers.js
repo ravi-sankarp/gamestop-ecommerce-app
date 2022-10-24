@@ -29,7 +29,6 @@ export const findAllPayments = asyncHandler(async (query) => {
   }
 
   const payments = await getDb().collection('payments').aggregate(agg).toArray();
-  console.log(payments);
   return payments;
 });
 

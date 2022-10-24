@@ -28,6 +28,7 @@ import {
   useReturnOrderMutation
 } from '../../../redux/api/userApiSlice';
 import OrderPriceDetails from './OrderPriceDetails';
+import { PrimaryButton } from '../../../MaterialUiConfig/styled';
 
 function OrderTable({ items, order, admin }) {
   const [open, setOpen] = useState(false);
@@ -152,6 +153,7 @@ function OrderTable({ items, order, admin }) {
         in={open}
         timeout="auto"
         unmountOnExit
+        sx={{ maxWidth: { xs: '80vw', md: '80vw' } }}
       >
         <Box sx={{ margin: 1 }}>
           <Typography
@@ -250,7 +252,7 @@ function OrderTable({ items, order, admin }) {
                           }}
                         />
                       )}
-                      {item.retured
+                      {item.returned
                         ? 'Item Returned'
                         : item.cancelled
                         ? 'Item Cancelled'
@@ -291,24 +293,18 @@ function OrderTable({ items, order, admin }) {
                                 Cancel Order
                               </Typography>
                             )}
-                          {order.orderStatus === 'Delivered' && (
-                            <>
-                              <Typography onClick={() => handleGetInvoice(order)}>
-                                Get Invoice
+                          {order.orderStatus === 'Delivered' &&
+                            calcDayDifference(order.orderStatusUpdatedOn) && (
+                              <Typography
+                                onClick={() => handleReturnRequest({
+                                    orderId: order.orderId,
+                                    productId: item.productId,
+                                    productName: item.productName
+                                  })}
+                              >
+                                Return Product
                               </Typography>
-                              {calcDayDifference(order.orderStatusUpdatedOn) && (
-                                <Typography
-                                  onClick={() => handleReturnRequest({
-                                      orderId: order.orderId,
-                                      productId: item.productId,
-                                      productName: item.productName
-                                    })}
-                                >
-                                  Return Product
-                                </Typography>
-                              )}
-                            </>
-                          )}
+                            )}
                         </Box>
                       </TableCell>
                     )}
@@ -419,24 +415,18 @@ function OrderTable({ items, order, admin }) {
                               Cancel Order
                             </Typography>
                           )}
-                        {order.orderStatus === 'Delivered' && (
-                          <>
-                            <Typography onClick={() => handleGetInvoice(order)}>
-                              Get Invoice
+                        {order.orderStatus === 'Delivered' &&
+                          calcDayDifference(order.orderStatusUpdatedOn) && (
+                            <Typography
+                              onClick={() => handleReturnRequest({
+                                  orderId: order.orderId,
+                                  productId: order.item.productId,
+                                  productName: order.item.productName
+                                })}
+                            >
+                              Return Product
                             </Typography>
-                            {calcDayDifference(order.orderStatusUpdatedOn) && (
-                              <Typography
-                                onClick={() => handleReturnRequest({
-                                    orderId: order.orderId,
-                                    productId: order.item.productId,
-                                    productName: order.item.productName
-                                  })}
-                              >
-                                Return Product
-                              </Typography>
-                            )}
-                          </>
-                        )}
+                          )}
                       </Box>
                     </TableCell>
                   )}
@@ -453,6 +443,11 @@ function OrderTable({ items, order, admin }) {
             }}
           >
             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+              {order.orderStatus === 'Delivered' && (
+                <PrimaryButton sx={{ maxWidth: 200 }} onClick={() => handleGetInvoice(order)}>
+                  Download Invoice
+                </PrimaryButton>
+              )}
               <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column' }}>
                 <Typography
                   variant="h6"
@@ -468,7 +463,7 @@ function OrderTable({ items, order, admin }) {
                   <Typography>{order.deliveryAddress.name}</Typography>
                   <Typography>{order.deliveryAddress.phoneNumber}</Typography>
                 </Box>
-                <Box sx={{ display: 'flex', gap: 1, whiteSpace: 'nowrap', pl: 1 }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, whiteSpace: 'nowrap', pl: 1 }}>
                   <Typography>{`${order.deliveryAddress.houseName},`}</Typography>
                   <Typography>{`${order.deliveryAddress.streetName},`}</Typography>
                   <Typography>{`${order.deliveryAddress.city},`}</Typography>

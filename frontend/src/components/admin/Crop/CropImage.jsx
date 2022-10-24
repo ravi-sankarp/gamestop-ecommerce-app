@@ -37,7 +37,6 @@ function CropImage({ photoURL, index, fileName, type, handleToggleCrop, setImage
       setImages((images) => ({ ...images, [index]: file }));
       handleToggleCrop();
     } catch (error) {
-      console.log(error);
       errorHandler(error);
     }
   };

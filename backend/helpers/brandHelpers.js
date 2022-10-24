@@ -73,6 +73,6 @@ export const deleteBrandById = asyncHandler(async (id) => {
   const _id = ObjectId(id);
   await getDb()
     .collection('brands')
-    .updateOne({ _id }, { $set: { isDeleted: false } });
+    .updateOne({ _id }, { $set: { isDeleted: true } });
   await deleteProductsByBrandId(id);
 });

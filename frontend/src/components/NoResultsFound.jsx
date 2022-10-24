@@ -1,6 +1,6 @@
 import { Box, Typography } from '@mui/material';
 
-function NoResultsFound() {
+function NoResultsFound({ margin = 10 }) {
   return (
     <Box
       sx={{
@@ -10,8 +10,8 @@ function NoResultsFound() {
         justifyContent: 'center',
         gap: 3,
         width: '100%',
-        height: '100%',
-        mt: 10
+        height: 'max-content',
+        mt: margin
       }}
     >
       <img

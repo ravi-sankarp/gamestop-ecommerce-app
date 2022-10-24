@@ -130,8 +130,7 @@ function UserOtpLoginForm() {
       {otpSent || (
         <Box
           sx={{
-            width: { xs: '50vw', md: 'max-content' },
-            maxWidth: { md: '30vw' },
+            width: { xs: '50vw', md: '30vw' },
             p: 5,
             textAlign: 'center',
             backgroundColor: '#ffffff',
@@ -149,7 +148,7 @@ function UserOtpLoginForm() {
             component="h1"
             sx={{ mb: '2rem', textAlign: 'center' }}
           >
-            OTP Login
+            OTP LOGIN
           </Typography>
           <Typography
             variant="subtitle1"
@@ -212,7 +211,7 @@ function UserOtpLoginForm() {
       {otpSent && (
         <Box
           sx={{
-            width: { xs: '50vw', md: 'max-content' },
+            width: { xs: '50vw', md: '30vw' },
             maxWidth: { md: '30vw' },
             p: 5,
             textAlign: 'center',

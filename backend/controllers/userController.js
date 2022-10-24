@@ -30,6 +30,7 @@ import {
   changeOrderStatus,
   findOrderByOrderId,
   findOrdersByUserId,
+  findTotalOrdersByUserId,
   returnIndividualOrder,
   returnOrderById
 } from '../helpers/orderHelpers.js';
@@ -331,10 +332,10 @@ const getCartTotal = asyncHandler(async (req, res) => {
   let resData;
   const [cart] = await cartHelpers.findCartByUserId(_id);
 
-// if cart is empty
-if(!cart){
-   throw new AppError('Your cart is empty ! Cannnot place order', 400);
-}
+  // if cart is empty
+  if (!cart) {
+    throw new AppError('Your cart is empty ! Cannnot place order', 400);
+  }
 
   //check if any product is out of stock
   const outOfStock = cart.items.find((item) => item.productDetails.stock < item.count);
@@ -400,6 +401,13 @@ const editUserDetails = asyncHandler(async (req, res) => {
     throw new AppError('Email already exists', 409);
   }
 
+  // if the user has logged in with google and requested to change the email then throw an error
+  if (userData.googleAuth && userData.email !== updatedData.email) {
+    throw new AppError(
+      'You have logged in with your google account! Cannot change your email address',
+      400
+    );
+  }
   //checking if phone number already exists
   const userCheckPhoneNumber = await checkPhoneNumberAlreadyExists(id, updatedData.phoneNumber);
   if (userCheckPhoneNumber) {
@@ -994,12 +1002,15 @@ const checkPaymentStatus = asyncHandler(async (req, res) => {
 //@access private
 const listUserOrders = asyncHandler(async (req, res) => {
   const user = req.userDetails;
-  const orders = await findOrdersByUserId(user._id);
+  const [orders, totalOrders] = await Promise.all([
+    findOrdersByUserId(user._id, req.query?.page),
+    findTotalOrdersByUserId(user._id)
+  ]);
   let resData;
   if (orders) {
     resData = {
       status: 'success',
-      data: orders.orders
+      data: { orders: orders.orders, totalOrders }
     };
   } else {
     resData = {
@@ -1122,7 +1133,7 @@ const returnOrder = asyncHandler(async (req, res) => {
   }
 
   // find the corresponding order details
-  const order = await findOrderByOrderId(orderId);
+  const { order } = await findOrderByOrderId(orderId);
 
   // check if orderId was invalid
   if (!order) {

@@ -82,6 +82,11 @@ const getSingleProduct = asyncHandler(async (req, res) => {
   }
 
   const product = await productHelpers.findProductByIdAggregation(id);
+
+  // throw error if product id was not found
+  if (!product) {
+    throw new AppError('Invalid product Id ! Please send a valid product Id', 400);
+  }
   const resData = {
     status: 'success',
     data: { ...product }

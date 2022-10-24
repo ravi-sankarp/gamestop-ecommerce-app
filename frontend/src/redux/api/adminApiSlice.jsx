@@ -229,7 +229,7 @@ export const extendedAdminApiSlice = apiSlice.injectEndpoints({
     }),
 
     getSalesReport: builder.query({
-      query: () => '/admin/getsalesreport',
+      query: (query) => `/admin/getsalesreport${query}`,
       providesTags: ['orders']
     })
   })

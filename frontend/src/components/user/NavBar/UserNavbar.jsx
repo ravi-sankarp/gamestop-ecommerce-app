@@ -15,13 +15,15 @@ import { useGetNavlistQuery } from '../../../redux/api/viewsApiSlice';
 import { setCategoryAndBrandData } from '../../../redux/reducers/brandAndCategorySlice';
 import { setToast } from '../../../redux/reducers/toastSlice';
 import MobileDrawer from './MobileDrawer';
+import useApiErrorHandler from '../../../hooks/useApiErrorHandler';
 
 function UserNavBar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { isSuccess, data, isError, error } = useGetNavlistQuery();
   const dispatch = useDispatch();
+  const errorHandler = useApiErrorHandler();
   if (isError) {
-    console.log(error.message);
+    errorHandler(error);
   }
 
   const handleDrawerToggle = () => {

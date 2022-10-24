@@ -1,5 +1,6 @@
+/* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable operator-linebreak */
-import { useEffect } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { CircularProgress, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import { Link } from 'react-router-dom';
@@ -10,22 +11,54 @@ import HelmetMeta from '../../HelmetMeta';
 import useApiErrorHandler from '../../../hooks/useApiErrorHandler';
 
 export default function CollapsibleTable() {
-  const { data, isFetching, isLoading, isSuccess, isError, error } = useGetUserOrdersQuery();
+  const orderObserver = useRef();
+  const [page, setPage] = useState(0);
+  const [resData, setResData] = useState([]);
+  const { data, isFetching, isLoading, isSuccess, isError, error } = useGetUserOrdersQuery({
+    page
+  });
   const errorToast = useApiErrorHandler();
   useEffect(() => {
     if (isError) {
       errorToast(error);
     }
   }, [isError, error, errorToast]);
+  useEffect(() => {
+    if (isSuccess) {
+      if (data?.data?.orders) {
+        setResData((prevResData) => [...prevResData, ...data.data.orders]);
+      }
+    }
+  }, [data, isSuccess]);
 
+  const lastBookElementRef = useCallback(
+    (node) => {
+      if (isLoading) return;
+      if (orderObserver.current) orderObserver.current.disconnect();
+      orderObserver.current = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting && data?.data?.totalOrders > resData.length) {
+            setPage((prevPageNumber) => prevPageNumber + 1);
+          }
+        },
+        {
+          rootMargin: '100px'
+        }
+      );
+      if (node) orderObserver.current.observe(node);
+    },
+    [data?.data?.totalOrders, isLoading, resData.length]
+  );
+
+  let content;
   if (isLoading || (isFetching && !isSuccess)) {
-    return (
+    content = (
       <Box
         sx={{
-          position: 'fixed',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%,0%)',
+          position: 'absolute',
+          top: 0,
+          width: '100%',
+          height: '100vh',
           overflowY: 'hidden',
           display: 'flex',
           alignItems: 'center',
@@ -46,6 +79,7 @@ export default function CollapsibleTable() {
     <>
       <HelmetMeta title="User Orders | Gamestop" />
       <Box sx={{ pt: 4, display: 'flex', justifyContent: 'center', width: '100%' }}>
+        {content}
         {data?.message && (
           <Box
             sx={{
@@ -83,9 +117,11 @@ export default function CollapsibleTable() {
           </Box>
         )}
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-          {data?.data &&
-            data.data.map((order) => (
+          {isSuccess &&
+            resData.length &&
+            resData.map((order, index) => (
               <Box
+                {...(resData.length === index + 1 ? { ref: lastBookElementRef } : {})}
                 key={order.orderedOn}
                 sx={{
                   display: 'flex',
@@ -94,6 +130,7 @@ export default function CollapsibleTable() {
                   alignItems: 'center',
                   backgroundColor: '#fff',
                   width: '80vw',
+                  maxWidth: '80vw',
                   p: 2,
                   boxShadow: 'rgba(0, 0, 0, 0.15) 0px 0px 0px 0px',
                   border: '1px solid #dbdbdb',
@@ -133,9 +170,14 @@ export default function CollapsibleTable() {
                     ))}
                   </Box>
                   <Box>
-                    <Typography textAlign="center" sx={{ color: '#868e96', fontSize: 12 }}>Order Status</Typography>
+                    <Typography
+                      textAlign="center"
+                      sx={{ color: '#868e96', fontSize: 12 }}
+                    >
+                      Order Status
+                    </Typography>
                     {order.orderStatus.includes('Cancelled') ||
-                    order.orderStatus.includes('Retured') ? (
+                    order.orderStatus.includes('Returned') ? (
                       <Box
                         component="span"
                         sx={{
@@ -184,6 +226,28 @@ export default function CollapsibleTable() {
                 />
               </Box>
             ))}
+          {isFetching && (
+            <Box
+              sx={{
+                position: 'absolute',
+                top: 0,
+                width: '100%',
+                height: '10vh',
+                overflowY: 'hidden',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                '&::-webkit-scrollbar': {
+                  display: 'none'
+                }
+              }}
+            >
+              <CircularProgress
+                sx={{ overflow: 'hidden' }}
+                color="primary"
+              />
+            </Box>
+          )}
         </Box>
       </Box>
     </>

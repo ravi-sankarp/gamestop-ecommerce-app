@@ -168,7 +168,7 @@ function ProfileTab() {
               >
                 <Grid
                   item
-                  xs={6}
+                  xs={12}
                 >
                   <TextField
                     sx={{ mb: 2 }}
@@ -184,7 +184,7 @@ function ProfileTab() {
                 </Grid>
                 <Grid
                   item
-                  xs={6}
+                  xs={12}
                 >
                   <TextField
                     sx={{ mb: 2 }}
@@ -201,7 +201,7 @@ function ProfileTab() {
                 {googleAuth || (
                   <Grid
                     item
-                    xs={6}
+                    xs={12}
                   >
                     <TextField
                       sx={{ mb: 2 }}
@@ -218,7 +218,7 @@ function ProfileTab() {
                 )}
                 <Grid
                   item
-                  xs={6}
+                  xs={12}
                 >
                   <TextField
                     sx={{ mb: 2 }}

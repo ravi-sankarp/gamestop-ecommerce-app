@@ -201,11 +201,11 @@ export const extendedUserApiSlice = apiSlice.injectEndpoints({
         method: 'POST',
         body: data
       }),
-      invalidatesTags: ['orders', 'cart', 'productdata']
+      invalidatesTags: ['cart', 'productdata']
     }),
 
     getUserOrders: builder.query({
-      query: () => '/user/getallorders',
+      query: ({ page }) => `/user/getallorders?page=${page}`,
       providesTags: ['orders'],
       invalidatesTags: ['orders', 'cart', 'productdata']
     }),

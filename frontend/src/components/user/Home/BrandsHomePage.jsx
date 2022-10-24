@@ -12,7 +12,6 @@ function BrandsHomePage() {
       <Box
         sx={{
           width: '100%',
-          height: '30vh',
           overflowY: 'hidden',
           display: 'flex',
           alignItems: 'center',

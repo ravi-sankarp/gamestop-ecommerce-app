@@ -21,7 +21,7 @@ function HomeBannerCarousel() {
       <Box
         sx={{
           width: '100%',
-          height: '30vh',
+          minHeight: '30vh',
           overflowY: 'hidden',
           display: 'flex',
           alignItems: 'center',
@@ -34,7 +34,7 @@ function HomeBannerCarousel() {
         <Skeleton
           variant="rectangular"
           animation="wave"
-          sx={{ width: '100%', height: '40vh' }}
+          sx={{ width: '100%', minHeight: '50vh' }}
         />
       </Box>
     );
@@ -58,7 +58,7 @@ function HomeBannerCarousel() {
             loading="lazy"
             src={banner?.bannerImg.imgUrl}
             alt={banner?.title}
-            sx={{ height: '50vh', aspectRatio: '16/9', objectFit: 'cover' }}
+            sx={{ height: '50vh', aspectRatio: '16/9', objectFit: { xs: 'contain', md: 'cover' } }}
           />
         ))}
       </Carousel>

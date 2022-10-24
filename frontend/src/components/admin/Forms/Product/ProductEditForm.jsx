@@ -29,11 +29,6 @@ function ProductEditForm({ categories, brands, product }) {
       .number('Product Price must be a number')
 
       .typeError('Product Price must be a number'),
-    discount: yup
-      .number()
-
-      .typeError('Discount must be a number')
-      .max(100),
     details: yup.string().min(10),
     keyFeatures: yup.string().min(10),
     categoryId: yup.string(),
@@ -247,22 +242,6 @@ function ProductEditForm({ categories, brands, product }) {
             error={!!errors.price}
             helperText={errors.price ? errors.price.message : ''}
             {...register('price')}
-          />
-        </Grid>
-        <Grid
-          item
-          xs={6}
-        >
-          <TextField
-            sx={{ mb: 2 }}
-            label="Product Discount Percentage"
-            name="discount"
-            fullWidth
-            required
-            type="number"
-            error={!!errors.discount}
-            helperText={errors.discount ? errors.discount.message : ''}
-            {...register('discount')}
           />
         </Grid>
         <Grid

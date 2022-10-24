@@ -94,6 +94,9 @@ function AddressTab() {
             <Typography sx={{ color: '#333333' }}>Click here to add One</Typography>
           </Box>
         )}
+        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+          <PrimaryButton onClick={toggleForm}>Add Address</PrimaryButton>
+        </Box>
         {data?.data && (
           <Box
             sx={{
@@ -101,7 +104,7 @@ function AddressTab() {
               flexDirection: 'column',
               gap: 2,
               p: 2,
-              width: '100%',
+              width: '90vw',
               alignItems: 'center'
             }}
           >
@@ -114,7 +117,7 @@ function AddressTab() {
                   gap: 1,
                   background: '#fff',
                   p: 2,
-                  width: { xs: '100%', md: '40vw' },
+                  width: { xs: '80vw', md: '40vw' },
                   boxShadow: 'rgba(0, 0, 0, 0.15) 0px 0px 0px 0px',
                   position: 'relative',
                   border: '1px solid #dbdbdb',
@@ -141,7 +144,14 @@ function AddressTab() {
                   <Typography>{address.name}</Typography>
                   <Typography>{address.phoneNumber}</Typography>
                 </Box>
-                <Box sx={{ display: 'flex', gap: 1, whiteSpace: 'nowrap' }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    gap: 1,
+                    flexDirection: { xs: 'column', md: 'row' },
+                    whiteSpace: { xs: 'break-spaces', md: 'nowrap' }
+                  }}
+                >
                   <Typography>{`${address.houseName},`}</Typography>
                   <Typography>{`${address.streetName},`}</Typography>
                   <Typography>{`${address.city},`}</Typography>
@@ -153,9 +163,7 @@ function AddressTab() {
             ))}
           </Box>
         )}
-        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-          <PrimaryButton onClick={toggleForm}>Add Address</PrimaryButton>
-        </Box>
+
         {open && (
           <UserAddressForm
             open={open}

@@ -37,11 +37,9 @@ function GetOtpForm({ handleNext, setPhoneNumber }) {
         await requestOtp(data).unwrap();
         setFormError('');
         setPhoneNumber(data.phoneNumber);
-        console.log('inside');
         handleNext();
         setBtnText('Send OTP');
     } catch (err) {
-          console.log(err);
         setBtnText('Send OTP');
         setFormError(err.data.message);
       }

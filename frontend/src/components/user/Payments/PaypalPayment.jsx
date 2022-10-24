@@ -5,6 +5,7 @@ import {
   usePayPalScriptReducer
 } from '@paypal/react-paypal-js';
 import { useVerifyPaypalMutation } from '../../../redux/api/userApiSlice';
+import useApiErrorHandler from '../../../hooks/useApiErrorHandler';
 
 export default function PaypalPayment({ totalAmount, handlePayment, setSuccessModal }) {
   return (
@@ -27,14 +28,7 @@ export default function PaypalPayment({ totalAmount, handlePayment, setSuccessMo
 function PaypalButtonComponent({ totalAmount, handlePayment, setSuccessModal }) {
   const amount = Math.ceil(totalAmount / 80);
   const [{ isPending }] = usePayPalScriptReducer();
-
-  // useEffect(() => {
-  //   dispatch({
-  //     type: 'resetOptions',
-  //     value: {}
-  //   });
-  // }, [amount]);
-
+  const errorHandler = useApiErrorHandler();
   const [paypalVerify, { isLoading: paypalVerifyIsLoading }] = useVerifyPaypalMutation();
 
   const handleApprove = async (data) => {
@@ -48,7 +42,7 @@ function PaypalButtonComponent({ totalAmount, handlePayment, setSuccessModal }) 
         setSuccessModal(true);
       }
     } catch (err) {
-      console.log(err);
+      errorHandler(err);
     }
   };
 

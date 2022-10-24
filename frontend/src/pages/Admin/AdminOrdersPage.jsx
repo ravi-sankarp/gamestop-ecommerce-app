@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import {
@@ -25,10 +26,11 @@ import { SecondaryButton } from '../../MaterialUiConfig/styled';
 import DashboardCard from '../../components/admin/DashboardCard';
 
 function AdminOrdersPage() {
-  const { search } = useLocation();
-  const { data, isLoading, isFetching, isSuccess, isError, error } = useGetAllOrdersQuery(search);
-  const [changeOrderStatus,
-    { isLoading: isLoadingChangeOrderStatus }] = useChangeOrderStatusMutation();
+  const { search: params } = useLocation();
+  const [resData, setResData] = useState([]);
+  const { data, isLoading, isFetching, isSuccess, isError, error } = useGetAllOrdersQuery(params);
+  const [changeOrderStatus, {
+     isLoading: isLoadingChangeOrderStatus }] = useChangeOrderStatusMutation();
   const [status, setStatus] = useState();
   const [selectError, setSelectError] = useState();
 
@@ -37,12 +39,21 @@ function AdminOrdersPage() {
   const successToast = useSuccessHandler();
   let content;
   const handleError = useApiErrorHandler();
-  if (isLoading || isFetching) {
+
+  useEffect(() => {
+    if (isSuccess) {
+      if (data?.data?.orders?.length) {
+        setResData(data.data.orders);
+      }
+    }
+  }, [data]);
+
+  if (isLoading || (isFetching && !isSuccess)) {
     content = (
       <Box
         sx={{
           width: '100%',
-          height: '100vh',
+          height: '50vh',
           overflowY: 'hidden',
           display: 'flex',
           alignItems: 'center',
@@ -79,6 +90,7 @@ function AdminOrdersPage() {
   const handleSelectChange = (e) => {
     setStatus(e.target.value);
   };
+
   const handleConfirmOrderStatusChange = async () => {
     if (!status) {
       setSelectError('Please select a status');
@@ -109,7 +121,6 @@ function AdminOrdersPage() {
         >
           ORDERS
         </Typography>
-        {content}
         {isSuccess && (
           <Box sx={{ display: 'flex', mt: 3, mb: 3, justifyContent: 'space-between' }}>
             <DashboardCard
@@ -140,22 +151,20 @@ function AdminOrdersPage() {
           </Box>
         )}
         {isSuccess && <OrderFilter />}
-        {!!(isSuccess && data?.data?.orders?.length) || <NoResultsFound />}
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 3,
-            alignItems: 'center',
-            minHeight: '40vh',
-            my: 4
-          }}
-        >
-          {isSuccess
-            && data?.data?.orders?.length > 0
-            && data?.data?.orders?.map((order, index) => (
+        {isSuccess && resData.length > 0 && (
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 3,
+              alignItems: 'center',
+              minHeight: '40vh',
+              my: 4
+            }}
+          >
+            {resData?.map((order, index) => (
               <Box
-                key={order.orderedOn}
+                key={order.orderId}
                 sx={{
                   display: 'flex',
                   flexDirection: 'column',
@@ -312,7 +321,10 @@ function AdminOrdersPage() {
                 />
               </Box>
             ))}
-        </Box>
+          </Box>
+        )}
+        {content}
+        {isSuccess && !data?.data?.length && <NoResultsFound margin={0} />}
       </Box>
       <Dialog
         open={drawerOpen}

@@ -56,41 +56,6 @@ const verifyRazorpayPayment = asyncHandler(async (req, res) => {
   }
 });
 
-//@desc   Verify Paypal webhook
-//@route  POST /api/verifypaypalpayment
-//@access public
-// const verifyPaypalPayment = asyncHandler(async (req, res) => {
-//   try {
-//     const { headers } = req;
-//     const url = 'https://api-m.sandbox.paypal.com/v1/notifications/verify-webhook-signature';
-//     const body = {
-//       transmission_id: headers['paypal-transmission-id'],
-//       transmission_time: headers['paypal-transmission-time'],
-//       cert_url: headers['paypal-cert-url'],
-//       auth_logo: headers['paypal-auth-logo'],
-//       transmission_sig: headers['paypal-transmission-sig'],
-//       webhook_id: process.env.PAYPAL_WEBHOOK_ID,
-//       webhook_event: req.body
-//     };
-//     const options = {
-//       headers: {
-//         Authorization: `Bearer ${process.env.PAYPAL_ACCESS_TOKEN}`,
-//         'Content-Type': 'application/json'
-//       }
-//     };
-//     const result = await axios.post(url, body, options);
-//     console.log(result);
-//     res.json({
-//       status: 'success'
-//     });
-//   } catch (err) {
-//     console.log(err);
-//     res.json({
-//       status: 'success'
-//     });
-//   }
-// });
-
 export default {
   verifyRazorpayPayment
   // verifyPaypalPayment

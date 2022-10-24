@@ -14,7 +14,7 @@ export const createNewOrder = asyncHandler(async (id, data) => {
 });
 
 //find orders with user id
-export const findOrdersByUserId = asyncHandler(async (id) => {
+export const findOrdersByUserId = asyncHandler(async (id, page) => {
   const userId = ObjectId(id);
   const agg = [
     {
@@ -29,20 +29,38 @@ export const findOrdersByUserId = asyncHandler(async (id) => {
       $sort: {
         'order.orderedOn': -1
       }
-    },
-    {
-      $group: {
-        _id: '$userId',
-        orders: {
-          $push: '$order'
-        }
-      }
     }
   ];
+  const limit = 5;
+  if (page >= 0) {
+    agg.push(
+      {
+        $skip: page * limit
+      },
+      {
+        $limit: limit
+      }
+    );
+  }
 
+  agg.push({
+    $group: {
+      _id: '$userId',
+      orders: {
+        $push: '$order'
+      }
+    }
+  });
   const result = await getDb().collection('orders').aggregate(agg).toArray();
 
   return result[0];
+});
+
+// find total orders by user id
+export const findTotalOrdersByUserId = asyncHandler(async (id) => {
+  const userId = ObjectId(id);
+  const count = await getDb().collection('orders').countDocuments({ userId });
+  return count;
 });
 
 //find all orders
@@ -59,14 +77,6 @@ export const findAllOrders = asyncHandler(async (query) => {
       $sort: {
         'order.orderedOn': -1
       }
-    },
-    {
-      $group: {
-        _id: null,
-        orders: {
-          $push: '$order'
-        }
-      }
     }
   ];
   // if a query exists then filter according to it
@@ -76,6 +86,14 @@ export const findAllOrders = asyncHandler(async (query) => {
       agg.unshift({ $match: { 'order.orderStatus': status } });
     }
   }
+  agg.push({
+    $group: {
+      _id: null,
+      orders: {
+        $push: '$order'
+      }
+    }
+  });
   const result = await getDb().collection('orders').aggregate(agg).toArray();
   return result[0]?.orders;
 });
@@ -330,29 +348,21 @@ export const findAllSales = asyncHandler(async (query) => {
       $sort: {
         'order.orderedOn': -1
       }
-    },
-    {
-      $group: {
-        _id: null,
-        orders: {
-          $push: '$order'
-        }
-      }
     }
   ];
   // if a query exists then filter according to it
   if (query?.filter) {
     const { filter } = query;
-    if (filter === 'yesterday') {
+    if (filter === 'Yesterday') {
       agg.unshift({
         $match: {
           'order.orderedOn': {
-            $gt: new Date(new Date() - 60 * 60 * 24 * 1000)
+            $gt: new Date(new Date() - 60 * 60 * 48 * 1000)
           }
         }
       });
     }
-    if (filter === 'last month') {
+    if (filter === 'Last month') {
       agg.unshift({
         $match: {
           'order.orderedOn': {
@@ -361,16 +371,7 @@ export const findAllSales = asyncHandler(async (query) => {
         }
       });
     }
-    if (filter === 'last week') {
-      agg.unshift({
-        $match: {
-          'order.orderedOn': {
-            $gt: new Date(new Date() - 60 * 60 * 24 * 1000 * 6)
-          }
-        }
-      });
-    }
-    if (filter === 'last week') {
+    if (filter === 'Last week') {
       agg.unshift({
         $match: {
           'order.orderedOn': {
@@ -385,13 +386,29 @@ export const findAllSales = asyncHandler(async (query) => {
 
     agg.unshift({
       $match: {
-        'order.orderedOn': {
+        'order.orderStatusUpdatedOn': {
           $gte: new Date(minDate),
-          lte: new Date(maxDate)
+          $lte: new Date(maxDate)
         }
       }
     });
   }
+  agg.push({
+    $group: {
+      _id: null,
+      orders: {
+        $push: '$order'
+      }
+    }
+  });
   const result = await getDb().collection('orders').aggregate(agg).toArray();
   return result[0]?.orders;
+});
+
+// find total orders by user id
+export const findTotalSalesCount = asyncHandler(async () => {
+  const count = await getDb()
+    .collection('orders')
+    .countDocuments({ 'order.orderStatus': 'Delivered' });
+  return count;
 });

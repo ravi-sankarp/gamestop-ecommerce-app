@@ -162,7 +162,7 @@ export default function SearchBar() {
             >
               {(isLoading || isFetching) && content}
               {!!(isSuccess && content.length < 1 && !isFetching) && (
-                <Typography>No results found</Typography>
+                <Typography sx={{ py: 2 }}>No results found</Typography>
               )}
               {isSuccess
                 && content?.length > 0

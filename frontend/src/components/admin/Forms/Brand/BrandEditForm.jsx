@@ -59,8 +59,6 @@ function BrandEditForm({ brandData, close }) {
         const res = await editBrand({ id: brandData._id, data: form }).unwrap();
         dispatch(setToast({ data: res, open: true }));
         close();
-
-        console.log(res);
       } catch (err) {
         setText('Update Brand');
         setFormError(err.data.message);
@@ -73,9 +71,17 @@ function BrandEditForm({ brandData, close }) {
     reset(newProduct);
   }, [brandData, reset]);
   return (
-    <Box component="form" noValidate autoComplete="off" onSubmit={handleSubmit(onSubmitHandler)}>
+    <Box
+      component="form"
+      noValidate
+      autoComplete="off"
+      onSubmit={handleSubmit(onSubmitHandler)}
+    >
       {formError && (
-        <Alert sx={{ mb: 5, textAlign: 'center' }} severity="error">
+        <Alert
+          sx={{ mb: 5, textAlign: 'center' }}
+          severity="error"
+        >
           {formError}!
         </Alert>
       )}
@@ -119,9 +125,17 @@ function BrandEditForm({ brandData, close }) {
         {...register('bannerImg')}
       />
       <Box sx={{ display: 'flex', justifyContent: 'space-evenly' }}>
-        <img width="100px" height="100px" src={brandData.bannerImg.imgUrl} alt={brandData.name} />
+        <img
+          width="100px"
+          height="100px"
+          src={brandData.bannerImg.imgUrl}
+          alt={brandData.name}
+        />
       </Box>
-      <PrimaryButton sx={{ width: '200px', mx: 'auto', p: 1, display: 'block' }} type="submit">
+      <PrimaryButton
+        sx={{ width: '200px', mx: 'auto', p: 1, display: 'block' }}
+        type="submit"
+      >
         {text}
       </PrimaryButton>
     </Box>

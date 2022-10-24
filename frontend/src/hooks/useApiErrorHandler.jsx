@@ -36,14 +36,14 @@ function useApiErrorHandler() {
           navigate('/login');
         }
       }
-      // if (error?.data?.message === 'Your session has expired! Please log in again.') {
-      //   dispatch(deleteToken());
-      //   if (pathname.split('/').includes('admin')) {
-      //     navigate('/admin/login');
-      //   } else {
-      //     navigate('/login');
-      //   }
-      // }
+      if (error?.data?.message === 'Your session has expired! Please log in again.') {
+        dispatch(deleteToken());
+        if (pathname.split('/').includes('admin')) {
+          navigate('/admin/login');
+        } else {
+          navigate('/login');
+         }
+       }
       if (error?.data?.message === 'The user no longer exists') {
         dispatch(deleteToken());
         if (pathname.split('/').includes('admin')) {

@@ -21,7 +21,6 @@ export default function AdminSalesTableList({ data }) {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
-  console.log(data);
   return (
     <Paper sx={{ mb: 5, mt: 5, mx: { md: 25 } }}>
       <TableContainer>
@@ -69,7 +68,7 @@ export default function AdminSalesTableList({ data }) {
                   {order.paymentMethod}
                 </TableCell>
                 <TableCell
-                  data-label="Delivery Date"
+                  data-label="Delivered Date"
                   align="center"
                 >
                   {new Date(order.orderStatusUpdatedOn).toLocaleDateString('en-us')}

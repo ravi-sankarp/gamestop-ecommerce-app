@@ -103,18 +103,18 @@ items)
               <Box
                 sx={{ display: 'flex', justifyContent: 'space-between', '&>*': { color: 'red' } }}
               >
-                <Typography>Cancelled</Typography>
+                <Typography>Returned</Typography>
                 <Typography>{`- ₹${order?.returnedAmount.toLocaleString()}`}</Typography>
               </Box>
             </>
           )}
 
-            <Divider />
+          <Divider />
           <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
             <Typography>Bill Total</Typography>
             <Typography>
 ₹
-{order?.totalAmountDiscounted.toLocaleString()}
+{ order?.totalAmountDiscounted?.toLocaleString() }
             </Typography>
           </Box>
         </>

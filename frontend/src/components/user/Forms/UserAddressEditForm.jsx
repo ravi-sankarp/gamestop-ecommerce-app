@@ -127,7 +127,7 @@ function UserAddressEditForm({ open, toggleForm, addressData }) {
             maxHeight: '60vh',
             display: 'flex',
             flexDirection: 'column',
-            padding: '40px 80px'
+            padding: { xs: '20px 20px', md: '40px 80px' }
           }}
           component="form"
           noValidate
@@ -155,6 +155,7 @@ function UserAddressEditForm({ open, toggleForm, addressData }) {
                 sx={{ mb: 2 }}
                 label="Name"
                 fullWidth
+                inputRef={(input) => input && input.focus()}
                 required
                 type="text"
                 error={!!errors.name}

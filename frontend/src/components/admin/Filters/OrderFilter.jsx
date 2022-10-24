@@ -17,6 +17,7 @@ function OrderFilter() {
 
   const handleSort = (e) => {
     search.set('status', e.target.textContent);
+    search.set('page', 0);
     setSearch(search);
   };
   return (

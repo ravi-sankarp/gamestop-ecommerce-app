@@ -342,14 +342,17 @@ const editProduct = asyncHandler(async (req, res) => {
 
   let discountedPrice;
   let categoryDiscount;
+  let discount;
   // checking if category has changed if changed then update the offer accordingly
   if (categoryId.toString() !== product.categoryId.toString()) {
     // check if offer exists for the selected category
     const result = await offerHelpers.findOfferByCategoryId(categoryId);
     categoryDiscount = result?.discount ?? 0;
     discountedPrice = Number(price) - Number(price) * categoryDiscount * 0.01;
+    discount = categoryDiscount;
     if (discountedPrice > product.discountedPrice) {
       ({ discountedPrice } = product);
+      ({ discount } = product);
     }
   }
 
@@ -359,6 +362,7 @@ const editProduct = asyncHandler(async (req, res) => {
     price: price,
     categoryDiscount: categoryDiscount ?? product.categoryDiscount,
     discountedPrice: discountedPrice ?? product.discountedPrice,
+    discount: discount ?? product.discount,
     categoryId: categoryId,
     brandId: brandId,
     details,
@@ -1155,10 +1159,10 @@ const deleteCoupon = asyncHandler(async (req, res) => {
 //@route  GET /api/getsalesdata
 //@access private
 const getSalesReport = asyncHandler(async (req, res) => {
-  const orders = await orderHelpers.findAllSales(req.query);
+  const sales = await orderHelpers.findAllSales(req.query);
   const resData = {
     status: 'success',
-    data: orders
+    data: sales
   };
   sendResponse(200, resData, res);
 });

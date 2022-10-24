@@ -67,6 +67,7 @@ export default function UserTableList({ data }) {
                   <TableCell
                     data-label="Email"
                     align="center"
+                    sx={{ wordBreak: 'break-all' }}
                   >
                     {user.email}
                   </TableCell>

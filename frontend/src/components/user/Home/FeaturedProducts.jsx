@@ -9,7 +9,7 @@ import CardLoadingHome from './CardLoadingHome';
 function FeaturedProducts() {
   const { id } = useParams();
   const { data, isLoading,
-    isFetching, isSuccess, isError, error } = useGetFeaturedProductsQuery(id);
+     isFetching, isSuccess, isError, error } = useGetFeaturedProductsQuery(id);
   const handleError = useApiErrorHandler();
 
   useEffect(() => {
@@ -19,7 +19,7 @@ function FeaturedProducts() {
   }, [isError, error, handleError]);
 
   if (isLoading || isFetching) {
-    return <CardLoadingHome />;
+    return <CardLoadingHome width={2} />;
   }
   return (
     isSuccess && (

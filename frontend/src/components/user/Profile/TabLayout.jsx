@@ -97,7 +97,7 @@ export default function IconTabs() {
           >
             <StyledTab
               label="Profile Information"
-              icon={<AccountCircleOutlinedIcon />}
+              icon={<AccountCircleOutlinedIcon sx={{ display: { xs: 'none', md: 'block' } }} />}
               iconPosition="start"
               aria-label="phone"
               value="info"
@@ -105,7 +105,7 @@ export default function IconTabs() {
             />
             <StyledTab
               label="Manage Addresses"
-              icon={<HomeOutlinedIcon />}
+              icon={<HomeOutlinedIcon sx={{ display: { xs: 'none', md: 'block' } }} />}
               aria-label="favorite"
               iconPosition="start"
               value="address"
@@ -113,7 +113,7 @@ export default function IconTabs() {
             />
             <StyledTab
               label="My Orders"
-              icon={<UploadFileOutlinedIcon />}
+              icon={<UploadFileOutlinedIcon sx={{ display: { xs: 'none', md: 'block' } }} />}
               aria-label="person"
               iconPosition="start"
               value="orders"
@@ -121,7 +121,7 @@ export default function IconTabs() {
             />
             <StyledTab
               label="Wallet"
-              icon={<WalletOutlinedIcon />}
+              icon={<WalletOutlinedIcon sx={{ display: { xs: 'none', md: 'block' } }} />}
               aria-label="person"
               iconPosition="start"
               value="wallet"

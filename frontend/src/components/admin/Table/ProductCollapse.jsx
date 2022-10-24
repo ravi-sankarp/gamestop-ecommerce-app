@@ -17,7 +17,6 @@ import { useState } from 'react';
 
 function ProductCollapse({ product }) {
   const [open, setOpen] = useState(false);
-  console.log(product);
   return (
     <>
       <Box sx={{ display: 'flex', alignItems: 'center', ml: 'auto', mr: 4 }}>

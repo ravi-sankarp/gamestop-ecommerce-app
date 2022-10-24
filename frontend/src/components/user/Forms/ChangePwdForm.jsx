@@ -80,6 +80,7 @@ function ChangePwdForm() {
         sx={{
           width: { xs: '50vw', md: '50vw' },
           maxWidth: { md: '30vw' },
+          minHeight: '501px',
           p: 5,
           mb: 0,
           textAlign: 'center',

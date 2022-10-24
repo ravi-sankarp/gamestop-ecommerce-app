@@ -1,37 +1,36 @@
-import { Box, Skeleton } from '@mui/material';
+import { Grid, Skeleton } from '@mui/material';
 import React from 'react';
 
-function CardLoadingHome() {
+function CardLoadingHome({ width = 3 }) {
   return (
-    <Box
-      sx={{
-        width: '100%',
-        height: '30vh',
-        overflowY: 'hidden',
-        display: 'flex',
-        alignItems: 'center',
-        gap: 2,
-        mt: 23,
-        justifyContent: { xs: 'center', md: 'space-around' },
-        '&::-webkit-scrollbar': {
-          display: 'none'
-        }
-      }}
+    <Grid
+      container
+      rowSpacing={4}
+      columnSpacing={{ xs: 1, sm: 2, md: 3, lg: 4 }}
+      sx={{ my: 10, alignItems: 'center', justifyContent: 'center' }}
     >
       {[1, 2, 3, 4].map((item) => (
-        <Skeleton
-          key={item}
-          variant="rectangular"
-          height={150}
-          sx={{
-            width: {
-              xs: 160,
-              md: 250
-            }
-          }}
-        />
+        <Grid
+          item
+          xs={6}
+          sm={6}
+          md={6}
+          lg={width}
+          xl={width}
+          align="center"
+        >
+          <Skeleton
+            key={item}
+            variant="rectangular"
+            height={150}
+            sx={{
+              maxWidth: { xs: 300, lg: 300 },
+              minHeight: { xs: 150, lg: 240 }
+            }}
+          />
+        </Grid>
       ))}
-    </Box>
+    </Grid>
   );
 }
 
