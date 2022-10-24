@@ -14,12 +14,13 @@ function useApiErrorHandler() {
   const handleTokenDelete = async () => {
     if (pathname.split('/').includes('admin')) {
       await dispatch(deleteAdminToken());
+      await dispatch(apiSlice.util.resetApiState());
       navigate('/admin/login');
     } else {
       await dispatch(deleteToken());
+      await dispatch(apiSlice.util.resetApiState());
       navigate('/login');
     }
-    await dispatch(apiSlice.util.resetApiState());
   };
   useEffect(() => {
     if (error) {
@@ -45,7 +46,7 @@ function useApiErrorHandler() {
       }
       setError(null);
     }
-  }, [error, dispatch, navigate, pathname, handleTokenDelete]);
+  }, [error, dispatch, navigate, pathname]);
   return setError;
 }
 

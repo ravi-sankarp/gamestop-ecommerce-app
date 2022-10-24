@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -26,10 +26,20 @@ import SearchBar from './Searchbar';
 
 function DesktopIcons() {
   const [openAlert, setOpenAlert] = useState(false);
+  const [data, setData] = useState({ 0: {}, 1: {} });
   const { token } = useSelector((state) => state.auth.data);
-  const { data: result } = useGetCartAndWishlistCountQuery('Get cart count', { skip: !token });
+  const { data: result, isSuccess } = useGetCartAndWishlistCountQuery('Get cart count', {
+    skip: !token
+  });
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isSuccess) {
+      setData(result?.data);
+    }
+  }, [isSuccess, result]);
+
   const value = token ? 'Logout' : 'Login';
 
   // for alert window
@@ -38,10 +48,11 @@ function DesktopIcons() {
   };
 
   const handleLogout = async () => {
-    await dispatch(deleteToken());
-    await dispatch(apiSlice.util.resetApiState());
+    dispatch(deleteToken());
+    dispatch(apiSlice.util.resetApiState());
     const message = { message: 'Successfully Logged Out' };
     dispatch(setToast({ open: true, data: message }));
+    setData({ 0: {}, 1: {} });
     setOpenAlert(false);
     navigate('/');
   };
@@ -100,7 +111,7 @@ function DesktopIcons() {
         <Tooltip title="Wishlist">
           <Badge
             variant="dot"
-            invisible={!result?.data['1']?.wishlistCount}
+            invisible={!data['1']?.wishlistCount}
             color="error"
           >
             <FavoriteBorderOutlinedIcon />
@@ -114,7 +125,7 @@ function DesktopIcons() {
         <Tooltip title="Cart">
           <Badge
             variant="dot"
-            invisible={!result?.data['0']?.cartCount}
+            invisible={!data['0']?.cartCount}
             color="error"
           >
             <ShoppingCartOutlinedIcon />

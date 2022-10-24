@@ -18,6 +18,7 @@ function CardLoadingHome({ width = 3 }) {
           lg={width}
           xl={width}
           align="center"
+          key={item}
         >
           <Skeleton
             key={item}
