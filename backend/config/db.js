@@ -1,9 +1,10 @@
 import { MongoClient, ServerApiVersion } from 'mongodb';
 import { config } from 'dotenv';
 
-config({ path: './config.env' });
+config({ path: '../config.env' });
 
 const mongoUrl = process.env.DATABASE_CONNECTION;
+const databaseName = process.env.DATABASE_NAME;
 let _db;
 
 export const initDb = async (callback) => {
@@ -17,7 +18,7 @@ export const initDb = async (callback) => {
       useUnifiedTopology: true,
       serverApi: ServerApiVersion.v1
     });
-    _db = client.db('ECommerce');
+    _db = client.db(databaseName);
     callback(null, _db);
   } catch (err) {
     callback(err);
