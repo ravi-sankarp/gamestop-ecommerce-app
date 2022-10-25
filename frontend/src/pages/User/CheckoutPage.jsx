@@ -82,7 +82,7 @@ function CheckoutPage() {
   if (isErrorCart) {
    return (
       <>
-        <HelmetMeta title="Gamestop Checkout" />
+        <HelmetMeta title="Checkout | Gamestop" />
 
         <Box
           sx={{

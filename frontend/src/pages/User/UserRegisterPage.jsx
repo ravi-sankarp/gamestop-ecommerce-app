@@ -11,7 +11,7 @@ function UserRegisterPage() {
 
   return (
     <>
-      <HelmetMeta title="Register New Account | Gamestop" />
+      <HelmetMeta title="Register | Gamestop" />
 
       <UserRegisterForm />
     </>
