@@ -14,6 +14,7 @@ import { useGetBrandDataQuery } from '../../redux/api/adminApiSlice';
 import BrandTableList from '../../components/admin/Table/BrandTableList';
 import BrandForm from '../../components/admin/Forms/Brand/BrandForm';
 import useApiErrorHandler from '../../hooks/useApiErrorHandler';
+import HelmetMeta from '../../components/HelmetMeta';
 
 function AdminBrandsPage() {
   const [openPopup, setOpenPopup] = useState(false);
@@ -50,6 +51,8 @@ function AdminBrandsPage() {
   };
   return (
     <Box sx={{ overflowX: 'hidden', pt: 4 }}>
+      <HelmetMeta title="Brand Management | Gamestop" />
+
       <Typography
         variant="h5"
         sx={{ mb: '1rem', textAlign: 'center', fontWeight: '450' }}

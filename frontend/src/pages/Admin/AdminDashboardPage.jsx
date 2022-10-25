@@ -62,7 +62,7 @@ function AdminDashboardPage() {
 
   return (
     <>
-      <HelmetMeta title="Shopping Cart | Gamestop" />
+      <HelmetMeta title="Admin Dashboard | Gamestop" />
       {isSuccess && (
         <Box sx={{ p: 1, pt: 4, pb: 6 }}>
           <Typography

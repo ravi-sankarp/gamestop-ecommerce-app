@@ -14,6 +14,7 @@ import { useGetBannerDataQuery } from '../../redux/api/adminApiSlice';
 import useApiErrorHandler from '../../hooks/useApiErrorHandler';
 import AddNewBanner from '../../components/admin/Banners/AddNewBanner';
 import BannerTable from '../../components/admin/Banners/BannerTable';
+import HelmetMeta from '../../components/HelmetMeta';
 
 function AdminBannerPage() {
   const [openPopup, setOpenPopup] = useState(false);
@@ -53,6 +54,8 @@ function AdminBannerPage() {
   };
   return (
     <Box sx={{ overflowX: 'hidden', pt: 4 }}>
+      <HelmetMeta title="Banner Management | Gamestop" />
+
       <Typography
         variant="h5"
         sx={{ mb: '1rem', textAlign: 'center', fontWeight: '450' }}

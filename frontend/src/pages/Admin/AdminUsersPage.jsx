@@ -1,6 +1,7 @@
 import { Box, CircularProgress, Typography } from '@mui/material';
 import { useEffect } from 'react';
 import UserTableList from '../../components/admin/Table/UserTableList';
+import HelmetMeta from '../../components/HelmetMeta';
 import useApiErrorHandler from '../../hooks/useApiErrorHandler';
 import { useGetUserDataQuery } from '../../redux/api/adminApiSlice';
 
@@ -34,7 +35,12 @@ function AdminUsersPage() {
   }, [isError, error, handleError]);
   return (
     <Box sx={{ overflowX: 'hidden', pt: 4 }}>
-      <Typography variant="h5" sx={{ mb: '1rem', textAlign: 'center', fontWeight: '450' }}>
+      <HelmetMeta title="User Management | Gamestop" />
+
+      <Typography
+        variant="h5"
+        sx={{ mb: '1rem', textAlign: 'center', fontWeight: '450' }}
+      >
         USERS
       </Typography>
       {content}

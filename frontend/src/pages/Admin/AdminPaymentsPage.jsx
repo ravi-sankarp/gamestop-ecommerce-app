@@ -5,6 +5,7 @@ import useApiErrorHandler from '../../hooks/useApiErrorHandler';
 import PaymentTableList from '../../components/admin/Table/PaymentTableList';
 import { useGetAllPaymentsQuery } from '../../redux/api/adminApiSlice';
 import PaymentFilter from '../../components/admin/Filters/PaymentFilter';
+import HelmetMeta from '../../components/HelmetMeta';
 
 function AdminPaymentsPage() {
   const { search } = useLocation();
@@ -41,6 +42,7 @@ function AdminPaymentsPage() {
   }, [isError, error, handleError]);
   return (
     <Box sx={{ overflowX: 'hidden', pt: 4 }}>
+      <HelmetMeta title="Payments | Gamestop" />
       <Typography
         variant="h5"
         sx={{ mb: '1rem', textAlign: 'center', fontWeight: '450' }}

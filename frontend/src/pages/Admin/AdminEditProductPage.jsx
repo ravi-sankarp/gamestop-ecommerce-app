@@ -2,6 +2,7 @@ import { Box, CircularProgress } from '@mui/material';
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import ProductEditForm from '../../components/admin/Forms/Product/ProductEditForm';
+import HelmetMeta from '../../components/HelmetMeta';
 import useApiErrorHandler from '../../hooks/useApiErrorHandler';
 import { useGetNavlistQuery, useGetSingleProductQuery } from '../../redux/api/viewsApiSlice';
 
@@ -61,6 +62,8 @@ function AdminEditProductPage() {
 
   return (
     <Box sx={{ my: 4 }}>
+      <HelmetMeta title="Edit Product | Gamestop" />
+
       <Box sx={{ backgroundColor: '#fff', p: 3, mx: { xs: 5, md: 30 } }}>
         <ProductEditForm
           categories={data?.categories}

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Navigate, useNavigate } from 'react-router-dom';
 import Login from '../../components/admin/Login/Login';
+import HelmetMeta from '../../components/HelmetMeta';
 import { useAdminLoginMutation } from '../../redux/api/authApiSlice';
 import { setAdminToken } from '../../redux/reducers/adminAuthSlice';
 import { setToast } from '../../redux/reducers/toastSlice';
@@ -31,7 +32,15 @@ function AdminLoginPage() {
       }
     }
   };
-  return <Login formError={formError} handleAdminLogin={handleAdminLogin} />;
+  return (
+    <>
+      <HelmetMeta title="Admin Login | Gamestop" />
+      <Login
+        formError={formError}
+        handleAdminLogin={handleAdminLogin}
+      />
+    </>
+  );
 }
 
 export default AdminLoginPage;

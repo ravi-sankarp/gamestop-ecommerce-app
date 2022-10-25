@@ -14,6 +14,7 @@ import { useGetCategoryDataQuery } from '../../redux/api/adminApiSlice';
 import CategoryForm from '../../components/admin/Forms/Category/CategoryForm';
 import CategoryTableList from '../../components/admin/Table/CategoryTableList';
 import useApiErrorHandler from '../../hooks/useApiErrorHandler';
+import HelmetMeta from '../../components/HelmetMeta';
 
 function AdminCategoryPage() {
   const [openPopup, setOpenPopup] = useState(false);
@@ -55,6 +56,8 @@ function AdminCategoryPage() {
 
   return (
     <Box sx={{ overflowX: 'hidden', pt: 4 }}>
+      <HelmetMeta title="Category Management | Gamestop" />
+
       <Typography
         variant="h5"
         sx={{ mb: '1rem', textAlign: 'center', fontWeight: '450' }}

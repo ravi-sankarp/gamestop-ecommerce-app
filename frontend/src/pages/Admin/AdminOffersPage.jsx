@@ -83,7 +83,7 @@ function AdminOffersPage() {
 
   return (
     <>
-      <HelmetMeta title="Admin Offers Page | Gamestop" />
+      <HelmetMeta title="Offers | Gamestop" />
       <Box sx={{ overflowX: 'hidden', pt: 4 }}>
         <Typography
           variant="h5"

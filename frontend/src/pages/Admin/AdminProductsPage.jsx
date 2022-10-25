@@ -5,6 +5,7 @@ import AddBoxIcon from '@mui/icons-material/AddBox';
 import ProductTableList from '../../components/admin/Table/ProductTableList';
 import { useGetProductDataQuery } from '../../redux/api/adminApiSlice';
 import useApiErrorHandler from '../../hooks/useApiErrorHandler';
+import HelmetMeta from '../../components/HelmetMeta';
 
 function AdminProductsPage() {
   const { data, isLoading, isFetching, isSuccess, isError, error } = useGetProductDataQuery();
@@ -46,6 +47,8 @@ function AdminProductsPage() {
 
   return (
     <Box sx={{ overflowX: 'hidden', pt: 4 }}>
+      <HelmetMeta title="Product Management | Gamestop" />
+
       <Typography
         variant="h5"
         sx={{ mb: '1rem', textAlign: 'center', fontWeight: '450' }}

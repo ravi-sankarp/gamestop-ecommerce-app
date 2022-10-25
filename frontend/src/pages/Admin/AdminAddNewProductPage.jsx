@@ -1,6 +1,7 @@
 import { Box, CircularProgress } from '@mui/material';
 import { useEffect } from 'react';
 import ProductForm from '../../components/admin/Forms/Product/ProductForm';
+import HelmetMeta from '../../components/HelmetMeta';
 import useApiErrorHandler from '../../hooks/useApiErrorHandler';
 import { useGetNavlistQuery } from '../../redux/api/viewsApiSlice';
 
@@ -41,6 +42,8 @@ function AdminAddNewProductPage() {
 
   return (
     <Box sx={{ my: 4 }}>
+      <HelmetMeta title="Add New Product | Gamestop" />
+
       <Box sx={{ backgroundColor: '#fff', p: 3, mx: { xs: 5, md: 30 } }}>
         <ProductForm
           categories={data?.categories}

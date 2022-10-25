@@ -5,6 +5,7 @@ import jsPdf from 'jspdf';
 import { useLocation } from 'react-router-dom';
 import autoTable from 'jspdf-autotable';
 import DownloadIcon from '@mui/icons-material/Download';
+import HelmetMeta from '../../components/HelmetMeta';
 import { useGetSalesReportQuery } from '../../redux/api/adminApiSlice';
 import AdminSalesTableList from '../../components/admin/Table/AdminSalesTableList';
 import useApiErrorHandler from '../../hooks/useApiErrorHandler';
@@ -100,6 +101,8 @@ function AdminSalesReportPage() {
 
   return (
     <Box sx={{ overflowX: 'hidden', pt: 4 }}>
+      <HelmetMeta title="Sales Report | Gamestop" />
+
       <Typography
         variant="h5"
         sx={{ mb: '1rem', textAlign: 'center', fontWeight: '450' }}
