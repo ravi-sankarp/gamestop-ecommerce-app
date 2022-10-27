@@ -206,8 +206,7 @@ export const extendedUserApiSlice = apiSlice.injectEndpoints({
 
     getUserOrders: builder.query({
       query: ({ page }) => `/user/getallorders?page=${page}`,
-      providesTags: ['orders'],
-      invalidatesTags: ['orders', 'cart', 'productdata']
+      providesTags: ['orders']
     }),
 
     cancelOrder: builder.mutation({
