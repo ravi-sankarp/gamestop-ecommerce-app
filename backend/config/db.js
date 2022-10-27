@@ -1,8 +1,7 @@
 import { MongoClient, ServerApiVersion } from 'mongodb';
 import { config } from 'dotenv';
 
-config({ path: '../config.env' });
-
+config({ path: './config.env' });
 const mongoUrl = process.env.DATABASE_CONNECTION;
 const databaseName = process.env.DATABASE_NAME;
 let _db;
