@@ -12,8 +12,9 @@ import app from '../app.js';
  * Get port from environment and store in Express.
  */
 
+console.log(process.env.port);
 // eslint-disable-next-line no-use-before-define
-const port = normalizePort(process.env.PORT || '8000');
+const port = normalizePort(process.env.port || '8000');
 app.set('port', port);
 
 /**
