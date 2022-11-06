@@ -365,7 +365,8 @@ export const updateProductRating = asyncHandler(async (id, rating) => {
 export const findFeaturedProducts = asyncHandler(async () => {
   const products = await getDb()
     .collection('products')
-    .find({ $expr: { $lt: ['$discountedPrice', '$price'] } }).limit(4)
+    .find({ $expr: { $lt: ['$discountedPrice', '$price'] } })
+    .limit(4)
     .toArray();
   return products;
 });

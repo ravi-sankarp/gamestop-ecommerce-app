@@ -155,7 +155,6 @@ function UserAddressEditForm({ open, toggleForm, addressData }) {
                 sx={{ mb: 2 }}
                 label="Name"
                 fullWidth
-                inputRef={(input) => input && input.focus()}
                 required
                 type="text"
                 error={!!errors.name}

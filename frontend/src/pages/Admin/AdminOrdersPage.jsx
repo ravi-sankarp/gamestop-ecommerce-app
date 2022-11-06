@@ -324,7 +324,7 @@ function AdminOrdersPage() {
           </Box>
         )}
         {content}
-        {isSuccess && !data?.data?.length && <NoResultsFound margin={0} />}
+        {isSuccess && !resData?.length && <NoResultsFound margin={0} />}
       </Box>
       <Dialog
         open={drawerOpen}
