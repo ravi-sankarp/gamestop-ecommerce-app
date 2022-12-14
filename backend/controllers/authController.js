@@ -18,10 +18,10 @@ import {
   updateUserById,
   updateUserReferralDetails,
   updateVerifiedOtp
-} from '../helpers/userHelpers.js';
-import { createNewWallet, updateWalletBalance } from '../helpers/walletHelpers.js';
+} from '../services/userService.js';
+import { createNewWallet, updateWalletBalance } from '../services/walletService.js';
 import asyncRandomBytes from '../utils/asyncRandomBytes.js';
-import { createNewPayment } from '../helpers/paymentHelpers.js';
+import { createNewPayment } from '../services/paymentService.js';
 import client from '../config/googleAuth.js';
 
 

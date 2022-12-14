@@ -5,16 +5,16 @@ import bcrypt from 'bcryptjs';
 import AppError from '../utils/appError.js';
 import sendResponse from '../utils/sendResponse.js';
 import badWordsFilter from '../config/badWordsFilter.js';
-import * as cartHelpers from '../helpers/cartHelpers.js';
-import * as wishlistHelpers from '../helpers/wishlistHelpers.js';
-import * as paymentHelpers from '../helpers/paymentHelpers.js';
-import * as walletHelpers from '../helpers/walletHelpers.js';
-import * as reviewHelpers from '../helpers/reviewHelpers.js';
+import * as cartHelpers from '../services/cartService.js';
+import * as wishlistHelpers from '../services/wishlistService.js';
+import * as paymentHelpers from '../services/paymentService.js';
+import * as walletHelpers from '../services/walletService.js';
+import * as reviewHelpers from '../services/reviewService.js';
 import {
   findProductById,
   updateProductRating,
   updateProductStock
-} from '../helpers/productHelpers.js';
+} from '../services/productService.js';
 import {
   checkEmailAlreadyExists,
   checkPhoneNumberAlreadyExists,
@@ -23,7 +23,7 @@ import {
   insertNewAddress,
   updateAddress,
   updateUserById
-} from '../helpers/userHelpers.js';
+} from '../services/userService.js';
 import {
   cancelIndividualOrder,
   cancelOrderById,
@@ -33,15 +33,15 @@ import {
   findTotalOrdersByUserId,
   returnIndividualOrder,
   returnOrderById
-} from '../helpers/orderHelpers.js';
-import createOrder from '../helpers/createNewOrder.js';
+} from '../services/orderService.js';
+import createOrder from '../services/createNewOrderService.js';
 import generatePdf from '../utils/generatePdf.js';
 import { hashPassword } from './authController.js';
 import { generateRefreshToken, generateToken } from '../utils/jwtHelper.js';
 import { paypal, razorpayInstance } from '../config/payment.js';
-import { findByCouponCode } from '../helpers/couponHelpers.js';
+import { findByCouponCode } from '../services/couponService.js';
 import asyncRandomBytes from '../utils/asyncRandomBytes.js';
-import reviewEligibilityCheck from '../helpers/checkUserCanReview.js';
+import reviewEligibilityCheck from '../services/checkUserCanReviewService.js';
 
 //@desc   Add items to cart or increase/decrease product quantity
 //@route  GET /api/user/updatecart

@@ -1,11 +1,11 @@
 import asyncHandler from 'express-async-handler';
 import sendResponse from '../utils/sendResponse.js';
-import * as categoryHelpers from '../helpers/categoryHelpers.js';
-import * as brandHelpers from '../helpers/brandHelpers.js';
-import * as productHelpers from '../helpers/productHelpers.js';
-import { findAllBanners } from '../helpers/bannerHelpers.js';
+import * as categoryHelpers from '../services/categoryService.js';
+import * as brandHelpers from '../services/brandService.js';
+import * as productHelpers from '../services/productService.js';
+import { findAllBanners } from '../services/bannerService.js';
 import AppError from '../utils/appError.js';
-import { findReviewsByProductId } from '../helpers/reviewHelpers.js';
+import { findReviewsByProductId } from '../services/reviewService.js';
 
 //@desc   get all products
 //@route  GET /api/getproducts

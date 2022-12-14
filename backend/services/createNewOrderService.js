@@ -1,10 +1,10 @@
 import asyncHandler from 'express-async-handler';
 import AppError from '../utils/appError.js';
-import { findCartByUserId } from './cartHelpers.js';
-import { addUserToCouponAppliedList, findByCouponCode } from './couponHelpers.js';
-import { createNewOrder } from './orderHelpers.js';
-import { updateProductStock } from './productHelpers.js';
-import { findWalletByUserId } from './walletHelpers.js';
+import { findCartByUserId } from './cartService.js';
+import { addUserToCouponAppliedList, findByCouponCode } from './couponService.js';
+import { createNewOrder } from './orderService.js';
+import { updateProductStock } from './productService.js';
+import { findWalletByUserId } from './walletService.js';
 
 const createAnOrder = asyncHandler(
   async (user, addressId, couponCode, orderStatus, paymentMethod) => {

@@ -1,7 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import AppError from '../utils/appError.js';
-import { findOrdersByUserId } from './orderHelpers.js';
-import { findReviewByUserId } from './reviewHelpers.js';
+import { findOrdersByUserId } from './orderService.js';
+import { findReviewByUserId } from './reviewService.js';
 
 const reviewEligibilityCheck = asyncHandler(async (_id, productId) => {
   // getting the data of the user

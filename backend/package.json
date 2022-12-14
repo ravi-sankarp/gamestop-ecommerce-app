@@ -7,8 +7,8 @@
   },
   "private": true,
   "scripts": {
-    "start": "node ./bin/www.js",
-    "dev": "nodemon ./bin/www.js",
+    "start": "node ./app.js",
+    "dev": "nodemon ./app.js",
     "seeder": "node ./seeder/seeder.js"
   },
   "dependencies": {

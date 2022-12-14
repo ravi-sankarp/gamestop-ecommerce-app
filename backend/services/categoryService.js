@@ -1,7 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import { ObjectId } from 'mongodb';
 import { getDb } from '../config/db.js';
-import { deleteProductsByCategoryId } from './productHelpers.js';
+import { deleteProductsByCategoryId } from './productService.js';
 
 //get all category data with product count
 export const findAllCategories = asyncHandler(async () => {

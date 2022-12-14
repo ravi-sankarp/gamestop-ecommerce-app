@@ -74,10 +74,10 @@ initDb((err, _db) => {
   }
 });
 
-app.use('/api', indexRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
 app.use('/api/admin', adminRouter);
+app.use('/api', indexRouter);
 
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
@@ -86,4 +86,7 @@ app.all('*', (req, res, next) => {
 // error handler
 app.use(errorHandler);
 
-export default app;
+app.listen(process.env.port || 8000, () => {
+  console.log('Server running on port 8000');
+});
+

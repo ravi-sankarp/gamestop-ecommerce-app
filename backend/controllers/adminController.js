@@ -2,19 +2,19 @@ import asyncHandler from 'express-async-handler';
 import validator from 'validator';
 import AppError from '../utils/appError.js';
 import sendResponse from '../utils/sendResponse.js';
-import * as userHelpers from '../helpers/userHelpers.js';
-import * as productHelpers from '../helpers/productHelpers.js';
-import * as categoryHelpers from '../helpers/categoryHelpers.js';
-import * as brandHelpers from '../helpers/brandHelpers.js';
-import * as bannerHelpers from '../helpers/bannerHelpers.js';
-import * as adminHelpers from '../helpers/adminHelpers.js';
-import * as orderHelpers from '../helpers/orderHelpers.js';
-import * as offerHelpers from '../helpers/offerHelpers.js';
-import * as couponHelpers from '../helpers/couponHelpers.js';
+import * as userHelpers from '../services/userService.js';
+import * as productHelpers from '../services/productService.js';
+import * as categoryHelpers from '../services/categoryService.js';
+import * as brandHelpers from '../services/brandService.js';
+import * as bannerHelpers from '../services/bannerService.js';
+import * as adminHelpers from '../services/adminService.js';
+import * as orderHelpers from '../services/orderService.js';
+import * as offerHelpers from '../services/offerService.js';
+import * as couponHelpers from '../services/couponService.js';
 import cloudinarySingleUpload from '../utils/uploadToCloudinary.js';
 import asyncRandomBytes from '../utils/asyncRandomBytes.js';
-import { createNewPayment, findAllPayments } from '../helpers/paymentHelpers.js';
-import { updateWalletBalance } from '../helpers/walletHelpers.js';
+import { createNewPayment, findAllPayments } from '../services/paymentService.js';
+import { updateWalletBalance } from '../services/walletService.js';
 
 //@desc   get all user data
 //@route  GET /api/admin/getusers
